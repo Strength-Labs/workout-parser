@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.log
+.env
+.tokencache
+# Exclude JSON output files but keep exerciselist.json
+*.json
+!exerciselist.json
