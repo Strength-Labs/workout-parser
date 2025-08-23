@@ -33,7 +33,10 @@ def get_similar_exercises(exercise_name: str, exercise_names: List[str], limit: 
     return [match[0] for match in matches if match[1] >= 80]
 
 def prompt_for_exercise(exercise_name: str, exercise_names: List[str], line_num: int) -> Optional[str]:
-    """Prompt user to select or input a valid exercise name or skip."""
+    """
+    Prompt user to select or input a valid exercise name or skip.
+    Now includes fuzzy matching for user-entered names.
+    """
     print(f"Line {line_num}: Exercise '{exercise_name}' not found in exerciselist.json.")
     similar_exercises = get_similar_exercises(exercise_name.lower(), exercise_names)
     
@@ -52,10 +55,22 @@ def prompt_for_exercise(exercise_name: str, exercise_names: List[str], line_num:
                     return similar_exercises[choice - 1]
                 elif choice == len(similar_exercises) + 1:
                     new_name = input("Enter the correct exercise name: ").strip().lower()
+                    
                     if new_name in exercise_names:
                         return new_name
+
+                    # Fuzzy match the user's new input to prevent typos
+                    best_match = process.extractOne(new_name, exercise_names)
+                    if best_match and best_match[1] >= 90: # Use a high score threshold for confidence
+                        print(f"Did you mean '{best_match[0]}'?")
+                        confirmation = input("Type 'y' to confirm, or 'n' to try again: ").strip().lower()
+                        if confirmation.startswith('y'):
+                            return best_match[0]
+                        else:
+                            print("Okay, let's try again.")
+                            continue # Loop back to the name input
                     else:
-                        print(f"'{new_name}' is not in exerciselist.json. Try again.")
+                        print(f"'{new_name}' is not in exerciselist.json and no similar match was found. Try again.")
                 elif choice == len(similar_exercises) + 2:
                     return None
                 else:
@@ -64,8 +79,25 @@ def prompt_for_exercise(exercise_name: str, exercise_names: List[str], line_num:
                 print("Please enter a valid number.")
     else:
         print("No similar exercises found.")
-        new_name = input("Enter the correct exercise name or press Enter to skip: ").strip().lower()
-        return new_name if new_name in exercise_names else None
+        while True:
+            new_name = input("Enter the correct exercise name or press Enter to skip: ").strip().lower()
+            if not new_name:
+                return None
+            
+            if new_name in exercise_names:
+                return new_name
+
+            best_match = process.extractOne(new_name, exercise_names)
+            if best_match and best_match[1] >= 90:
+                print(f"Did you mean '{best_match[0]}'?")
+                confirmation = input("Type 'y' to confirm, or 'n' to try again: ").strip().lower()
+                if confirmation.startswith('y'):
+                    return best_match[0]
+                else:
+                    print("Okay, let's try again.")
+                    continue
+            else:
+                print(f"'{new_name}' is not in exerciselist.json and no similar match was found. Try again.")
 
 def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exercise_names: List[str], user_id: int) -> List[Dict]:
     """Parses a plain text workout file and returns a list of workout dictionaries for the API."""
@@ -76,24 +108,39 @@ def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exerc
     current_workout = None
     current_exercise = None
     exercise_priority = 0
+    line_num = 0
 
     with open(plain_text_path, 'r') as f:
         lines = f.readlines()
-        line_num = 0
+        
+    set_patterns = [
+        re.compile(r'(\d+)x(\d+)\s*@\s*(\d+\.?\d*)'),      # e.g., 3x5 @ 305
+        re.compile(r'(\d+)x(\d+)\s*@\s*RPE\s*(\d+)'),        # e.g., 3x5 @ RPE 9
+        re.compile(r'(\d+)xAMRAP\s*@\s*(\d+\.?\d*)'),        # e.g., 1xAMRAP @ 135
+        re.compile(r'(\d+\.?\d*)\s*(miles|kilometers|meters|yards|feet|calories)\s*@\s*(\d+):(\d+):(\d+)'),  # e.g., 2.5 miles @ 00:20:00
+        re.compile(r'(\d+)x(\d+)\s*@\s*(.*)') # Added regex for text-based sets
+    ]
 
-        while line_num < len(lines):
-            line = lines[line_num]
-            line_num += 1
-            
-            stripped_line = line.strip()
+    while line_num < len(lines):
+        line = lines[line_num]
+        line_num += 1
+        stripped_line = line.strip()
 
-            if not stripped_line:
-                continue
+        if not stripped_line:
+            continue
 
-            # Check for horizontal rules (---), which should be ignored
-            if stripped_line == '---':
-                continue
+        # Check for horizontal rules (---), which should be ignored
+        if stripped_line == '---':
+            continue
 
+        is_indented = line.startswith((' ', '\t'))
+        
+        # We also ignore private coach comments.
+        if stripped_line.startswith('>'):
+            continue
+
+        # Handle non-indented lines first, which must be workout dates, exercise names, or sets/reps.
+        if not is_indented:
             # Check for a new workout date to start a new workout
             if stripped_line.lower().startswith("workout date:"):
                 if current_workout:
@@ -111,120 +158,191 @@ def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exerc
                 exercise_priority = 0
                 continue
             
-            # If a workout hasn't been started, we have a malformed file
             if current_workout is None:
                 raise ValueError(f"Line {line_num}: Malformed input. Expected 'Workout Date:' at the start of the file.")
             
-            # Use lstrip to check for private coach comments and other indented lines
-            stripped_line_with_indent = line.lstrip(' \t')
+            # Check if the line is a set. This is a critical new step.
+            is_set_line = False
+            for pattern in set_patterns:
+                if pattern.match(stripped_line):
+                    is_set_line = True
+                    break
             
-            # Ignore private coach comments starting with '>'
-            if stripped_line_with_indent.startswith('>'):
+            # If the line is a set, it belongs to the previous exercise.
+            if is_set_line:
+                if current_exercise is None:
+                    raise ValueError(f"Line {line_num}: Set line found without a preceding exercise name.")
+                
+                # Parse the set line. We are assuming it's one of the patterns we've defined.
+                match_set_rep_weight = re.match(r'(\d+)x(\d+)\s*@\s*(\d+\.?\d*)', stripped_line)
+                match_set_rep_rpe = re.match(r'(\d+)x(\d+)\s*@\s*RPE\s*(\d+)', stripped_line)
+                match_set_rep_amrap = re.match(r'(\d+)xAMRAP\s*@\s*(\d+\.?\d*)', stripped_line)
+                match_set_rep_distance = re.match(r'(\d+\.?\d*)\s*(miles|kilometers|meters|yards|feet|calories)\s*@\s*(\d+):(\d+):(\d+)', stripped_line)
+                match_set_rep_text = re.match(r'(\d+)x(\d+)\s*@\s*(.*)', stripped_line)
+                
+                if match_set_rep_weight:
+                    sets, reps, weight = match_set_rep_weight.groups()
+                    current_exercise["assigned_sets"].append({
+                        "priority": len(current_exercise["assigned_sets"]),
+                        "sets": int(sets),
+                        "reps": int(reps),
+                        "weight": float(weight),
+                        "weight_type": "default_weight_type",
+                        "rep_type": "default_rep_type",
+                        "set_type": "default"
+                    })
+                elif match_set_rep_rpe:
+                    sets, reps, rpe = match_set_rep_rpe.groups()
+                    current_exercise["assigned_sets"].append({
+                        "priority": len(current_exercise["assigned_sets"]),
+                        "sets": int(sets),
+                        "reps": int(reps),
+                        "weight_type": "RPE",
+                        "weight_type_value": int(rpe),
+                        "rep_type": "default_rep_type",
+                        "set_type": "default"
+                    })
+                elif match_set_rep_amrap:
+                    sets, weight = match_set_rep_amrap.groups()
+                    current_exercise["assigned_sets"].append({
+                        "priority": len(current_exercise["assigned_sets"]),
+                        "sets": int(sets),
+                        "reps": 0,
+                        "weight": float(weight),
+                        "weight_type": "default_weight_type",
+                        "rep_type": "AMRAP",
+                        "set_type": "default"
+                    })
+                elif match_set_rep_distance:
+                    distance, distance_unit, hh, mm, ss = match_set_rep_distance.groups()
+                    time_seconds = int(hh) * 3600 + int(mm) * 60 + int(ss)
+                    current_exercise["assigned_sets"].append({
+                        "priority": len(current_exercise["assigned_sets"]),
+                        "distance": float(distance),
+                        "distance_unit": distance_unit,
+                        "time": time_seconds,
+                        "set_type": "default"
+                    })
+                elif match_set_rep_text:
+                    sets, reps, body = match_set_rep_text.groups()
+                    current_exercise["assigned_sets"].append({
+                        "priority": len(current_exercise["assigned_sets"]),
+                        "sets": int(sets),
+                        "reps": int(reps),
+                        "set_type": "custom",
+                        "body": body.strip()
+                    })
                 continue
-
-            # Check for a new exercise name (un-indented line)
-            if not line.startswith((' ', '\t')):
-                # This must be a new exercise or an error.
-                exercise_name_lower = stripped_line.lower()
-                if exercise_name_lower in exercise_mapping:
+            
+            # If the line is not a workout date and not a set, it must be an exercise name.
+            exercise_name_lower = stripped_line.lower()
+            if exercise_name_lower not in exercise_mapping:
+                resolved_name = prompt_for_exercise(stripped_line, exercise_names, line_num)
+                if resolved_name is not None:
+                    exercise_name_lower = resolved_name
+                else:
                     if current_exercise:
                         current_workout["assigned_exercises"].append(current_exercise)
                     current_exercise = {
-                        "exercise_id": exercise_mapping[exercise_name_lower],
+                        "exercise_id": None,
                         "priority": exercise_priority,
-                        "assigned_sets": []
+                        "assigned_sets": [
+                            {
+                                "priority": 0,
+                                "set_type": "custom",
+                                "body": stripped_line
+                            }
+                        ]
                     }
                     exercise_priority += 1
                     continue
-                else:
-                    # If it's not a recognized exercise and it's not indented, treat it as a note or an accomplished set line
-                    # and check if we have a current exercise to attach it to.
-                    if current_exercise is None:
-                        raise ValueError(f"Line {line_num}: Unrecognized non-indented line '{stripped_line}'. Expected a workout date or exercise name.")
-                    
-            # Parse sets and notes. The key change here is that it now accepts both indented and non-indented lines after an exercise.
-            # This is handled by processing the stripped line.
             
-            # Check for an active exercise to attach the set/note to
-            if current_exercise is None:
-                 raise ValueError(f"Line {line_num}: Indented content or a set/note found without a preceding exercise name.")
-
-            # Regex patterns for sets and notes
-            match_set_rep_weight = re.match(r'(\d+)x(\d+)\s*@\s*(\d+\.?\d*)', stripped_line)
-            match_set_rep_rpe = re.match(r'(\d+)x(\d+)\s*@\s*RPE\s*(\d+)', stripped_line)
-            match_set_rep_amrap = re.match(r'(\d+)xAMRAP\s*@\s*(\d+\.?\d*)', stripped_line)
-            match_set_rep_distance = re.match(r'(\d+\.?\d*)\s*(miles|kilometers|meters|yards|feet|calories)\s*@\s*(\d+):(\d+):(\d+)', stripped_line)
-            match_set_rep_text = re.match(r'(\d+)x(\d+)\s*@\s*(.*)', stripped_line)
-            match_accomplished_set = re.match(r'\((.+)\)', stripped_line) # Regex for accomplished sets in parentheses
+            if current_exercise:
+                current_workout["assigned_exercises"].append(current_exercise)
             
-            # Pattern for comments from coach/client, which should be ignored for JSON output.
-            match_comment = re.match(r'\[.*?\]:.*', stripped_line)
+            current_exercise = {
+                "exercise_id": exercise_mapping.get(exercise_name_lower),
+                "priority": exercise_priority,
+                "assigned_sets": []
+            }
+            exercise_priority += 1
+            continue
 
-            if match_set_rep_weight:
-                sets, reps, weight = match_set_rep_weight.groups()
-                current_exercise["assigned_sets"].append({
-                    "priority": len(current_exercise["assigned_sets"]),
-                    "sets": int(sets),
-                    "reps": int(reps),
-                    "weight": float(weight),
-                    "weight_type": "default_weight_type",
-                    "rep_type": "default_rep_type",
-                    "set_type": "default"
-                })
-            elif match_set_rep_rpe:
-                sets, reps, rpe = match_set_rep_rpe.groups()
-                current_exercise["assigned_sets"].append({
-                    "priority": len(current_exercise["assigned_sets"]),
-                    "sets": int(sets),
-                    "reps": int(reps),
-                    "weight_type": "RPE",
-                    "weight_type_value": int(rpe),
-                    "rep_type": "default_rep_type",
-                    "set_type": "default"
-                })
-            elif match_set_rep_amrap:
-                sets, weight = match_set_rep_amrap.groups()
-                current_exercise["assigned_sets"].append({
-                    "priority": len(current_exercise["assigned_sets"]),
-                    "sets": int(sets),
-                    "reps": 0,
-                    "weight": float(weight),
-                    "weight_type": "default_weight_type",
-                    "rep_type": "AMRAP",
-                    "set_type": "default"
-                })
-            elif match_set_rep_distance:
-                distance, distance_unit, hh, mm, ss = match_set_rep_distance.groups()
-                time_seconds = int(hh) * 3600 + int(mm) * 60 + int(ss)
-                current_exercise["assigned_sets"].append({
-                    "priority": len(current_exercise["assigned_sets"]),
-                    "distance": float(distance),
-                    "distance_unit": distance_unit,
-                    "time": time_seconds,
-                    "set_type": "default"
-                })
-            elif match_set_rep_text:
-                sets, reps, body = match_set_rep_text.groups()
-                current_exercise["assigned_sets"].append({
-                    "priority": len(current_exercise["assigned_sets"]),
-                    "sets": int(sets),
-                    "reps": int(reps),
-                    "set_type": "custom",
-                    "body": body.strip()
-                })
-            elif match_accomplished_set:
-                # Accomplished sets in parentheses are meant to be ignored for new workouts
-                continue
-            elif match_comment:
-                # Ignore comments from coach/client
-                continue
-            else:
-                # If no other pattern matches, assume it's a custom note and create a 'custom' set
-                current_exercise["assigned_sets"].append({
-                    "priority": len(current_exercise["assigned_sets"]),
-                    "set_type": "custom",
-                    "body": stripped_line
-                })
+        # Handle indented lines, which must be sets or notes
+        if current_exercise is None:
+             raise ValueError(f"Line {line_num}: Indented content found without a preceding exercise name.")
+        
+        # The rest of the parsing logic for sets and notes remains the same
+        match_set_rep_weight = re.match(r'(\d+)x(\d+)\s*@\s*(\d+\.?\d*)', stripped_line)
+        match_set_rep_rpe = re.match(r'(\d+)x(\d+)\s*@\s*RPE\s*(\d+)', stripped_line)
+        match_set_rep_amrap = re.match(r'(\d+)xAMRAP\s*@\s*(\d+\.?\d*)', stripped_line)
+        match_set_rep_distance = re.match(r'(\d+\.?\d*)\s*(miles|kilometers|meters|yards|feet|calories)\s*@\s*(\d+):(\d+):(\d+)', stripped_line)
+        match_set_rep_text = re.match(r'(\d+)x(\d+)\s*@\s*(.*)', stripped_line)
+        match_accomplished_set = re.match(r'\((.+)\)', stripped_line)
+        match_comment = re.match(r'\[.*?\]:.*', stripped_line)
+        
+        if match_set_rep_weight:
+            sets, reps, weight = match_set_rep_weight.groups()
+            current_exercise["assigned_sets"].append({
+                "priority": len(current_exercise["assigned_sets"]),
+                "sets": int(sets),
+                "reps": int(reps),
+                "weight": float(weight),
+                "weight_type": "default_weight_type",
+                "rep_type": "default_rep_type",
+                "set_type": "default"
+            })
+        elif match_set_rep_rpe:
+            sets, reps, rpe = match_set_rep_rpe.groups()
+            current_exercise["assigned_sets"].append({
+                "priority": len(current_exercise["assigned_sets"]),
+                "sets": int(sets),
+                "reps": int(reps),
+                "weight_type": "RPE",
+                "weight_type_value": int(rpe),
+                "rep_type": "default_rep_type",
+                "set_type": "default"
+            })
+        elif match_set_rep_amrap:
+            sets, weight = match_set_rep_amrap.groups()
+            current_exercise["assigned_sets"].append({
+                "priority": len(current_exercise["assigned_sets"]),
+                "sets": int(sets),
+                "reps": 0,
+                "weight": float(weight),
+                "weight_type": "default_weight_type",
+                "rep_type": "AMRAP",
+                "set_type": "default"
+            })
+        elif match_set_rep_distance:
+            distance, distance_unit, hh, mm, ss = match_set_rep_distance.groups()
+            time_seconds = int(hh) * 3600 + int(mm) * 60 + int(ss)
+            current_exercise["assigned_sets"].append({
+                "priority": len(current_exercise["assigned_sets"]),
+                "distance": float(distance),
+                "distance_unit": distance_unit,
+                "time": time_seconds,
+                "set_type": "default"
+            })
+        elif match_set_rep_text:
+            sets, reps, body = match_set_rep_text.groups()
+            current_exercise["assigned_sets"].append({
+                "priority": len(current_exercise["assigned_sets"]),
+                "sets": int(sets),
+                "reps": int(reps),
+                "set_type": "custom",
+                "body": body.strip()
+            })
+        elif match_accomplished_set:
+            continue
+        elif match_comment:
+            continue
+        else:
+            current_exercise["assigned_sets"].append({
+                "priority": len(current_exercise["assigned_sets"]),
+                "set_type": "custom",
+                "body": stripped_line
+            })
 
     # Finalize the last workout
     if current_workout:
@@ -276,3 +394,4 @@ if __name__ == "__main__":
         print("Error: The 'fuzzywuzzy' library is required. Install it using 'pip install fuzzywuzzy python-Levenshtein'")
         sys.exit(1)
     main()
+
