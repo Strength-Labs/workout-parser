@@ -41,6 +41,7 @@ For specific requirements or API details, refer to the [API Documentation](https
    ```bash
    git clone https://github.com/strength-labs/workout-parser.git
    cd workout-parser
+   ```
 2. Install Dependencies
 ```
 pip install -r requirements.txt
@@ -50,6 +51,8 @@ pip install -r requirements.txt
 This installs `fuzzywuzzy`, `python-Levenshtein`, and `requests`.
 
 3. **Prepare `exerciselist.json`**: put exerciselist.json in the same directory as the script. 
+
+Fetch the exercise list from the API using fetch_exercises.py (see "Usage: Fetching the Exercise List") or manually create it (see "Updating exerciselist.json").
 
 ## Usage
 
