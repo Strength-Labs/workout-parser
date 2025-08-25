@@ -117,8 +117,11 @@ def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exerc
         re.compile(r'(\d+)x(\d+)\s*@\s*RPE\s*(\d+)'),        # e.g., 3x5 @ RPE 9
         re.compile(r'(\d+)xAMRAP\s*@\s*(\d+\.?\d*)'),        # e.g., 1xAMRAP @ 135
         re.compile(r'(\d+\.?\d*)\s*(miles|kilometers|meters|yards|feet|calories)\s*@\s*(\d+):(\d+):(\d+)'),  # e.g., 2.5 miles @ 00:20:00
-        re.compile(r'(\d+)x(\d+)\s*@\s*(.*)') # Regex for text-based sets
+        re.compile(r'(\d+)x(\d+)\s*@\s*(.*)'), # Regex for text-based sets
+        re.compile(r'(\d+)x\s*(.*)') # Added regex for sets like '3x max time'
     ]
+    # This pattern is for standard sets with a custom note like '2x8 @ light'
+    set_text_pattern = re.compile(r'(\d+)x(\d+)\s*@\s*(.*)')
     
     # Regex for a comment from a coach or client, which we will ignore.
     comment_pattern = re.compile(r'^\s*\[.*?\]:.*')
@@ -159,7 +162,8 @@ def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exerc
                     match_set_rep_rpe = re.match(r'(\d+)x(\d+)\s*@\s*RPE\s*(\d+)', stripped_line)
                     match_set_rep_amrap = re.match(r'(\d+)xAMRAP\s*@\s*(\d+\.?\d*)', stripped_line)
                     match_set_rep_distance = re.match(r'(\d+\.?\d*)\s*(miles|kilometers|meters|yards|feet|calories)\s*@\s*(\d+):(\d+):(\d+)', stripped_line)
-                    match_set_rep_text = re.match(r'(\d+)x(\d+)\s*@\s*(.*)', stripped_line)
+                    match_amrap_text = re.match(r'(\d+)xAMRAP\s*@\s*(.*)', stripped_line)
+                    match_set_text_reps = re.match(r'(\d+)x\s*(.*)', stripped_line)
                     
                     if match_set_rep_weight:
                         sets, reps, weight = match_set_rep_weight.groups()
@@ -204,14 +208,24 @@ def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exerc
                             "time": time_seconds,
                             "set_type": "default"
                         })
-                    elif match_set_rep_text:
-                        sets, reps, body = match_set_rep_text.groups()
+                    elif match_amrap_text:
+                        sets, body = match_amrap_text.groups()
                         current_exercise["assigned_sets"].append({
                             "priority": len(current_exercise["assigned_sets"]),
                             "sets": int(sets),
-                            "reps": int(reps),
+                            "reps": 0,
                             "set_type": "custom",
-                            "body": body.strip()
+                            "body": body.strip(),
+                            "rep_type": "AMRAP",
+                        })
+                    elif match_set_text_reps:
+                        sets, body = match_set_text_reps.groups()
+                        current_exercise["assigned_sets"].append({
+                            "priority": len(current_exercise["assigned_sets"]),
+                            "sets": int(sets),
+                            "reps": None, # Reps are not explicitly stated, so they're None
+                            "set_type": "custom",
+                            "body": body.strip(),
                         })
                 else: # The line is just a custom note
                      current_exercise["assigned_sets"].append({
@@ -219,7 +233,7 @@ def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exerc
                         "set_type": "custom",
                         "body": stripped_line
                     })
-            continue # Continue to the next line after handling the indented line.
+            continue
         
 
         # Non-indented lines that are separators should also be ignored
@@ -263,6 +277,8 @@ def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exerc
             match_set_rep_rpe = re.match(r'(\d+)x(\d+)\s*@\s*RPE\s*(\d+)', stripped_line)
             match_set_rep_amrap = re.match(r'(\d+)xAMRAP\s*@\s*(\d+\.?\d*)', stripped_line)
             match_set_rep_distance = re.match(r'(\d+\.?\d*)\s*(miles|kilometers|meters|yards|feet|calories)\s*@\s*(\d+):(\d+):(\d+)', stripped_line)
+            match_amrap_text = re.match(r'(\d+)xAMRAP\s*@\s*(.*)', stripped_line)
+            match_set_text_reps = re.match(r'(\d+)x\s*(.*)', stripped_line)
             match_set_rep_text = re.match(r'(\d+)x(\d+)\s*@\s*(.*)', stripped_line)
             
             if match_set_rep_weight:
@@ -307,6 +323,25 @@ def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exerc
                     "distance_unit": distance_unit,
                     "time": time_seconds,
                     "set_type": "default"
+                })
+            elif match_amrap_text:
+                sets, body = match_amrap_text.groups()
+                current_exercise["assigned_sets"].append({
+                    "priority": len(current_exercise["assigned_sets"]),
+                    "sets": int(sets),
+                    "reps": 0,
+                    "set_type": "custom",
+                    "body": body.strip(),
+                    "rep_type": "AMRAP",
+                })
+            elif match_set_text_reps:
+                 sets, body = match_set_text_reps.groups()
+                 current_exercise["assigned_sets"].append({
+                    "priority": len(current_exercise["assigned_sets"]),
+                    "sets": int(sets),
+                    "reps": None,
+                    "set_type": "custom",
+                    "body": body.strip()
                 })
             elif match_set_rep_text:
                 sets, reps, body = match_set_rep_text.groups()

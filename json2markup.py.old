@@ -41,10 +41,7 @@ def parse_and_format_workouts(input_json_path, coach_id):
         output_lines.append(f"Workout Date: {workout['workout_date']}\n")
 
         # Get coach's and client's full names from the workout object
-        # This is the fix for the TypeError. We check if 'created_by' is not None.
-        coach_name = None
-        if workout['created_by']:
-            coach_name = workout['created_by']['full_name']
+        coach_name = workout['created_by']['full_name']
         client_name = workout['user']['full_name']
 
         # Process top-level workout comments
@@ -53,16 +50,18 @@ def parse_and_format_workouts(input_json_path, coach_id):
                 user_id = comment['user']['id']
                 body = clean_text(comment['body'])
                 
-                # Check for the coach's ID
                 if user_id == coach_id:
-                    if coach_name:
-                        output_lines.append(f"\t[{coach_name}]: {body}")
-                    else:
-                        # Fallback if coach_name is None
-                        output_lines.append(f"\t[Coach]: {body}")
+                    output_lines.append(f"\t[{coach_name}]: {body}")
                 else:
                     output_lines.append(f"\t[{client_name}]: {body}")
         
+        # This is a placeholder for a future feature. If the API provides private coach notes,
+        # you would add logic here to format them with a '>>' tag.
+        # For now, this section is a conceptual placeholder.
+        # if 'private_coach_notes' in workout and workout['private_coach_notes']:
+        #     for note in workout['private_coach_notes']:
+        #         output_lines.append(f">>\t{clean_text(note['body'])}")
+
         # Process exercises
         for exercise in workout['assigned_exercises']:
             exercise_name = exercise['exercise']['name']
@@ -73,45 +72,29 @@ def parse_and_format_workouts(input_json_path, coach_id):
                 set_line = ""
                 # Check if the set is a standard rep/weight/rpe set
                 if assigned_set['set_type'] == 'default':
-                    if 'sets' in assigned_set and 'reps' in assigned_set:
-                        if assigned_set['rep_type'] == 'AMRAP':
-                            set_line = f"\t{assigned_set['sets']}xAMRAP @ "
-                        else:
-                            set_line = f"\t{assigned_set['sets']}x{assigned_set['reps']} @ "
+                    if assigned_set['rep_type'] == 'AMRAP':
+                        set_line = f"\t{assigned_set['sets']}xAMRAP @ "
+                    else:
+                        set_line = f"\t{assigned_set['sets']}x{assigned_set['reps']} @ "
                     
                     if assigned_set['weight_type'] == 'RPE':
                         set_line += f"RPE {assigned_set['weight_type_value']}"
-                    elif 'weight' in assigned_set and assigned_set['weight'] is not None:
-                        if assigned_set['weight_type'] == 'percent':
-                            set_line += f"{assigned_set['weight_type_value']}%"
-                        else:
-                            set_line += f"{assigned_set['weight']} {workout['weight_type']}"
-                    
-                    # Handle cases where the set line might still be empty
-                    if set_line:
-                        output_lines.append(set_line)
+                    elif assigned_set['weight_type'] == 'percent':
+                        set_line += f"{assigned_set['weight_type_value']}%"
+                    else:
+                        set_line += f"{assigned_set['weight']} {workout['weight_type']}"
+                    output_lines.append(set_line)
                 
                 # Check if the set is a custom note
                 elif assigned_set['set_type'] == 'custom':
-                    if 'body' in assigned_set and assigned_set['body']:
-                        body = clean_text(assigned_set['body'])
-                        output_lines.append(f"\t{body}")
+                    body = clean_text(assigned_set['body'])
+                    output_lines.append(f"\t{body}")
 
                 # Check for actual sets and format them in parentheses
                 if 'actual_sets' in assigned_set and assigned_set['actual_sets']:
                     for actual_set in assigned_set['actual_sets']:
-                        # The API often includes a weight field in actual sets, even if the assigned set was RPE or bodyweight.
-                        # We'll format the line with the actual weight.
-                        actual_weight = actual_set.get('weight')
-                        actual_reps = actual_set.get('reps')
-                        actual_sets_count = actual_set.get('sets')
-                        
-                        if actual_weight is not None and actual_reps is not None:
-                            actual_set_line = f"\t({actual_sets_count}x{actual_reps} @ {actual_weight} {workout['weight_type']})"
-                            output_lines.append(actual_set_line)
-                        elif actual_reps is not None:
-                             actual_set_line = f"\t({actual_sets_count}x{actual_reps})"
-                             output_lines.append(actual_set_line)
+                        actual_set_line = f"\t({actual_set['sets']}x{actual_set['reps']} @ {actual_set['weight']} {workout['weight_type']})"
+                        output_lines.append(actual_set_line)
 
             # Process exercise-level comments
             if 'comments' in exercise and exercise['comments']:
@@ -119,10 +102,7 @@ def parse_and_format_workouts(input_json_path, coach_id):
                     user_id = comment['user']['id']
                     body = clean_text(comment['body'])
                     if user_id == coach_id:
-                        if coach_name:
-                            output_lines.append(f"\t[{coach_name}]: {body}")
-                        else:
-                            output_lines.append(f"\t[Coach]: {body}")
+                        output_lines.append(f"\t[{coach_name}]: {body}")
                     else:
                         output_lines.append(f"\t[{client_name}]: {body}")
 
