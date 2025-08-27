@@ -41,7 +41,9 @@ def parse_and_format_workouts(input_json_path, coach_id):
         output_lines.append(f"Workout Date: {workout['workout_date']}\n")
 
         # Get coach's and client's full names from the workout object
-        coach_name = workout['created_by']['full_name']
+        coach_name = None
+        if workout.get('created_by') and workout['created_by']['id'] == coach_id:
+            coach_name = workout['created_by']['full_name']
         client_name = workout['user']['full_name']
 
         # Process top-level workout comments
@@ -50,18 +52,16 @@ def parse_and_format_workouts(input_json_path, coach_id):
                 user_id = comment['user']['id']
                 body = clean_text(comment['body'])
                 
+                # Check for the coach's ID
                 if user_id == coach_id:
-                    output_lines.append(f"\t[{coach_name}]: {body}")
+                    if coach_name:
+                        output_lines.append(f"\t[{coach_name}]: {body}")
+                    else:
+                        # Fallback if coach_name is None
+                        output_lines.append(f"\t[Coach]: {body}")
                 else:
                     output_lines.append(f"\t[{client_name}]: {body}")
         
-        # This is a placeholder for a future feature. If the API provides private coach notes,
-        # you would add logic here to format them with a '>>' tag.
-        # For now, this section is a conceptual placeholder.
-        # if 'private_coach_notes' in workout and workout['private_coach_notes']:
-        #     for note in workout['private_coach_notes']:
-        #         output_lines.append(f">>\t{clean_text(note['body'])}")
-
         # Process exercises
         for exercise in workout['assigned_exercises']:
             exercise_name = exercise['exercise']['name']
@@ -70,31 +70,62 @@ def parse_and_format_workouts(input_json_path, coach_id):
             # Process assigned and actual sets
             for assigned_set in exercise['assigned_sets']:
                 set_line = ""
+                
+                # Check for distance-based sets
+                if assigned_set['set_type'] == 'distance' and assigned_set.get('distance') is not None:
+                    distance = assigned_set.get('distance')
+                    distance_unit = assigned_set.get('distance_unit')
+                    time_minutes = assigned_set.get('minutes', 0)
+                    time_seconds = assigned_set.get('seconds', 0)
+                    
+                    time_string = ""
+                    if time_minutes or time_seconds:
+                        time_string = f"@ {str(time_minutes).zfill(2)}:{str(time_seconds).zfill(2)}"
+                    
+                    set_line = f"\t{distance} {distance_unit} {time_string}".strip()
+                    
                 # Check if the set is a standard rep/weight/rpe set
-                if assigned_set['set_type'] == 'default':
-                    if assigned_set['rep_type'] == 'AMRAP':
-                        set_line = f"\t{assigned_set['sets']}xAMRAP @ "
-                    else:
-                        set_line = f"\t{assigned_set['sets']}x{assigned_set['reps']} @ "
+                elif assigned_set['set_type'] == 'default':
+                    if 'sets' in assigned_set and 'reps' in assigned_set:
+                        if assigned_set['rep_type'] == 'AMRAP':
+                            set_line = f"\t{assigned_set['sets']}xAMRAP @ "
+                        else:
+                            set_line = f"\t{assigned_set['sets']}x{assigned_set['reps']} @ "
                     
                     if assigned_set['weight_type'] == 'RPE':
                         set_line += f"RPE {assigned_set['weight_type_value']}"
-                    elif assigned_set['weight_type'] == 'percent':
-                        set_line += f"{assigned_set['weight_type_value']}%"
-                    else:
-                        set_line += f"{assigned_set['weight']} {workout['weight_type']}"
-                    output_lines.append(set_line)
-                
+                    elif 'weight' in assigned_set and assigned_set['weight'] is not None:
+                        if assigned_set['weight_type'] == 'percent':
+                            set_line += f"{assigned_set['weight_type_value']}%"
+                        else:
+                            set_line += f"{assigned_set['weight']} {workout['weight_type']}"
+                    
                 # Check if the set is a custom note
                 elif assigned_set['set_type'] == 'custom':
-                    body = clean_text(assigned_set['body'])
-                    output_lines.append(f"\t{body}")
+                    if 'body' in assigned_set and assigned_set['body']:
+                        body = clean_text(assigned_set['body'])
+                        set_line = f"\t{body}"
 
-                # Check for actual sets and format them in parentheses
+                # Append the formatted line
+                if set_line:
+                    output_lines.append(set_line)
+
+                # Now process the actual sets without indentation
                 if 'actual_sets' in assigned_set and assigned_set['actual_sets']:
                     for actual_set in assigned_set['actual_sets']:
-                        actual_set_line = f"\t({actual_set['sets']}x{actual_set['reps']} @ {actual_set['weight']} {workout['weight_type']})"
-                        output_lines.append(actual_set_line)
+                        actual_weight = actual_set.get('weight')
+                        actual_reps = actual_set.get('reps')
+                        actual_sets_count = actual_set.get('sets')
+                        
+                        actual_set_line = ""
+                        if actual_weight is not None and actual_reps is not None:
+                            actual_set_line = f"({actual_sets_count}x{actual_reps} @ {actual_weight} {workout['weight_type']})"
+                        elif actual_reps is not None:
+                            actual_set_line = f"({actual_sets_count}x{actual_reps})"
+                        
+                        if actual_set_line:
+                            output_lines.append(f"\t{actual_set_line}")
+
 
             # Process exercise-level comments
             if 'comments' in exercise and exercise['comments']:
@@ -102,10 +133,13 @@ def parse_and_format_workouts(input_json_path, coach_id):
                     user_id = comment['user']['id']
                     body = clean_text(comment['body'])
                     if user_id == coach_id:
-                        output_lines.append(f"\t[{coach_name}]: {body}")
+                        if coach_name:
+                            output_lines.append(f"\t[{coach_name}]: {body}")
+                        else:
+                            output_lines.append(f"\t[Coach]: {body}")
                     else:
                         output_lines.append(f"\t[{client_name}]: {body}")
-
+        
         output_lines.append("\n" + "---" + "\n") # Separator between workouts
 
     return "\n".join(output_lines).strip()

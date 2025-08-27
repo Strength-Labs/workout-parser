@@ -41,9 +41,8 @@ def parse_and_format_workouts(input_json_path, coach_id):
         output_lines.append(f"Workout Date: {workout['workout_date']}\n")
 
         # Get coach's and client's full names from the workout object
-        # This is the fix for the TypeError. We check if 'created_by' is not None.
         coach_name = None
-        if workout['created_by']:
+        if workout.get('created_by') and workout['created_by']['id'] == coach_id:
             coach_name = workout['created_by']['full_name']
         client_name = workout['user']['full_name']
 
@@ -71,13 +70,27 @@ def parse_and_format_workouts(input_json_path, coach_id):
             # Process assigned and actual sets
             for assigned_set in exercise['assigned_sets']:
                 set_line = ""
+                
+                # Check for distance-based sets
+                if assigned_set['set_type'] == 'distance' and assigned_set.get('distance') is not None:
+                    distance = assigned_set.get('distance')
+                    distance_unit = assigned_set.get('distance_unit')
+                    time_minutes = assigned_set.get('minutes', 0)
+                    time_seconds = assigned_set.get('seconds', 0)
+                    
+                    time_string = ""
+                    if time_minutes or time_seconds:
+                        time_string = f"@ {str(time_minutes).zfill(2)}:{str(time_seconds).zfill(2)}"
+                    
+                    set_line = f"{distance} {distance_unit} {time_string}".strip()
+                    
                 # Check if the set is a standard rep/weight/rpe set
-                if assigned_set['set_type'] == 'default':
+                elif assigned_set['set_type'] == 'default':
                     if 'sets' in assigned_set and 'reps' in assigned_set:
                         if assigned_set['rep_type'] == 'AMRAP':
-                            set_line = f"\t{assigned_set['sets']}xAMRAP @ "
+                            set_line = f"{assigned_set['sets']}xAMRAP @ "
                         else:
-                            set_line = f"\t{assigned_set['sets']}x{assigned_set['reps']} @ "
+                            set_line = f"{assigned_set['sets']}x{assigned_set['reps']} @ "
                     
                     if assigned_set['weight_type'] == 'RPE':
                         set_line += f"RPE {assigned_set['weight_type_value']}"
@@ -87,31 +100,32 @@ def parse_and_format_workouts(input_json_path, coach_id):
                         else:
                             set_line += f"{assigned_set['weight']} {workout['weight_type']}"
                     
-                    # Handle cases where the set line might still be empty
-                    if set_line:
-                        output_lines.append(set_line)
-                
                 # Check if the set is a custom note
                 elif assigned_set['set_type'] == 'custom':
                     if 'body' in assigned_set and assigned_set['body']:
                         body = clean_text(assigned_set['body'])
-                        output_lines.append(f"\t{body}")
+                        set_line = f"{body}"
 
-                # Check for actual sets and format them in parentheses
+                # Append the formatted line
+                if set_line:
+                    output_lines.append(set_line)
+
+                # Now process the actual sets without indentation
                 if 'actual_sets' in assigned_set and assigned_set['actual_sets']:
                     for actual_set in assigned_set['actual_sets']:
-                        # The API often includes a weight field in actual sets, even if the assigned set was RPE or bodyweight.
-                        # We'll format the line with the actual weight.
                         actual_weight = actual_set.get('weight')
                         actual_reps = actual_set.get('reps')
                         actual_sets_count = actual_set.get('sets')
                         
+                        actual_set_line = ""
                         if actual_weight is not None and actual_reps is not None:
-                            actual_set_line = f"\t({actual_sets_count}x{actual_reps} @ {actual_weight} {workout['weight_type']})"
-                            output_lines.append(actual_set_line)
+                            actual_set_line = f"({actual_sets_count}x{actual_reps} @ {actual_weight} {workout['weight_type']})"
                         elif actual_reps is not None:
-                             actual_set_line = f"\t({actual_sets_count}x{actual_reps})"
-                             output_lines.append(actual_set_line)
+                            actual_set_line = f"({actual_sets_count}x{actual_reps})"
+                        
+                        if actual_set_line:
+                            output_lines.append(actual_set_line)
+
 
             # Process exercise-level comments
             if 'comments' in exercise and exercise['comments']:
@@ -125,7 +139,7 @@ def parse_and_format_workouts(input_json_path, coach_id):
                             output_lines.append(f"\t[Coach]: {body}")
                     else:
                         output_lines.append(f"\t[{client_name}]: {body}")
-
+        
         output_lines.append("\n" + "---" + "\n") # Separator between workouts
 
     return "\n".join(output_lines).strip()
