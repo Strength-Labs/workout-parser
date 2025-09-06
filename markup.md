@@ -22,9 +22,9 @@ The workout_parser.py script converts text files in this markup language back in
     * Assigned: 3x5 @ 405  
     * Accomplished: (1x5 @ 405\)  
 * **Comments and Notes**: These are all indented with a tab or spaces.  
-  * **Comments to be Ignored**: These are conversational notes from a coach or client and are ignored by the workout\_parser.py script. They begin with a \> or with a name in brackets followed by a colon.  
+  * **Comments to be Ignored**: These are conversational notes from a coach or client and are ignored by the workout\_parser.py script. They begin a name in brackets followed by a colon. Private coach's comments are indented with a \>. These comments are also ignored by the parser, but are for the coach or any AI agent to explain the reasoning for the program.   
     * **Examples**:  
-      * \> This is a private coach note.  
+      * \> He should go up 5% on squats next week.
       * \[Coachy McCoach\]: Great job on that lift\!  
       * \[Lifty McGee\]: I felt a pinch in my shoulder.  
   * **Notes to be Preserved**: Any other indented line that does not match the comment patterns above is treated as a custom note and will be preserved in the body field of the JSON output.  
@@ -53,6 +53,7 @@ Bench Press
 3x5 @ 185  
   \>Increase by 2.5lbs, bench pressing every other workout.   
   \[Coachy McCoach\]: These workouts should give the pattern for the next three weeks, working out Monday, Wednesday, and Friday. 
+  \[Client McClient\]: I like the pattern, but I'm starting to get worn out by deadlifts!
 ```
 
 This format provides a complete and easily digestible view of a client's workout history, including the conversational feedback between the coach and the lifter.
