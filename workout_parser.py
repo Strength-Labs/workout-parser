@@ -181,6 +181,9 @@ def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exerc
             stripped_line = line.strip()
             if not stripped_line:
                 continue
+            # ignore the --- workout breaks. 
+            if stripped_line == "---":
+                continue
 
             # Ignore private coaching comments
             if stripped_line.startswith('>'):
