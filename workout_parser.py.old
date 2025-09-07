@@ -23,24 +23,12 @@ readline.set_completer_delims(' ')
 readline.parse_and_bind("tab: complete")
 
 def create_exercise_mapping() -> Tuple[Optional[Dict[str, int]], Optional[List[str]]]:
-    """
-    Creates a mapping from exercise names to their IDs from exerciselist.json.
-    If duplicate exercise names exist, prioritize the first one found.
-    """
+    """Creates a mapping from exercise names to their IDs from exerciselist.json in the script's directory."""
     exerciselist_path = os.path.join(os.path.dirname(__file__), 'exerciselist.json')
     try:
         with open(exerciselist_path, 'r') as f:
             exercises = json.load(f)
-        
-        # --- Start of modification ---
-        # Build mapping carefully to avoid overwrites from duplicates.
-        exercise_mapping = {}
-        for exercise in exercises:
-            name_lower = exercise['name'].lower()
-            if name_lower not in exercise_mapping:
-                exercise_mapping[name_lower] = exercise['id']
-        # --- End of modification ---
-
+        exercise_mapping = {exercise['name'].lower(): exercise['id'] for exercise in exercises}
         exercise_names = list(exercise_mapping.keys())
         return exercise_mapping, exercise_names
     except FileNotFoundError:
@@ -67,8 +55,7 @@ def parse_line(line: str) -> Optional[Dict]:
     base_set = {
         "priority": 0,
         "set_type": "default",
-        "rep_type": "default_rep_type",
-        "weight": 0.0 # Default weight to 0.0, will be overwritten if applicable.
+        "rep_type": "default_rep_type"
     }
 
     # Pattern for "Accomplished" sets
@@ -111,30 +98,30 @@ def parse_line(line: str) -> Optional[Dict]:
                 assigned_set["reps"] = 0
             assigned_set["weight_type"] = "RPE"
             assigned_set["weight_type_value"] = int(rpe_val.upper().replace("RPE", "").strip())
-            assigned_set["weight"] = 0.0 # Add weight field for RPE sets per corrected JSON
             return assigned_set
 
     # Pattern for weight in lbs or percentage
     if re.search(r"@\s*[\d\.]+", line):
+        # Regex updated to capture standard weight and percentage notations, and handle AMRAP reps.
+        # Format: sets x reps @ value unit(optional) -> e.g., 4 x AMRAP @ 170 lbs OR 2 x 5 @ 85%
         lbs_pattern = re.compile(r"(\d+)\s*x\s*([\w\d]+)\s*@\s*([\d\.]+)\s*(lbs|%|kg)?", re.IGNORECASE)
         lbs_match = lbs_pattern.match(line)
         if lbs_match:
             sets, reps, weight_value, unit = lbs_match.groups()
             assigned_set = {**base_set, "sets": int(sets)}
-
+            
             if reps.isnumeric():
                 assigned_set["reps"] = int(reps)
             elif reps.upper() == "AMRAP":
                 assigned_set["rep_type"] = "AMRAP"
                 assigned_set["reps"] = 0
 
+            assigned_set["weight"] = float(weight_value)
+            
+            # Set weight type if a specific unit like '%' is detected
             if unit and unit == "%":
                 assigned_set["weight_type"] = "percent"
-                assigned_set["weight_type_value"] = float(weight_value)
-                assigned_set["weight"] = 0.0 # Add weight field for percentage sets per corrected JSON
-            else:
-                assigned_set["weight"] = float(weight_value)
-
+            
             return assigned_set
 
     # Simpler pattern for sets x reps without weight
@@ -178,46 +165,42 @@ def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exerc
         current_exercise = None
 
         for line in lines[1:]:
-            stripped_line = line.strip()
-            if not stripped_line:
+            line = line.strip()
+            if not line:
                 continue
 
             # Ignore private coaching comments
-            if stripped_line.startswith('>'):
+            if line.startswith('>'):
                 continue
-            
-            # Ignore conversational comments
-            if re.match(r"\[.*?\]:", stripped_line):
-                continue
-            
+
             # Check if line is a known exercise name
-            # Exercise names are unindented.
-            indentation = len(line) - len(line.lstrip())
-            if indentation == 0 and stripped_line.lower() in exercise_mapping:
+            if line.lower() in exercise_mapping:
                 if current_exercise:
                     workout["assigned_exercises"].append(current_exercise)
                 current_exercise = {
-                    "exercise_id": exercise_mapping[stripped_line.lower()],
+                    "exercise_id": exercise_mapping[line.lower()],
                     "priority": len(workout["assigned_exercises"])
                 }
                 continue
 
-            # --- Process line as set or note ---
-            if current_exercise:
-                parsed_info = parse_line(stripped_line)
-                if parsed_info:
-                    assigned_sets_list = current_exercise.setdefault("assigned_sets", [])
-                    parsed_info["priority"] = len(assigned_sets_list)
-                    assigned_sets_list.append(parsed_info)
-            elif indentation == 0:
-                # Handle potential unknown exercises or non-note lines before first exercise
-                similar_exercises = get_similar_exercises(stripped_line.lower(), exercise_names)
+            parsed_info = parse_line(line)
+            if parsed_info:
+                if current_exercise:
+                    parsed_info["priority"] = len(current_exercise.get("assigned_sets", []))
+                    if parsed_info.get("status") == "accomplished":
+                         current_exercise.setdefault("actual_sets", []).append(parsed_info)
+                    else:
+                         current_exercise.setdefault("assigned_sets", []).append(parsed_info)
+                else:
+                    workout.setdefault("comments", []).append(parsed_info)
+            else: # Line is not a set/note, so treat as potential unknown exercise
+                similar_exercises = get_similar_exercises(line.lower(), exercise_names)
                 if similar_exercises:
-                    print(f"\nExercise '{stripped_line}' not found. Did you mean one of these?")
+                    print(f"\nExercise '{line}' not found. Did you mean one of these?")
                     for i, name in enumerate(similar_exercises, 1):
                         print(f"{i}: {name.title()}")
                     print("m: Manually enter exercise name")
-                    print("0: Skip (treat as a note/error)")
+                    print("0: Skip (treat as a note)")
 
                     while True:
                         choice = input("Enter number, 'm', or 0 to skip: ")
@@ -249,6 +232,9 @@ def parse_workouts(plain_text_path: str, exercise_mapping: Dict[str, int], exerc
                             "exercise_id": exercise_mapping[chosen_exercise],
                             "priority": len(workout["assigned_exercises"])
                         }
+                    else: # Skip
+                        if current_exercise:
+                             current_exercise.setdefault("assigned_sets", []).append({"priority": 0, "set_type": "custom", "body": line, "rep_type": "default_rep_type"})
 
         if current_exercise:
             workout["assigned_exercises"].append(current_exercise)
