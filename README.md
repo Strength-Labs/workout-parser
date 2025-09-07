@@ -1,5 +1,7 @@
 # Workout Parser and Uploader
 
+v1.1 development branch 
+
 A Python suite for parsing workout plans from plain text files into JSON and uploading them to the Barbell Logic Turnkey Coach API (`POST /api/v1/workouts`). The suite includes three scripts:
 
 - **`workout_parser.py`**: Converts plain text workout files (e.g., `john.txt`) into JSON (e.g., `john.json`) compatible with the API.
