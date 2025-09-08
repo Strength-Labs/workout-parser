@@ -59,7 +59,7 @@ def parse_and_format_workouts(input_json_path, coach_id):
                             reps = actual_set.get('reps', '')
                             weight = actual_set.get('weight', '')
                             sets = actual_set.get('sets', '')
-                            output_lines.append(f"({sets}x{reps} @ {weight})")
+                            output_lines.append(f"\tAccomplished: {sets}x{reps} @ {weight}")
 
             if 'comments' in exercise and exercise['comments']:
                  output_lines.append("")

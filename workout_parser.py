@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Tuple
 
 # Attempt to import fuzzywuzzy and provide a helpful error message if it fails
 try:
-    from fuzzywuzzy import process
+    from rapidfuzz import process
 except ImportError:
     print("Error: The 'fuzzywuzzy' library is required. Please install it by running 'pip install fuzzywuzzy python-Levenshtein'")
     sys.exit(1)
