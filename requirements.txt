@@ -1,4 +1,2 @@
-fuzzywuzzy==0.18.0
-# python-Levenshtein==0.25.1
 requests==2.32.3
 rapidfuzz==3.14.0
