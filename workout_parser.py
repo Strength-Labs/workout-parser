@@ -10,9 +10,9 @@ from typing import Dict, List, Optional, Tuple
 
 # Attempt to import fuzzywuzzy and provide a helpful error message if it fails
 try:
-    from fuzzywuzzy import process
+    from rapidfuzz import process
 except ImportError:
-    print("Error: The 'fuzzywuzzy' library is required. Please install it by running 'pip install fuzzywuzzy python-Levenshtein'")
+    print("Error: The 'rapidfuzz' library is required. Please install it by running 'pip install rapidfuzz'")
     sys.exit(1)
 
 def complete(text, state):
@@ -32,14 +32,12 @@ def create_exercise_mapping() -> Tuple[Optional[Dict[str, int]], Optional[List[s
         with open(exerciselist_path, 'r') as f:
             exercises = json.load(f)
         
-        # --- Start of modification ---
         # Build mapping carefully to avoid overwrites from duplicates.
         exercise_mapping = {}
         for exercise in exercises:
             name_lower = exercise['name'].lower()
             if name_lower not in exercise_mapping:
                 exercise_mapping[name_lower] = exercise['id']
-        # --- End of modification ---
 
         exercise_names = list(exercise_mapping.keys())
         return exercise_mapping, exercise_names
@@ -82,6 +80,22 @@ def parse_line(line: str) -> Optional[Dict]:
             "weight": float(weight),
             "status": "accomplished"
         }
+
+    # Pattern for RM (Rep Max)
+    if re.search(r"@\s*RM", line, re.IGNORECASE):
+        rm_pattern = re.compile(r"(\d+)\s*x\s*([\w\d]+)\s*@\s*RM", re.IGNORECASE)
+        rm_match = rm_pattern.match(line)
+        if rm_match:
+            sets, reps = rm_match.groups()
+            assigned_set = {**base_set, "sets": int(sets), "weight_type": "RM"}
+            if reps.isnumeric():
+                assigned_set["reps"] = int(reps)
+            elif reps.upper() == "AMRAP":
+                assigned_set["rep_type"] = "AMRAP"
+                assigned_set["reps"] = 0
+            # Per API spec, when weight_type is RM, weight should be 0.0
+            assigned_set["weight"] = 0.0
+            return assigned_set
 
     # Pattern for bodyweight
     if "bodyweight" in line.lower():
