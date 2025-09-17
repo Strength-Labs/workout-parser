@@ -5,7 +5,10 @@ import argparse
 import sys
 import os
 import getpass
-import readline
+try:
+    import readline
+except ImportError:
+    import pyreadline3 as readline
 import glob
 from datetime import datetime, timedelta
 

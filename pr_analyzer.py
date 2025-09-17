@@ -8,7 +8,10 @@ import sys
 from datetime import datetime, timedelta, date
 
 # Libraries for Tab Completion
-import readline
+try:
+    import readline
+except ImportError:
+    import pyreadline3 as readline
 import glob
 
 # --- Tab Completion Setup ---
