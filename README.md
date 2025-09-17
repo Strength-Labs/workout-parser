@@ -7,8 +7,8 @@ A Python suite for parsing workout plans from plain text files into JSON and upl
 - **`workout_parser.py`**: Converts plain text workout files (e.g., `john.txt`) into JSON (e.g., `john.json`) compatible with the API.
 - **`workout_uploader.py`**: Authenticates with the Turnkey Coach API and uploads JSON workouts to the `POST /api/v1/workouts` endpoint.
 - **`fetch_exercises.py`**: Retrieves the exercise list from the API (`GET /api/v1/exercises`) and saves it as `exerciselist.json` for use by `workout_parser.py`.
-* **pr_downloader.py**: Retrieves and sorts the PRs as stored on the Turnkey Coach servers.
-* **pr_analyzer.py**: Outputs the highest estimated one-rep-maximums over a particular time period, using workouts in JSON format downloaded with **workout_downloader.py**.
+* **`pr_downloader.py`**: Retrieves and sorts the PRs as stored on the Turnkey Coach servers.
+* **`pr_analyzer.py`**: Outputs the highest estimated one-rep-maximums over a particular time period, using workouts in JSON format downloaded with **workout_downloader.py**.
 
 ## Features
 
