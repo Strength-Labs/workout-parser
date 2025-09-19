@@ -2,22 +2,20 @@ import os
 import sys
 import json
 import tempfile
+from datetime import datetime
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
 # Import our shared functions
-from api_client import get_access_token, get_clients
+from api_client import get_access_token, get_clients, clear_screen, get_workout_history
 # Import our tools
 from feed_tool import run_feed
 from pr_tool import run_pr_analyzer
 from format_tool import format_workouts_to_markup
+from actual_prs_tool import run_actual_prs_viewer
 
 console = Console()
-
-def clear_screen():
-    """Clears the terminal screen."""
-    os.system('cls' if os.name == 'nt' else 'clear')
 
 def select_client(token, user_id):
     """Displays a table of clients and prompts the user to select one."""
@@ -50,36 +48,32 @@ def select_client(token, user_id):
         except ValueError:
             console.print("[bold red]Invalid input, please enter a number.[/bold red]")
 
-def browse_history(client, coach_user_id):
-    """Generates a markup file of workout history and opens it in a text editor."""
-    client_id = client['id']
-    filepath = os.path.join(os.path.expanduser("~/TurnkeyClients"), str(client_id), f"workouts_user_{client_id}.json")
-
-    if not os.path.exists(filepath):
-        console.print(f"\n[bold red]Workout history file not found.[/bold red]")
-        console.print("[yellow]Hint: Run the 'Unified Feed' tool first to download the history.[/yellow]")
-        console.input("\nPress Enter to return to the tool menu.")
+def browse_history(token, client, coach_user_id):
+    """Generates a markup file of workout history and opens it in an editor."""
+    # Use the smart function to get data (will auto-update if necessary)
+    workouts = get_workout_history(token, client)
+    if not workouts:
+        console.input("\nCould not load workout history. Press Enter to return.")
         return
 
-    console.print(f"Loading workout history from [cyan]{filepath}[/cyan]...")
-    with open(filepath, 'r') as f:
-        workouts = json.load(f)
-
-    # --- ADDED THIS LINE TO SORT THE WORKOUTS ---
     workouts.sort(key=lambda w: w['workout_date'])
-    # ---------------------------------------------
-
     markup_content = format_workouts_to_markup(workouts, coach_user_id)
     
-    with tempfile.NamedTemporaryFile(mode='w+', suffix=".txt", delete=False) as tmp_file:
-        tmp_file.write(markup_content)
-        tmp_filepath = tmp_file.name
+    client_name = client['full_name']
+    client_dir = os.path.join(os.path.expanduser("~/TurnkeyClients"), str(client['id']))
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    safe_client_name = client_name.replace(' ', '_')
+    history_filename = f"{safe_client_name}_history_{timestamp}.txt"
+    history_filepath = os.path.join(client_dir, history_filename)
 
-    editor = os.getenv('EDITOR', 'vim') 
-    console.print(f"Opening history in [bold green]{editor}[/bold green]...")
-    os.system(f"{editor} {tmp_filepath}")
-
-    os.remove(tmp_filepath)
+    with open(history_filepath, 'w') as f:
+        f.write(markup_content)
+    
+    console.print(f"\nWorkout history saved to:\n[green]{history_filepath}[/green]")
+    editor = os.getenv('EDITOR', 'nvim') 
+    console.print(f"\nOpening history in [bold green]{editor}[/bold green]...")
+    console.print("[dim]Close the editor to continue...[/dim]")
+    os.system(f"{editor} {history_filepath}")
 
 def show_tool_menu(token, user_id, client):
     """Displays the main tool menu for a selected client."""
@@ -89,9 +83,10 @@ def show_tool_menu(token, user_id, client):
         
         console.print("\n[bold]Select a tool:[/bold]")
         console.print("  [bold]1.[/bold] Unified Feed")
-        console.print("  [bold]2.[/bold] PR Analyzer")
-        console.print("  [bold]3.[/bold] Browse Workout History in Editor")
-        console.print("  [bold]4.[/bold] Upload Workout from File")
+        console.print("  [bold]2.[/bold] Estimated 1RMs (from workout history)")
+        console.print("  [bold]3.[/bold] Actual PRs (from API)")
+        console.print("  [bold]4.[/bold] Browse & Save Workout History")
+        console.print("  [bold]5.[/bold] Upload Workout from File")
         console.print("\n  [bold]q.[/bold] Go back to client list")
 
         choice = console.input("\n> ")
@@ -99,10 +94,12 @@ def show_tool_menu(token, user_id, client):
         if choice == '1':
             run_feed(token, user_id, client)
         elif choice == '2':
-            run_pr_analyzer(client)
+            run_pr_analyzer(token, client)
         elif choice == '3':
-            browse_history(client, user_id)
+            run_actual_prs_viewer(token, client)
         elif choice == '4':
+            browse_history(token, client, user_id)
+        elif choice == '5':
             console.print(f"\n[yellow]Tool '{choice}' is not yet implemented.[/yellow]")
             console.input("Press Enter to continue...")
         elif choice.lower() == 'q':
@@ -126,6 +123,10 @@ def main():
         
         if selected_client is None:
             break
+        
+        # --- NEW: Trigger automatic, efficient update after selecting a client ---
+        get_workout_history(token, selected_client)
+        # -------------------------------------------------------------------------
         
         show_tool_menu(token, user_id, selected_client)
 

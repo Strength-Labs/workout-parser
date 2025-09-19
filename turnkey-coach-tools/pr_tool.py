@@ -1,8 +1,8 @@
-import json
 import os
 from datetime import datetime, timedelta, date
 from rich.console import Console
 from rich.text import Text
+from api_client import get_workout_history # Import the new smart function
 
 console = Console()
 
@@ -18,22 +18,6 @@ def wendler_1rm(weight, reps):
     if not isinstance(reps, (int, float)) or reps <= 1:
         return weight
     return (weight * reps * 0.0333) + weight
-
-def load_workout_data(filepath):
-    """Loads workout data from the local JSON file cache."""
-    if not os.path.exists(filepath):
-        console.print(f"\n[bold red]Workout history file not found.[/bold red]")
-        console.print(f"[dim]Expected at: {filepath}[/dim]")
-        console.print("[yellow]Hint: Run the 'Unified Feed' tool first to download the history.[/yellow]")
-        return None
-    try:
-        with open(filepath, 'r') as f:
-            data = json.load(f)
-        console.print(f"Successfully loaded {len(data)} workouts from local cache. 👍", style="green")
-        return data
-    except Exception as e:
-        console.print(f"\n[bold red]An unexpected error occurred while reading the file: {e}[/bold red]")
-        return None
 
 def process_workout_history(workouts, start_date=None, end_date=None):
     """Processes workout history to find the best e1RM for every exercise in a date range."""
@@ -84,23 +68,19 @@ def display_prs(main_lifts, other_lifts, date_range_str, show_other=False):
                 display_name = lift_name.title()
                 console.print(f"{display_name:<25} [bold green]{perf['e1rm']:.1f}[/bold green] {perf['unit']} on {perf['date']} ([dim]from {perf['weight']} {perf['unit']} x {perf['reps']}[/dim])")
 
-def run_pr_analyzer(client):
+def run_pr_analyzer(token, client):
     """Main analysis loop for the PR tool with improved menu flow."""
-    client_id = client['id']
     client_name = client['full_name']
     
-    filepath = os.path.join(os.path.expanduser("~/TurnkeyClients"), str(client_id), f"workouts_user_{client_id}.json")
-    
-    workouts = load_workout_data(filepath)
+    workouts = get_workout_history(token, client)
     if not workouts:
-        console.input("\nPress Enter to return to the tool menu.")
+        console.input("\nCould not load workout history. Press Enter to return.")
         return
 
     while True:
         clear_screen()
         console.print(f"Analyzing PRs for: [bold green]{client_name}[/bold green]")
         console.print("\n--- [bold]Select a Date Range[/bold] ---")
-        # Wrap in Text() to prevent rich from parsing the brackets as markup
         console.print(Text(" [3] Last 3 Months"))
         console.print(Text(" [6] Last 6 Months"))
         console.print(Text(" [y] Last Year"))
@@ -152,7 +132,6 @@ def run_pr_analyzer(client):
             if other_lift_performances:
                 prompt_parts.append("[m]ore lifts" if not show_other else "[h]ide other lifts")
             
-            # Revert to standard print/input for this prompt to ensure stability
             print("\n" + "-"*50)
             print(' | '.join(prompt_parts))
             action = input("> ").lower()

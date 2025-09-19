@@ -10,13 +10,15 @@ from rich.console import Console
 # --- Configuration ---
 API_BASE_URL = "https://app.turnkey.coach"
 TOKEN_CACHE_FILE = ".tokencache"
+CLIENT_DATA_DIR = os.path.expanduser("~/TurnkeyClients")
 console = Console()
 
-# --- Shared Helper Function ---
+# --- Shared Helper Functions ---
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 def clean_text(raw_html):
-    """Strips HTML tags, unescapes entities, and preserves line breaks."""
-    if not raw_html:
-        return ""
+    if not raw_html: return ""
     text = re.sub(r'<br\s*/?>', '\n', raw_html, flags=re.IGNORECASE)
     text = re.sub(r'</p>|</div>', '\n', text, flags=re.IGNORECASE)
     text = html.unescape(text)
@@ -25,30 +27,91 @@ def clean_text(raw_html):
     text = re.sub(r'\n\s*\n', '\n\n', text).strip()
     return text
 
-# --- Authentication ---
+# --- Data Fetching Logic ---
+def _download_workouts_from_api(token, client_id, start_date=None):
+    """(Internal) Downloads workout details, optionally from a start date."""
+    status_message = "Downloading full workout history" if not start_date else "Downloading new workouts"
+    headers = {"Authorization": f"Bearer {token}"}
+    list_url = f"{API_BASE_URL}/api/v1/workouts"
+    params = {"user_id": client_id, "sort": "ascending", "published": True}
+    if start_date:
+        params["start_date"] = start_date
+    
+    with console.status(f"[bold green]{status_message} for client {client_id}...[/bold green]"):
+        try:
+            response = requests.get(list_url, headers=headers, params=params)
+            response.raise_for_status()
+            workouts_summary = response.json()
+            
+            detailed_workouts = []
+            for summary in workouts_summary:
+                workout_id = summary['id']
+                detail_url = f"{API_BASE_URL}/api/v1/workouts/{workout_id}"
+                detail_response = requests.get(detail_url, headers=headers)
+                if detail_response.status_code == 200:
+                    detailed_workouts.append(detail_response.json())
+            return detailed_workouts
+        except requests.exceptions.RequestException:
+            return []
+
+def get_workout_history(token, client, force_refresh=False):
+    """
+    Smartly gets/updates workout history. Loads from cache and fetches only new workouts.
+    """
+    client_id = client["id"]
+    client_dir = os.path.join(CLIENT_DATA_DIR, str(client_id))
+    workout_cache_path = os.path.join(client_dir, f"workouts_user_{client_id}.json")
+    os.makedirs(client_dir, exist_ok=True)
+
+    if force_refresh:
+        workouts = _download_workouts_from_api(token, client_id)
+        with open(workout_cache_path, 'w') as f: json.dump(workouts, f, indent=4)
+        return workouts
+
+    if os.path.exists(workout_cache_path):
+        with open(workout_cache_path, 'r') as f:
+            existing_workouts = json.load(f)
+        
+        if not existing_workouts: # If cache is empty, do a full download
+            return get_workout_history(token, client, force_refresh=True)
+
+        # Find the last date in the cache and fetch anything new since then
+        latest_date_str = max(w['workout_date'] for w in existing_workouts)
+        start_date = datetime.fromisoformat(latest_date_str).date() + timedelta(days=1)
+        
+        new_workouts = _download_workouts_from_api(token, client_id, start_date=start_date.isoformat())
+        
+        if new_workouts:
+            console.print(f"[green]Found {len(new_workouts)} new workouts. Updating cache...[/green]")
+            all_workouts = existing_workouts + new_workouts
+            with open(workout_cache_path, 'w') as f: json.dump(all_workouts, f, indent=4)
+            return all_workouts
+        else:
+            console.print("[dim]Workout history is up to date.[/dim]")
+            return existing_workouts
+    else:
+        # Cache doesn't exist, do a full first-time download
+        return get_workout_history(token, client, force_refresh=True)
+
+# --- (Authentication and get_clients functions remain the same) ---
 def save_auth_data(token, user_id):
-    """Saves the access token, user ID, and expiration date to a cache file."""
     expires_at = datetime.now() + timedelta(hours=1)
     auth_data = {"token": token, "user_id": user_id, "expires_at": expires_at.isoformat()}
     with open(TOKEN_CACHE_FILE, 'w') as f:
         json.dump(auth_data, f)
 
 def load_auth_data():
-    """Loads auth data from the cache file if it's still valid."""
-    if not os.path.exists(TOKEN_CACHE_FILE):
-        return None, None
+    if not os.path.exists(TOKEN_CACHE_FILE): return None, None
     with open(TOKEN_CACHE_FILE, 'r') as f:
         try:
             data = json.load(f)
-            expires_at = datetime.fromisoformat(data.get("expires_at"))
-            if expires_at > datetime.now():
+            if datetime.fromisoformat(data.get("expires_at")) > datetime.now():
                 return data.get("token"), data.get("user_id")
         except (json.JSONDecodeError, KeyError, TypeError):
             return None, None
     return None, None
 
 def get_access_token():
-    """Authenticates with the API to get an access token and user ID."""
     token, user_id = load_auth_data()
     if token and user_id:
         console.print("Using cached access token. 👍", style="green")
@@ -65,20 +128,16 @@ def get_access_token():
             response = requests.post(url, headers=headers, json=payload)
             response.raise_for_status()
             data = response.json()
-            token = data.get("token")
-            user_id = data.get("resource_owner", {}).get("id")
+            token, user_id = data.get("token"), data.get("resource_owner", {}).get("id")
             if token and user_id:
                 console.print("Successfully obtained new access token. 🎉", style="green")
                 save_auth_data(token, user_id)
                 return token, user_id
-            else:
-                return None, None
         except requests.exceptions.RequestException as e:
             console.print(f"\n[bold red]Login failed:[/bold red] {e}")
             return None, None
 
 def get_clients(token, user_id):
-    """Fetches a de-duplicated list of clients and their coaches."""
     headers = {"Authorization": f"Bearer {token}"}
     url = f"{API_BASE_URL}/api/v1/users/{user_id}/clients"
     
@@ -89,19 +148,12 @@ def get_clients(token, user_id):
             relationships = response.json()
             clients_data = {}
             for rel in relationships:
-                client_info = rel.get('client')
-                coach_info = rel.get('coach')
+                client_info, coach_info = rel.get('client'), rel.get('coach')
                 if not client_info or not coach_info: continue
                 client_id = client_info.get('id')
                 if client_id not in clients_data:
-                    clients_data[client_id] = {
-                        'id': client_id,
-                        'full_name': client_info.get('full_name', 'N/A'),
-                        'coaches': []
-                    }
-                coach_name = coach_info.get('full_name', 'Unknown')
-                coach_type = rel.get('display_coach_type', 'Coach')
-                clients_data[client_id]['coaches'].append(f"{coach_name} ({coach_type})")
+                    clients_data[client_id] = {'id': client_id, 'full_name': client_info.get('full_name', 'N/A'), 'coaches': []}
+                clients_data[client_id]['coaches'].append(f"{coach_info.get('full_name', 'Unknown')} ({rel.get('display_coach_type', 'Coach')})")
             return sorted(list(clients_data.values()), key=lambda x: x['full_name'])
         except requests.exceptions.RequestException as err:
             console.print(f"\n[bold red]Could not fetch clients:[/bold red] {err}")
