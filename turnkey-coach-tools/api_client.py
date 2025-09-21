@@ -27,22 +27,53 @@ def clean_text(raw_html):
     text = re.sub(r'\n\s*\n', '\n\n', text).strip()
     return text
 
-# --- Data Fetching Logic ---
+# --- Data Loading and Updating ---
+def load_exercise_map():
+    """Loads exerciselist.json and creates a name-to-ID mapping."""
+    try:
+        filepath = os.path.join(os.path.dirname(__file__), 'exerciselist.json')
+        with open(filepath, 'r') as f:
+            exercises = json.load(f)
+        return {ex['name'].lower(): ex['id'] for ex in exercises}
+    except FileNotFoundError:
+        console.print("[bold red]Error: `exerciselist.json` not found.[/bold red]")
+        return None
+    except Exception as e:
+        console.print(f"[bold red]Error loading exercise list: {e}[/bold red]")
+        return None
+
+def update_exercise_list(token):
+    """Fetches the latest exercise list from the API and saves it to exerciselist.json."""
+    url = f"{API_BASE_URL}/api/v1/exercises"
+    headers = {"Authorization": f"Bearer {token}"}
+    filepath = os.path.join(os.path.dirname(__file__), 'exerciselist.json')
+
+    with console.status("[bold green]Downloading latest exercise list...[/bold green]"):
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            exercises = response.json()
+            with open(filepath, 'w') as f:
+                json.dump(exercises, f, indent=2)
+            console.print(f"✅ [green]Successfully saved {len(exercises)} exercises to {filepath}[/green]")
+            return True
+        except requests.exceptions.RequestException as e:
+            console.print(f"❌ [red]Error fetching exercises: {e}[/red]")
+            return False
+
 def _download_workouts_from_api(token, client_id, start_date=None):
-    """(Internal) Downloads workout details, optionally from a start date."""
+    # ... (This function remains the same)
     status_message = "Downloading full workout history" if not start_date else "Downloading new workouts"
     headers = {"Authorization": f"Bearer {token}"}
     list_url = f"{API_BASE_URL}/api/v1/workouts"
     params = {"user_id": client_id, "sort": "ascending", "published": True}
     if start_date:
         params["start_date"] = start_date
-    
     with console.status(f"[bold green]{status_message} for client {client_id}...[/bold green]"):
         try:
             response = requests.get(list_url, headers=headers, params=params)
             response.raise_for_status()
             workouts_summary = response.json()
-            
             detailed_workouts = []
             for summary in workouts_summary:
                 workout_id = summary['id']
@@ -55,32 +86,26 @@ def _download_workouts_from_api(token, client_id, start_date=None):
             return []
 
 def get_workout_history(token, client, force_refresh=False):
-    """
-    Smartly gets/updates workout history. Loads from cache and fetches only new workouts.
-    """
+    # ... (This function remains the same)
     client_id = client["id"]
     client_dir = os.path.join(CLIENT_DATA_DIR, str(client_id))
     workout_cache_path = os.path.join(client_dir, f"workouts_user_{client_id}.json")
     os.makedirs(client_dir, exist_ok=True)
-
     if force_refresh:
         workouts = _download_workouts_from_api(token, client_id)
         with open(workout_cache_path, 'w') as f: json.dump(workouts, f, indent=4)
         return workouts
-
     if os.path.exists(workout_cache_path):
         with open(workout_cache_path, 'r') as f:
             existing_workouts = json.load(f)
-        
-        if not existing_workouts: # If cache is empty, do a full download
+        if not existing_workouts:
             return get_workout_history(token, client, force_refresh=True)
-
-        # Find the last date in the cache and fetch anything new since then
-        latest_date_str = max(w['workout_date'] for w in existing_workouts)
+        valid_workouts = [w for w in existing_workouts if w.get('workout_date')]
+        if not valid_workouts:
+             return get_workout_history(token, client, force_refresh=True)
+        latest_date_str = max(w['workout_date'] for w in valid_workouts)
         start_date = datetime.fromisoformat(latest_date_str).date() + timedelta(days=1)
-        
         new_workouts = _download_workouts_from_api(token, client_id, start_date=start_date.isoformat())
-        
         if new_workouts:
             console.print(f"[green]Found {len(new_workouts)} new workouts. Updating cache...[/green]")
             all_workouts = existing_workouts + new_workouts
@@ -90,15 +115,13 @@ def get_workout_history(token, client, force_refresh=False):
             console.print("[dim]Workout history is up to date.[/dim]")
             return existing_workouts
     else:
-        # Cache doesn't exist, do a full first-time download
         return get_workout_history(token, client, force_refresh=True)
 
 # --- (Authentication and get_clients functions remain the same) ---
 def save_auth_data(token, user_id):
     expires_at = datetime.now() + timedelta(hours=1)
     auth_data = {"token": token, "user_id": user_id, "expires_at": expires_at.isoformat()}
-    with open(TOKEN_CACHE_FILE, 'w') as f:
-        json.dump(auth_data, f)
+    with open(TOKEN_CACHE_FILE, 'w') as f: json.dump(auth_data, f)
 
 def load_auth_data():
     if not os.path.exists(TOKEN_CACHE_FILE): return None, None
@@ -107,8 +130,7 @@ def load_auth_data():
             data = json.load(f)
             if datetime.fromisoformat(data.get("expires_at")) > datetime.now():
                 return data.get("token"), data.get("user_id")
-        except (json.JSONDecodeError, KeyError, TypeError):
-            return None, None
+        except (json.JSONDecodeError, KeyError, TypeError): pass
     return None, None
 
 def get_access_token():
@@ -116,13 +138,11 @@ def get_access_token():
     if token and user_id:
         console.print("Using cached access token. 👍", style="green")
         return token, user_id
-
     email = console.input("[bold]Enter your email:[/bold] ")
     password = getpass.getpass("Enter your password: ")
     url = f"{API_BASE_URL}/users/tokens/sign_in"
     headers = {"Content-Type": "application/json"}
     payload = {"email": email, "password": password}
-    
     with console.status("Authenticating..."):
         try:
             response = requests.post(url, headers=headers, json=payload)
@@ -140,7 +160,6 @@ def get_access_token():
 def get_clients(token, user_id):
     headers = {"Authorization": f"Bearer {token}"}
     url = f"{API_BASE_URL}/api/v1/users/{user_id}/clients"
-    
     with console.status("Fetching client list..."):
         try:
             response = requests.get(url, headers=headers)

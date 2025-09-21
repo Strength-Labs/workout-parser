@@ -1,0 +1,6632 @@
+[
+  {
+    "id": 243,
+    "name": "Dumbbell Lateral Raise",
+    "video_url": "https://vimeo.com/720390081",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 476,
+    "name": "Reverse Pec Deck",
+    "video_url": "https://youtu.be/RY_hTH2OBAA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 734,
+    "name": "Accessories",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 735,
+    "name": "Terminal Knee Extension with Heel Down",
+    "video_url": "https://vimeo.com/723682915",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 736,
+    "name": "ATG Lunge",
+    "video_url": "https://youtu.be/q3mHvHGjbBg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 257,
+    "name": "Banded Chin-Up",
+    "video_url": "https://vimeo.com/725307634",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 457,
+    "name": "Sitting Straight Leg Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 738,
+    "name": "Downward Dog",
+    "video_url": "https://youtu.be/ayQoxw8sRTk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 739,
+    "name": "Pause Front Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 740,
+    "name": "GHD Glute Ham Raise",
+    "video_url": "https://youtu.be/c2pWqsHR7FU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 741,
+    "name": "Tib Anterior Raise",
+    "video_url": "https://youtu.be/pn7DLqo-IKs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 742,
+    "name": "Battle Ropes",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 775,
+    "name": "Tibialis Anterior Kettlebell Hold",
+    "video_url": "https://youtu.be/L3FWpnQTxck",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 776,
+    "name": "Veggies (Servings)",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 778,
+    "name": "Press Multi-Grip/Swiss/Football Bar",
+    "video_url": "https://vimeo.com/740734309",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 779,
+    "name": "Banded Hip Flexor Stretch",
+    "video_url": "https://youtu.be/g1sOD9TYrLY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 543,
+    "name": "Prone Quad Set",
+    "video_url": "https://youtu.be/Kj8AadelUUc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 782,
+    "name": "Banded Adduction",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 783,
+    "name": "Banded Dorsiflexion",
+    "video_url": "https://youtu.be/WqVs3ORmL4Q",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 792,
+    "name": "Seated Leg Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 793,
+    "name": "Beltless Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 794,
+    "name": "Competition Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 797,
+    "name": "Pendulum Squat",
+    "video_url": "https://www.youtube.com/watch?v=QCLWnLNM35U",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 798,
+    "name": "Sciatic Nerve Floss",
+    "video_url": "https://vimeo.com/747358132",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 799,
+    "name": "Fire Hydrant ",
+    "video_url": "https://youtu.be/La3xYT8MGks",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 801,
+    "name": "Standing Hip Flexion",
+    "video_url": "https://youtu.be/LVn0OaQJIPU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 802,
+    "name": "Lying Hip Extension",
+    "video_url": "https://youtu.be/kxmIfSC9aUk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 803,
+    "name": "Man-Maker",
+    "video_url": "https://youtu.be/3vg8m9yPpAI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 805,
+    "name": "Standing Hip Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 806,
+    "name": "Swiss Ball Couch Stretch",
+    "video_url": "https://youtu.be/m-z1k0dzsP0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 807,
+    "name": "Active Assisted Shoulder Abduction with PVC",
+    "video_url": "https://youtu.be/hIw_umXNtIw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 808,
+    "name": "Banded Knee Distraction",
+    "video_url": "https://youtu.be/f5bAw6fMkQM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 7,
+    "name": "Other",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 11,
+    "name": "Tempo Bench Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 732,
+    "name": "Prone Pec Minor Stretch",
+    "video_url": "https://youtu.be/Gn4u_ASC-9g",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 784,
+    "name": "Banded Draw the Sword",
+    "video_url": "https://youtu.be/Xpn656LpNbA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 785,
+    "name": "Towel Twist",
+    "video_url": "https://youtu.be/NzqPnWJx_Nw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 786,
+    "name": "Dumbbell Wrist Extension",
+    "video_url": "https://youtu.be/6TtkRqPjmsg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 787,
+    "name": "Dumbbell Wrist Flexion",
+    "video_url": "https://youtu.be/il8ZE5eXIts",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 795,
+    "name": "Competition Bench",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 796,
+    "name": "Competition Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 800,
+    "name": "Banded Hip Extension",
+    "video_url": "https://youtu.be/d4JPAOwo02g",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 809,
+    "name": "Hinge Lunge on PVC Pipe",
+    "video_url": "https://youtu.be/enTMcVhe8Ns",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 162,
+    "name": "Barbell Shrug",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 733,
+    "name": "Foam Roll Chest Stretch",
+    "video_url": "https://youtu.be/5nJ9ON9wbzc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 289,
+    "name": "Press in Snatch",
+    "video_url": "https://www.youtube.com/watch?v=0JIj91he19Y",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 291,
+    "name": "Bench Dip",
+    "video_url": "https://vimeo.com/574902715",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 790,
+    "name": "Towel Internal Rotation Stretch",
+    "video_url": "https://youtu.be/gmX7KS14e4A",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 791,
+    "name": "Halting Snatch Grip Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 293,
+    "name": "Kettlebell RDL",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 371,
+    "name": "Do Something New",
+    "video_url": "https://vimeo.com/580054462",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 413,
+    "name": "Walk",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 164,
+    "name": "Bear Push-Up",
+    "video_url": "https://youtu.be/UeBEgsnHqzo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 1905,
+    "name": "Tib Curl",
+    "video_url": "https://youtu.be/tVMM38HuTC8?t=52",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 617,
+    "name": "Hang Power Clean Mid-Thigh + Push Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 724,
+    "name": "Reverse Nordic Curl",
+    "video_url": "https://youtube.com/shorts/Dd3SX08tZV4?feature=share",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22,
+    "name": "Safety Squat Bar Squat",
+    "video_url": "https://vimeo.com/743444692",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 721,
+    "name": "Halting Clean Pull (to knee)",
+    "video_url": "https://youtube.com/shorts/8w_nhxebC-A?feature=share",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 19,
+    "name": "Squat + Chains",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21,
+    "name": "Reverse Band Squat",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 29,
+    "name": "Tempo Deadlift",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 30,
+    "name": "Banded Deadlift",
+    "video_url": "https://www.youtube.com/watch?v=obM6SBVa-MU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31,
+    "name": "Reverse Band Deadlift",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 32,
+    "name": "Deadlift + Chains",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 51,
+    "name": "Reverse Band Bench Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 60,
+    "name": "Pause Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 57,
+    "name": "Press 2.0",
+    "video_url": "https://youtu.be/LNGK1TyeYbg?t=109",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 72,
+    "name": "Leg Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 158,
+    "name": "Rower",
+    "video_url": "https://vimeo.com/834745850",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 23,
+    "name": "Straight Leg Deadlift",
+    "video_url": "https://youtu.be/USpmiOk61Ek",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 52,
+    "name": "Bench Press + Chains",
+    "video_url": "https://youtu.be/Y2aJUGe_b-I?t=94",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 53,
+    "name": "Hover Bench",
+    "video_url": "https://youtu.be/Y2aJUGe_b-I?t=251",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 80,
+    "name": "Belt Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 79,
+    "name": "Rack Jerk",
+    "video_url": "https://youtu.be/6JHxmVqApMI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 50,
+    "name": "Banded Bench Press",
+    "video_url": "https://youtu.be/Y2aJUGe_b-I?t=65",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 56,
+    "name": "Press 1.5",
+    "video_url": "https://youtu.be/LNGK1TyeYbg?t=224",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 78,
+    "name": "Block Pull",
+    "video_url": "https://vimeo.com/612827917",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 10,
+    "name": "Press Lockouts/Pin Press",
+    "video_url": "https://vimeo.com/612840585",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 2,
+    "name": "Press",
+    "video_url": "https://vimeo.com/612825777",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 5,
+    "name": "Chin-Up",
+    "video_url": "https://vimeo.com/612838363",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 114,
+    "name": "Tempo Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 115,
+    "name": "JM Press",
+    "video_url": "https://youtu.be/6tFLbJ0AKI0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 160,
+    "name": "1 Board Press",
+    "video_url": "https://vimeo.com/612828466",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33,
+    "name": "Snatch Grip Deadlift",
+    "video_url": "https://vimeo.com/612829150",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 13,
+    "name": "Snatch",
+    "video_url": "https://vimeo.com/612826944",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 4,
+    "name": "Bench Press",
+    "video_url": "https://vimeo.com/612826007",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 120,
+    "name": "Face Pulls",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 154,
+    "name": "Olympic Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 155,
+    "name": "Iso Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 118,
+    "name": "5 Position Deadlift",
+    "video_url": "https://vimeo.com/612828257",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 36,
+    "name": "Clean",
+    "video_url": "https://vimeo.com/612831878",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 43,
+    "name": "Floor Press",
+    "video_url": "https://vimeo.com/612837826",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 16,
+    "name": "Pin Squat",
+    "video_url": "https://vimeo.com/612832980",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 28,
+    "name": "Pause Deadlift",
+    "video_url": "https://vimeo.com/612832409",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 116,
+    "name": "Meal Picture",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 63,
+    "name": "Dips",
+    "video_url": "https://vimeo.com/612836154",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 17,
+    "name": "Pause Squat",
+    "video_url": "https://vimeo.com/612833574",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35,
+    "name": "Power Snatch",
+    "video_url": "https://vimeo.com/612839338",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 82,
+    "name": "Sled",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 81,
+    "name": "Prowler",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 61,
+    "name": "Press Start",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 44,
+    "name": "Pause Bench",
+    "video_url": "https://vimeo.com/612834504",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 157,
+    "name": "Dumbbell Row",
+    "video_url": "https://vimeo.com/654286003",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 75,
+    "name": "Box Step-Up",
+    "video_url": "https://vimeo.com/574905035",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 67,
+    "name": "Sumo Deadlift",
+    "video_url": "https://vimeo.com/612841969",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 47,
+    "name": "2 Board Press",
+    "video_url": "https://vimeo.com/612828466",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 3,
+    "name": "Deadlift",
+    "video_url": "https://vimeo.com/612825294",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 26,
+    "name": "Rack Pull",
+    "video_url": "https://vimeo.com/612837301",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 156,
+    "name": "Seated Dumbbell Press",
+    "video_url": "https://vimeo.com/654285472",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 37,
+    "name": "Pull-Up",
+    "video_url": "https://vimeo.com/612828923",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 722,
+    "name": "Banded Leg Extension",
+    "video_url": "https://vimeo.com/711638054",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 723,
+    "name": "Rainbow Drop Plank",
+    "video_url": "https://youtu.be/j3dSTiOdsE0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 42,
+    "name": "Incline Bench Press",
+    "video_url": "https://vimeo.com/835491348",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 725,
+    "name": "Meadows Row",
+    "video_url": "https://www.youtube.com/watch?v=G-jU1aPVhnY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 66,
+    "name": "Larsen Press",
+    "video_url": "https://youtu.be/Ilt0GuTwB_Y",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 68,
+    "name": "Pendlay Row",
+    "video_url": "https://vimeo.com/612840118",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 55,
+    "name": "Strict Press",
+    "video_url": "https://youtu.be/LNGK1TyeYbg?t=61",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 41,
+    "name": "Barbell Curl",
+    "video_url": "https://vimeo.com/612836729",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 9,
+    "name": "Box Squat",
+    "video_url": "https://vimeo.com/612840780",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 14,
+    "name": "Clean and Jerk",
+    "video_url": "https://vimeo.com/613511226",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 6,
+    "name": "Power Clean",
+    "video_url": "https://vimeo.com/612835354",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 45,
+    "name": "Slingshot Bench Press",
+    "video_url": "https://vimeo.com/612830742",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 25,
+    "name": "Deficit Deadlift",
+    "video_url": "https://vimeo.com/612833895",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 27,
+    "name": "Floating Deadlift",
+    "video_url": "https://vimeo.com/612833168",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 15,
+    "name": "Front Squat",
+    "video_url": "https://vimeo.com/612836513",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 1,
+    "name": "Squat",
+    "video_url": "https://vimeo.com/612824563",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 18,
+    "name": "High Bar Squat",
+    "video_url": "https://vimeo.com/612835176",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 38,
+    "name": "Lat Pulldown",
+    "video_url": "https://vimeo.com/612830334",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 59,
+    "name": "Z Press",
+    "video_url": "https://youtu.be/kj16PSRuwKA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 54,
+    "name": "Wide Grip Bench Press",
+    "video_url": "https://vimeo.com/654286715",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 24,
+    "name": "Romanian Deadlift",
+    "video_url": "https://vimeo.com/654286232",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 113,
+    "name": "Dumbbell Bench Press",
+    "video_url": "https://vimeo.com/654285151",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 165,
+    "name": "Sandbag Carry",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 168,
+    "name": "Goblet Squat",
+    "video_url": "https://www.youtube.com/watch?v=6aLLiik02yU&t=8s",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 174,
+    "name": "Power Jerk",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 176,
+    "name": "Hang Clean",
+    "video_url": "https://www.youtube.com/watch?v=uUeV3LwisDI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 177,
+    "name": "Hang Power Clean",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 182,
+    "name": "Hatfield Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 185,
+    "name": "Hang Snatch",
+    "video_url": "https://www.youtube.com/watch?v=Php-RclQ1yU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 189,
+    "name": "Bear Complex",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 190,
+    "name": "Power Snatch + Overhead Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 197,
+    "name": "Back Extensions",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 200,
+    "name": "Goals",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 173,
+    "name": "Bike (Echo/ Airdyne/ Assault)",
+    "video_url": "https://vimeo.com/832251922",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 196,
+    "name": "Snack Pictures",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 195,
+    "name": "Dinner Pictures",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 194,
+    "name": "Lunch Pictures",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 193,
+    "name": "Breakfast Pictures",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 192,
+    "name": "Progress Pictures",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 181,
+    "name": "Visual Food Diary",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 179,
+    "name": "Nutrition Check-In",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 175,
+    "name": "Meal Pictures",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 202,
+    "name": "Other",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 203,
+    "name": "Handstand Push-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 12,
+    "name": "Barbell Row",
+    "video_url": "https://vimeo.com/612840118",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 206,
+    "name": "Glute-Ham Raise",
+    "video_url": "https://www.youtube.com/watch?v=c2pWqsHR7FU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 208,
+    "name": "GHD Back Extensions",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 245,
+    "name": "Upright Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 246,
+    "name": "Arnold Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 247,
+    "name": "Ab Roll-Out",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 183,
+    "name": "Circuit",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 184,
+    "name": "Full Body Circuit",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 180,
+    "name": "Check-In",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 172,
+    "name": "Lower Circuit",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 171,
+    "name": "Upper Circuit",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 170,
+    "name": "Conditioning",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 40,
+    "name": "Rolling Dumbbell Extensions",
+    "video_url": "https://vimeo.com/612835920",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 251,
+    "name": "Warm-Up",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 252,
+    "name": "Cool-Down",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 255,
+    "name": "Behind the Neck Jerk",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 256,
+    "name": "Block Jerk",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 263,
+    "name": "Run",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 267,
+    "name": "Decline Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 268,
+    "name": "Muscle Snatch",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 163,
+    "name": "Power Clean + Jerk",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 270,
+    "name": "Log Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 166,
+    "name": "Sandbag Over Shoulder",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 272,
+    "name": "Atlas Stone",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 273,
+    "name": "Axle Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 274,
+    "name": "Axle Bench",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 209,
+    "name": "Trap Bar Deadlift",
+    "video_url": "https://www.youtube.com/watch?v=Vu4oXIRzx7w",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 276,
+    "name": "Axle Clean",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 277,
+    "name": "Axle Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 278,
+    "name": "Axle Block Pull",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 279,
+    "name": "Keg Load",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 280,
+    "name": "Keg Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 281,
+    "name": "Hamstring Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 282,
+    "name": "Kettlebell Snatch",
+    "video_url": "https://www.youtube.com/watch?v=ZQccQg4kDf8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 283,
+    "name": "Kettlebell Clean",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 284,
+    "name": "Kettlebell Thruster",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 287,
+    "name": "Dumbbell Front Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 264,
+    "name": "Lateral Lunge",
+    "video_url": "https://www.youtube.com/watch?v=gwWv7aPcD88",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 261,
+    "name": "Single Leg RDL",
+    "video_url": "https://youtu.be/ji8mBbj5MYA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 248,
+    "name": "Clean High Pull",
+    "video_url": "https://youtu.be/fidmSMSa_Ag",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 258,
+    "name": "Banded Pull-Up",
+    "video_url": "https://vimeo.com/745502130",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 275,
+    "name": "Axle Clean + Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 271,
+    "name": "Log Clean + Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 262,
+    "name": "Farmer Carry",
+    "video_url": "https://vimeo.com/840583344",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 207,
+    "name": "GHD Sit-Up",
+    "video_url": "https://www.youtube.com/watch?v=KrGRFmL6-pg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 167,
+    "name": "Step-Up",
+    "video_url": "https://vimeo.com/574905035",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 266,
+    "name": "Dumbbell Lunge",
+    "video_url": "https://vimeo.com/574902949",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 46,
+    "name": "Close Grip Bench Press",
+    "video_url": "https://vimeo.com/612837081",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 8,
+    "name": "Tempo Squat",
+    "video_url": "https://vimeo.com/612832743",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 187,
+    "name": "Tall Clean",
+    "video_url": "https://youtu.be/YhGbp1wp8Ls",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 161,
+    "name": "1/2 Board Press",
+    "video_url": "https://vimeo.com/612828466",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 178,
+    "name": "Reverse Hyper",
+    "video_url": "https://vimeo.com/612832100",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 285,
+    "name": "Hip Thrust",
+    "video_url": "https://youtu.be/WxYSCCA52aI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 186,
+    "name": "Overhead Squat",
+    "video_url": "https://youtu.be/pn8mqlG0nkE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 71,
+    "name": "Lunge",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 201,
+    "name": "Bulgarian Split Squat",
+    "video_url": "https://vimeo.com/716095558",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 290,
+    "name": "Press in Clean (Sots Press)",
+    "video_url": "https://www.catalystathletics.com/exercise/209/Press-In-Clean-Sots-Press/",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 298,
+    "name": "Ring Row",
+    "video_url": "https://youtu.be/xhlReCpAE9k",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 304,
+    "name": "Kettlebell Floor Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 306,
+    "name": "Swiss Ball Scoliosis Stretch",
+    "video_url": "https://youtu.be/43Mhxsfw0VY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 307,
+    "name": "Clean Pull",
+    "video_url": "https://youtu.be/VF-hqxyLly4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 308,
+    "name": "Snatch Pull",
+    "video_url": "https://youtu.be/ozFjbwIOjU4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 249,
+    "name": "Snatch High Pull",
+    "video_url": "https://youtu.be/WXoIHlJ7u4s",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 478,
+    "name": "Smith Machine Incline Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 311,
+    "name": "Swim",
+    "video_url": "https://youtu.be/h14NVKCAEwY?t=176",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 312,
+    "name": "Medicine Ball Throw",
+    "video_url": "https://youtu.be/ihpqz2Wtooc",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 313,
+    "name": "Sprint-Drag-Carry",
+    "video_url": "https://youtu.be/e74I7lgNu_8",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 314,
+    "name": "Leg Tuck",
+    "video_url": "https://youtu.be/bXSHlJVjpIM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 316,
+    "name": "Ruck March",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 317,
+    "name": "Swim Circuit",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 318,
+    "name": "Move to Contact",
+    "video_url": "https://youtu.be/zlgTK2Z9xA0?t=13",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 319,
+    "name": "Ammo Can Lift",
+    "video_url": "https://youtu.be/zlgTK2Z9xA0?t=25",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 320,
+    "name": "Maneuver Under Fire",
+    "video_url": "https://youtu.be/zlgTK2Z9xA0?t=53",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 327,
+    "name": "Underwater",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 328,
+    "name": "Toes to Bar",
+    "video_url": "https://youtu.be/NxFx5Trfv6Q",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 332,
+    "name": "Jump Rope",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 325,
+    "name": "Close Grip Push-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 334,
+    "name": "Frog Stretch",
+    "video_url": "https://youtu.be/mO8S7qOdcdU",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 335,
+    "name": "Handstand Walk",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 336,
+    "name": "Dumbbell Shoulder Extension",
+    "video_url": "https://youtu.be/SXsZpsJnhGc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 339,
+    "name": "Clean + Front Squat + Jerk",
+    "video_url": "https://youtu.be/SULItH8tZoY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 341,
+    "name": "Standing Soleus Stretch",
+    "video_url": "https://youtu.be/RCjNN6JfSmE",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 342,
+    "name": "Towel Scrunch for Foot",
+    "video_url": "https://youtu.be/XEJYq1HBtHY",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 343,
+    "name": "Tall Snatch",
+    "video_url": "https://youtu.be/dCiugtIWFrU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 344,
+    "name": "Banded Lat Pulldown",
+    "video_url": "https://youtu.be/w8VtPzZlgeE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 346,
+    "name": "Duck Walk",
+    "video_url": "https://youtu.be/e5lPjg0GhFM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 347,
+    "name": "Block Snatch",
+    "video_url": "https://www.youtube.com/watch?v=ao0FAy0qu50",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 348,
+    "name": "Knee Push-Up",
+    "video_url": "https://vimeo.com/574904624",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 349,
+    "name": "Incline Push-Up",
+    "video_url": "https://vimeo.com/574903308",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 350,
+    "name": "Decline Push-Up",
+    "video_url": "https://vimeo.com/574902506",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 351,
+    "name": "Weighted Sit to Stand",
+    "video_url": "https://vimeo.com/574905878",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 300,
+    "name": "Wall Push-Up",
+    "video_url": "https://vimeo.com/574905777",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 352,
+    "name": "Toe Touch",
+    "video_url": "https://vimeo.com/574905604",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 353,
+    "name": "Superman",
+    "video_url": "https://vimeo.com/574905354",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 302,
+    "name": "Bodyweight Squat",
+    "video_url": "https://vimeo.com/574901645",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 354,
+    "name": "Bent Over Row (Before Barbells)",
+    "video_url": "https://vimeo.com/574901882",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 355,
+    "name": "Bird Dog",
+    "video_url": "https://vimeo.com/574902092",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 292,
+    "name": "Kettlebell Deadlift",
+    "video_url": "https://vimeo.com/574902319",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 356,
+    "name": "Deadlift (Before Barbells)",
+    "video_url": "https://vimeo.com/574902319",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 357,
+    "name": "Dips (Before Barbells)",
+    "video_url": "https://vimeo.com/574902715",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 358,
+    "name": "Forward Lunge",
+    "video_url": "https://vimeo.com/574902949",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 361,
+    "name": "Elliptical Trainer",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 303,
+    "name": "Lying Glute Bridge",
+    "video_url": "https://youtu.be/tqp5XQPpTxY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 362,
+    "name": "Standing Hip Abduction",
+    "video_url": "https://youtu.be/L78aQyCdTkc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 363,
+    "name": "Instructions",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 364,
+    "name": "Drink Your Water",
+    "video_url": "https://vimeo.com/526146957",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 365,
+    "name": "Reduce Added Sugars",
+    "video_url": "https://vimeo.com/527408970",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 366,
+    "name": "Keep a Food Journal",
+    "video_url": "https://vimeo.com/527412325",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 305,
+    "name": "Basketball Ab ",
+    "video_url": "https://youtu.be/EbyTUalwRiw",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 309,
+    "name": "Burpee",
+    "video_url": "https://youtu.be/TU8QYVW0gDU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 337,
+    "name": "Squat Jump",
+    "video_url": "https://youtu.be/YGGq0AE5Uyc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 299,
+    "name": "Toe Taps on Step",
+    "video_url": "https://youtu.be/TvppoqEGlD8?si=DK0IhhlJWQxNUPYU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 323,
+    "name": "Lying Leg Raise (Supine)",
+    "video_url": "https://vimeo.com/876464374/7d4b25858e",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 253,
+    "name": "Plank",
+    "video_url": "https://www.youtube.com/watch?v=W5fYocntawU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 269,
+    "name": "Dead-Bug",
+    "video_url": "https://youtu.be/wXFfaLRJ3vk?si=gUdNWvRQr2O5fddL",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 70,
+    "name": "Dumbbell Curl",
+    "video_url": "https://vimeo.com/612834749",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 359,
+    "name": "Prone Press-Up",
+    "video_url": "https://youtu.be/qCOt_Em11g8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 329,
+    "name": "V-Up",
+    "video_url": "https://youtu.be/BcFv0HU0sAo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 301,
+    "name": "Sit to Stand",
+    "video_url": "https://vimeo.com/574904821",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 296,
+    "name": "Plank Walk Out",
+    "video_url": "https://youtu.be/Ao-nV3IdINQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 338,
+    "name": "Anterior Shoulder Rack Stretch",
+    "video_url": "https://youtu.be/dJhN36sg_Lg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 372,
+    "name": "Find Your Push-Up",
+    "video_url": "https://vimeo.com/581150083",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 368,
+    "name": "Reduce Added Sugars",
+    "video_url": "https://vimeo.com/527408970",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 367,
+    "name": "Drink Your Water",
+    "video_url": "https://vimeo.com/526146957",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 473,
+    "name": "Turkish Get-Up",
+    "video_url": "https://youtu.be/v_gxE3YDMb0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 373,
+    "name": "Find Your Squat",
+    "video_url": "https://vimeo.com/581150435",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 374,
+    "name": "Find Your Row",
+    "video_url": "https://vimeo.com/581150329",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 375,
+    "name": "Overhead Dumbbell Lunge",
+    "video_url": "https://youtu.be/J3DxelcaaMU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 376,
+    "name": "Clean and Push Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 378,
+    "name": "Treadmill",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 379,
+    "name": "Banded Pull Apart",
+    "video_url": "https://youtu.be/MnDpmNYUjbc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 412,
+    "name": "Russian Twist",
+    "video_url": "https://youtu.be/JyUqwkVpsi8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 414,
+    "name": "King's Chair Straight Leg Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 415,
+    "name": "Hollow Body Hold",
+    "video_url": "https://youtu.be/IEPL464V4_4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 417,
+    "name": "Couch Stretch",
+    "video_url": "https://youtu.be/kbId9zYgoFQ",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 419,
+    "name": "Seated Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 420,
+    "name": "Thruster",
+    "video_url": "https://youtu.be/aea5BGj9a8Y",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 421,
+    "name": "Dumbbell Snatch",
+    "video_url": "https://youtu.be/3mlhF3dptAo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 422,
+    "name": "Three Legged Dog",
+    "video_url": "https://youtu.be/PPUAjosakvY",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 423,
+    "name": "Sandbag Bear Hug Squat",
+    "video_url": "https://youtu.be/2B4kvtpwfsc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 424,
+    "name": "Sandbag Hop Over",
+    "video_url": "https://youtu.be/RUSrl0dQbPk",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 425,
+    "name": "Posterior Pelvic Tilt",
+    "video_url": "https://youtu.be/44s2-4rEjoo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 426,
+    "name": "Supine Ball Squeeze",
+    "video_url": "https://youtu.be/Kd9Dt7J9Ixs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 427,
+    "name": "Standing Ball Squeeze",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 429,
+    "name": "Waiter Carry",
+    "video_url": "https://youtu.be/oDD4-R4YvMM",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 430,
+    "name": "Side Plank Clam Shell",
+    "video_url": "https://youtu.be/2kAN9qi40Lc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 432,
+    "name": "Bent Knee Pullover",
+    "video_url": "https://youtu.be/FLOvfyHQhy8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 433,
+    "name": "Single Leg Heel Tap",
+    "video_url": "https://youtu.be/lFsSWKzcmbw",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 436,
+    "name": "Wall Ball Shot",
+    "video_url": "https://youtu.be/EqjGKsiIMCE",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 437,
+    "name": "Rope Climb",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 439,
+    "name": "Reverse Table Pose",
+    "video_url": "https://youtu.be/z5vn81t4jOs",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 441,
+    "name": "Clean + Power Jerk + Split Jerk",
+    "video_url": "https://youtu.be/a1zusGya_YY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 442,
+    "name": "Block Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 443,
+    "name": "Hack Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 444,
+    "name": "Press + Chains",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 445,
+    "name": "Kettlebell Bottom Up Overhead Reverse Lunge",
+    "video_url": "https://youtu.be/FJSjoyq9das",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 446,
+    "name": "Chest Supported Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 447,
+    "name": "Rear Deltoid Machine",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 450,
+    "name": "Banded Good Morning",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 451,
+    "name": "Banded Split Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 452,
+    "name": "Buffalo Bar Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 453,
+    "name": "Kadillac Bar Bench",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 454,
+    "name": "Walk",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 455,
+    "name": "Instructions",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 458,
+    "name": "Wall Sit",
+    "video_url": "https://www.youtube.com/watch?v=o-3sLIGoaJM",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 459,
+    "name": "Tire Flip",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 460,
+    "name": "Plate Pinch",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 461,
+    "name": "Broad Jump",
+    "video_url": "https://youtu.be/z1IDJMMg024",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 462,
+    "name": "Chest to Bar Chin-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 463,
+    "name": "Negative Push-Up",
+    "video_url": "https://youtu.be/otG1M7Xl64I",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 465,
+    "name": "Push Jerk",
+    "video_url": "https://www.youtube.com/watch?v=Om7vLD6x8W0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 466,
+    "name": "Split Jerk",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 467,
+    "name": "Cable Pull Through",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 468,
+    "name": "Banded Pull Through",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 470,
+    "name": "Lat Push Down",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 471,
+    "name": "Dumbbell Pull Over",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 472,
+    "name": "Skull Crusher",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 474,
+    "name": "Leg Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 475,
+    "name": "Pec Deck",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 477,
+    "name": "Incline Chest Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 479,
+    "name": "Cable Crossover",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 438,
+    "name": "Leg/Quad/Knee Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 469,
+    "name": "Banded Triceps Push Down",
+    "video_url": "https://vimeo.com/612827715",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 370,
+    "name": "10 Minute Walk",
+    "video_url": "https://vimeo.com/580053111",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 369,
+    "name": "Keep a Food Journal",
+    "video_url": "https://vimeo.com/527412325",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 377,
+    "name": "Handstand Kipping Push-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 435,
+    "name": "Ball Slam",
+    "video_url": "https://youtu.be/ePo39a3mSfk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 434,
+    "name": "Heel Drops",
+    "video_url": "https://youtu.be/8qx5lp67ozg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 324,
+    "name": "Bench Press Multi-Grip/Swiss/Football Bar",
+    "video_url": "https://vimeo.com/740476432",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 440,
+    "name": "Table Top Pose",
+    "video_url": "https://youtu.be/MeNKrcLDexA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 297,
+    "name": "Side Plank",
+    "video_url": "https://www.youtube.com/watch?v=kiVFaQAyZAE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 431,
+    "name": "Transverse Abdominus Isometric",
+    "video_url": "https://youtu.be/oa6BNZVukDc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 416,
+    "name": "Terminal Knee Extension",
+    "video_url": "https://vimeo.com/707835463",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 418,
+    "name": "Banded Hamstring Curl",
+    "video_url": "https://vimeo.com/708674511",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 449,
+    "name": "Iron Cross",
+    "video_url": "https://youtu.be/yqol7AAhHc8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 428,
+    "name": "Wall Push-Up with Shoulder Tap",
+    "video_url": "https://youtu.be/Je_kiDtc5eY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 77,
+    "name": "Kettlebell Swing",
+    "video_url": "https://vimeo.com/574904347",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 260,
+    "name": "Negative Chin-Up",
+    "video_url": "https://vimeo.com/612830963",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 49,
+    "name": "Pin Bench Press",
+    "video_url": "https://vimeo.com/612841391",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 48,
+    "name": "3 Board Press",
+    "video_url": "https://vimeo.com/612828466",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 484,
+    "name": "Dumbbell Incline Bench",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 485,
+    "name": "Test 1",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 486,
+    "name": "Both Feet Elevated Split Squat",
+    "video_url": "https://youtu.be/5pmLtrJLqVk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 487,
+    "name": "Bronco Test",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 488,
+    "name": "Dumbbell Hammer Curl",
+    "video_url": "https://youtu.be/CFBZ4jN1CMI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 489,
+    "name": "Dumbbell Reverse Curl",
+    "video_url": "https://youtu.be/uiH-2J85mzI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 490,
+    "name": "Rolling Thunder Grip Implement",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 492,
+    "name": "Nordic Hamstring Curls",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 493,
+    "name": "Overhead Barbell Triceps Extensions",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 494,
+    "name": "Flexed Arm Hang",
+    "video_url": "https://www.youtube.com/watch?v=THg2oJ8CjOY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 529,
+    "name": "Dumbbell Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 532,
+    "name": "PVC Pipe Walk",
+    "video_url": "https://youtu.be/dhVSLnM2XXY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 533,
+    "name": "Zercher Squat",
+    "video_url": "https://youtu.be/nwx6Ip7hd3I",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 480,
+    "name": "Wall Walk-Up",
+    "video_url": "https://youtu.be/NK_OcHEm8yM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 528,
+    "name": "Kettlebell Turkish Get Up Sit-Up",
+    "video_url": "https://youtu.be/1cQTjhNagBM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 360,
+    "name": "Push-Up (Before Barbells)",
+    "video_url": "https://vimeo.com/574640082",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 534,
+    "name": "Towel Curl",
+    "video_url": "https://vimeo.com/642648005",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 535,
+    "name": "Block Clean",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 538,
+    "name": "Foam Roll Thoracic Extension",
+    "video_url": "https://youtu.be/GUBUD1Rt9KY",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 539,
+    "name": "Standing Thoracic Rotation",
+    "video_url": "https://youtu.be/vbkQl25Spsg",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 542,
+    "name": "IT Band Foam Roll",
+    "video_url": "https://youtu.be/6NHEY8JCWqA",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 39,
+    "name": "Lying Triceps Extensions",
+    "video_url": "https://vimeo.com/612837994",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 119,
+    "name": "Spoto Press",
+    "video_url": "https://vimeo.com/612829662",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 544,
+    "name": "Double Under Jump Rope",
+    "video_url": "https://youtu.be/-tF3hUsPZAI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 546,
+    "name": "Dumbbell Overhead Squat",
+    "video_url": "https://youtu.be/azumEfnk-GI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 549,
+    "name": "Dumbbell Shrug",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 550,
+    "name": "Wall Slides with Ball Between Knees",
+    "video_url": "https://youtu.be/0NO8zKSdoS4",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 551,
+    "name": "Squat Walk Out",
+    "video_url": "https://youtu.be/ihM6TEB18lg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 552,
+    "name": "Muscle Clean",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 554,
+    "name": "Twist Yo Wrist",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 555,
+    "name": "Wrist Roller",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 556,
+    "name": "3 Position Snatch",
+    "video_url": "https://youtu.be/Za5LjeGGE10",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 557,
+    "name": "2 Position Snatch",
+    "video_url": "https://youtu.be/3CmuoICoRPc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 558,
+    "name": "2 Position Clean",
+    "video_url": "https://youtu.be/zzMt0QyN6T8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 559,
+    "name": "3 Position Clean",
+    "video_url": "https://youtu.be/7IEbN4yZ9IA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 560,
+    "name": "Prone Quad Stretch",
+    "video_url": "https://youtu.be/W98_kVhZ_sM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 561,
+    "name": "Monkey Hang",
+    "video_url": "https://youtu.be/Xi495NzNoQ8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 563,
+    "name": "Chest Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 564,
+    "name": "Shoulder Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 76,
+    "name": "Dumbbell Press",
+    "video_url": "https://vimeo.com/654285740",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 565,
+    "name": "Hang Power Snatch",
+    "video_url": "https://youtu.be/-zSQqTHdLA4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 566,
+    "name": "Plank Dumbbell Row",
+    "video_url": "https://youtu.be/c7mKIJ7CeuU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 567,
+    "name": "PVC Thoracic Rotation",
+    "video_url": "https://youtu.be/y8fL4VsmeM4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 568,
+    "name": "Banded Supine Hip Abduction",
+    "video_url": "https://youtu.be/qKniTOK7HQs?t=86",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 569,
+    "name": "Drop Snatch",
+    "video_url": "https://youtu.be/EQrcCmgraa8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 562,
+    "name": "Hang Clean and Jerk",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 572,
+    "name": "Kettlebell Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 573,
+    "name": "Bike (Outdoor-Road)",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 574,
+    "name": "Butt Kick",
+    "video_url": "https://youtu.be/-dtvAxibgYQ",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 576,
+    "name": "Weighted Plank",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 577,
+    "name": "Clean + Front Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 578,
+    "name": "Push Up Plus (Serratus Anterior)",
+    "video_url": "https://youtu.be/RR5xJ1mXEV4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 579,
+    "name": "Beltless Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 580,
+    "name": "Hike",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 615,
+    "name": "Equipped Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 616,
+    "name": "Hang Power Snatch Mid Thigh + Drop Snatch",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 581,
+    "name": "Walking Lunge",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 570,
+    "name": "Plank Jacks",
+    "video_url": "https://youtu.be/PR9nHQXCZMo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 547,
+    "name": "TRX Plank Abdominal Crunch",
+    "video_url": "https://youtu.be/htW-oRyJFfE?t=78",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 540,
+    "name": "Thoracic Spine Windmill",
+    "video_url": "https://youtu.be/63DoI8EYvRI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 537,
+    "name": "Bench Thoracic Spine Mobilization",
+    "video_url": "https://youtu.be/2b0LY4tyzgk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 545,
+    "name": "Jumping Lunge",
+    "video_url": "https://youtu.be/cIkkHg8YZQU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 541,
+    "name": "Squat Prying Stretch with Pole",
+    "video_url": "https://youtu.be/EZe1LbkRnnU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 483,
+    "name": "Handstand Hold",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 575,
+    "name": "Forward Fold",
+    "video_url": "https://youtu.be/0KzyEgkq7zw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 536,
+    "name": "Standing Calf Raise",
+    "video_url": "https://www.youtube.com/watch?v=JUDbOvgH6AQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 614,
+    "name": "Split Squat",
+    "video_url": "https://youtu.be/SGHnCftrZkA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 495,
+    "name": "Warrior Pose",
+    "video_url": "https://youtu.be/fiOXtyjQzY8?t=25",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 618,
+    "name": "Hanging Banded Snatch Grip- Overhead Carry + Overhead Squat",
+    "video_url": "https://youtu.be/TA4z80PuTkg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 619,
+    "name": "Heaving Snatch Balance",
+    "video_url": "https://youtu.be/jarNDV_fMCE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 620,
+    "name": "Jerk Recovery",
+    "video_url": "https://youtu.be/04jzgo3nG2Q",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 621,
+    "name": "Snatch Push Press",
+    "video_url": "https://youtu.be/9r7rOC3hhjk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 622,
+    "name": "Clean High Pull + Power Clean",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 624,
+    "name": "Reverse Band Bench Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 623,
+    "name": "Snatch + Overhead Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 625,
+    "name": "Triangle Pose",
+    "video_url": "https://youtu.be/_1124fj0BeQ",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 626,
+    "name": "Wall Hamstring Stretch",
+    "video_url": "https://www.spine-health.com/video/wall-hamstring-stretch-low-back-pain-relief-video?jwsource=cl",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 627,
+    "name": "Supine Hamstring Stretch",
+    "video_url": "https://youtu.be/QL8FK8CsGc8",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 628,
+    "name": "Weighted Side Bends",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 634,
+    "name": "Clean Grip Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 635,
+    "name": "Hang Power Clean + Push Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 636,
+    "name": "Chest Towel Stretch",
+    "video_url": "https://youtu.be/osiTnMfsyMM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 530,
+    "name": "Dumbbell RDL",
+    "video_url": "https://youtu.be/OJPUg6Y2eCo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 639,
+    "name": "Clean + Power Jerk",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 640,
+    "name": "Smith Machine Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 642,
+    "name": "French Press",
+    "video_url": "https://youtu.be/GFdbiVdBdCg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 643,
+    "name": "Pause Bench (2ct)",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 644,
+    "name": "Pause Bench (3ct)",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 645,
+    "name": "Kettlebell Shrug",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 647,
+    "name": "Cambered Bar",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 648,
+    "name": "Snatch Hip Contact Drill",
+    "video_url": "https://youtu.be/pOV12aRIyAU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 649,
+    "name": "Barbell Lunge",
+    "video_url": "https://youtu.be/RL0kxD6cpz4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 650,
+    "name": "Wide Leg Forward Fold",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 651,
+    "name": "Scaption Dumbbell Raise",
+    "video_url": "https://youtu.be/v1Tn5yb29Ag",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 653,
+    "name": "Shoulder Extension with PVC",
+    "video_url": "https://youtu.be/R0SBQz7jnoo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 655,
+    "name": "Medicine Ball Popcorn Drill (Abs)",
+    "video_url": "https://youtu.be/ikwrXDY3Qy8",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 657,
+    "name": "Single Leg Bridge",
+    "video_url": "https://youtu.be/z4J188sFD4g",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 658,
+    "name": "Behind the Neck Push Press",
+    "video_url": "https://youtu.be/pE07wCY_j7U",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 659,
+    "name": "Power Jerk + Jerk",
+    "video_url": "https://youtu.be/-eD_PAD03EY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 654,
+    "name": "TRX Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 652,
+    "name": "TRX Scapular Retraction",
+    "video_url": "https://youtu.be/VBnuvPSD0XA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 633,
+    "name": "TRX Chest Press",
+    "video_url": "https://youtu.be/Boad82S0XCA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 632,
+    "name": "TRX Chest Fly",
+    "video_url": "https://youtu.be/xTEZppGJze4",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 631,
+    "name": "TRX Bicep Curl",
+    "video_url": "https://youtu.be/xG57S0fgXAk",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 630,
+    "name": "TRX Bicep Hug",
+    "video_url": "https://youtu.be/ZIcSuR983e4",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 629,
+    "name": "TRX Hamstring Curls",
+    "video_url": "https://youtu.be/OIEAPz61114",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 656,
+    "name": "Kneeling Shot Release",
+    "video_url": "https://youtu.be/pXEbwKTphXM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 660,
+    "name": "Thread the Needle Pose",
+    "video_url": "https://youtu.be/MfUx9FCOb1E",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 661,
+    "name": "Child's Pose",
+    "video_url": "https://youtu.be/2pkLUbN34GI",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 662,
+    "name": "Clean Rack Delivery Drill",
+    "video_url": "https://youtu.be/cvA3cBlYGaE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 663,
+    "name": "Tall Muscle Clean",
+    "video_url": "https://youtu.be/p47TjhKxMh0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 664,
+    "name": "Speed Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 714,
+    "name": "Seated Cable Row",
+    "video_url": "https://youtu.be/UCXxvVItLoM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 667,
+    "name": "Trampoline Jumps",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 666,
+    "name": "Power Snatch from Power Position",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 668,
+    "name": "Power Snatch from Power Position + Drop Snatch",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 701,
+    "name": "Viking Press",
+    "video_url": "https://www.youtube.com/watch?v=btVO23viw1I",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 702,
+    "name": "Terminal Knee Extension Step Down",
+    "video_url": "https://youtu.be/XvtQxr13zpo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 703,
+    "name": "Copenhagen Plank",
+    "video_url": "https://youtu.be/IDooEYdhH4U",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 704,
+    "name": "Close Grip Incline Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 705,
+    "name": "Cable Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 707,
+    "name": "Medicine Ball Rotational Throws",
+    "video_url": "https://youtu.be/fi26fgPgcBg",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 708,
+    "name": "Standing Wall Medicine Ball Throw",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 709,
+    "name": "Standing Neck Stretches",
+    "video_url": "https://www.spine-health.com/video/4-easy-stretches-neck-and-shoulder-pain-video",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 710,
+    "name": "Standing IT Band Stretch",
+    "video_url": "https://youtube.com/shorts/UWSfQol_X_E?feature=share",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 711,
+    "name": "Butt Low Bear Crawl",
+    "video_url": "https://youtu.be/Ar3UcaRwOEU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 712,
+    "name": "Sleeper Stretch",
+    "video_url": "https://youtu.be/HU6bdtdDess",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 646,
+    "name": "Wall Ball Sit-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 638,
+    "name": "Reverse Crunch",
+    "video_url": "https://youtu.be/gAyTBB4lm3I",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 641,
+    "name": "Banded Ab Crunch",
+    "video_url": "https://vimeo.com/705800068",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 715,
+    "name": "Cable Shrug",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 716,
+    "name": "Weighted Push-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 717,
+    "name": "Figure 4 Piriformis Stretch",
+    "video_url": "https://youtu.be/Pxx3i6kVYW4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 718,
+    "name": "Lateral Step Up",
+    "video_url": "https://youtu.be/GThrNeGcjGc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 719,
+    "name": "Reverse Grip Bench Press",
+    "video_url": "https://youtu.be/Jeth1aZ3Qpw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 720,
+    "name": "Half Kneeling Rotational Med Ball Throws",
+    "video_url": "https://youtu.be/eyQithc9c7Q?t=66",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 548,
+    "name": "TRX Thoracic Rotation Plank",
+    "video_url": "https://youtu.be/htW-oRyJFfE?t=137",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 117,
+    "name": "Inverted Row",
+    "video_url": "https://vimeo.com/716094322",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 637,
+    "name": "Pause Front Squat + Front Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 713,
+    "name": "Dumbbell Floor Press",
+    "video_url": "https://youtu.be/lNdi7VEf2Ew?si=ln6z11bgRJe9IXwm",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 726,
+    "name": "Drop Squat",
+    "video_url": "https://youtube.com/shorts/eHNnlQ2QTFA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 727,
+    "name": "Decline Squat with plate",
+    "video_url": "https://youtube.com/shorts/rfyUy9PWW3k?feature=share",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 706,
+    "name": "Woodchoppers",
+    "video_url": "https://youtu.be/Rf-2l8Z40dg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 728,
+    "name": "Side Bear Crawl",
+    "video_url": "https://youtu.be/RE-akVcenfA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 730,
+    "name": "Donkey Kick",
+    "video_url": "https://youtu.be/SJ1Xuz9D-ZQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 731,
+    "name": "Banded Face Pull",
+    "video_url": "https://vimeo.com/718707125",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 729,
+    "name": "Lunge Matrix",
+    "video_url": "https://youtu.be/LA54RIK8b3U",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 50004,
+    "name": "Barbell Spider Curl",
+    "video_url": "https://youtu.be/k5u2IwU06o8?si=FhjFPWQUEv6TA4i5",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 50016,
+    "name": "Curl-Up (McGill Big 3)",
+    "video_url": "https://youtu.be/vLpHJ1Cxj6k?si=vHE8I-xKl2JYVX20",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 4461,
+    "name": "Yoke Walk",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 4827,
+    "name": "Seated Figure 4 Stretch",
+    "video_url": "https://youtu.be/Km2MXt5-hSU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 4828,
+    "name": "Circus Dumbbell",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 5194,
+    "name": "Ring Dip",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 5195,
+    "name": "Ring Pull-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 5196,
+    "name": "Muscle Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 5197,
+    "name": "Frame Carry",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 5198,
+    "name": "Duck Walk to Power Stairs",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 5199,
+    "name": "Power Stairs",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 780,
+    "name": "Dumbbell Spider Curl",
+    "video_url": "https://www.youtube.com/watch?v=kPKvWfxWb50&ab_channel=BPISports",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 250,
+    "name": "Yates Row",
+    "video_url": "https://youtu.be/7jMXp9TFLcg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 45330,
+    "name": "Reverse Grip Yates Row",
+    "video_url": "https://youtu.be/SHED5899rnY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31018,
+    "name": "Hip Snatch",
+    "video_url": "https://youtu.be/tNYKb6tmru0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31019,
+    "name": "Tail Snatch",
+    "video_url": "https://youtu.be/UpDy-VNnUuo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31023,
+    "name": "Heel Elevated Goblet Squat",
+    "video_url": "https://youtu.be/L7_WSjGgLR4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31024,
+    "name": "Safety Squat Bar Box Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31042,
+    "name": "Kettlebell Halo",
+    "video_url": "https://youtu.be/wJcmanVh5EE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 5201,
+    "name": "Banded Biceps Curl",
+    "video_url": "https://youtu.be/0hZboUNuogA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 169,
+    "name": "Weighted Windmill",
+    "video_url": "https://www.youtube.com/watch?v=Mrkcagf91zo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 571,
+    "name": "Squat Jerk",
+    "video_url": "https://youtu.be/iFc4l24llpw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31065,
+    "name": "Fingal Fingers",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31053,
+    "name": "Banded Row",
+    "video_url": "https://youtu.be/j7ABJGauUEk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35754,
+    "name": "Pistol Squat",
+    "video_url": "https://youtu.be/e9lfpiHQu70",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35757,
+    "name": "Bamboo Bar Overhead Press",
+    "video_url": "https://youtu.be/xTBJS7hat58",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 553,
+    "name": "Passive (Dead) Hang",
+    "video_url": "https://youtu.be/seyTsW-iNpA",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 35760,
+    "name": "Oblique Roll",
+    "video_url": "https://youtu.be/GNyfcAgV13E",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35762,
+    "name": "Half Kneeling Trunk Rotation",
+    "video_url": "https://youtu.be/78gh3wOoqXU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35763,
+    "name": "Strict Barbell Row",
+    "video_url": "https://youtu.be/6FZHJGzMFEc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 789,
+    "name": "Quadruped Forearm Stretch",
+    "video_url": "https://youtu.be/gwuSXDn8y24",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31508,
+    "name": "Clean Rack Position Stretch",
+    "video_url": "https://youtu.be/RknkVzeNYfs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31509,
+    "name": "Bent Knee Calf Raise",
+    "video_url": "https://youtu.be/NIK_hmryfDg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31510,
+    "name": "Seated Calf Raise",
+    "video_url": "https://youtu.be/3ZRe_QpvRPg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35764,
+    "name": "Wide Elbow Dumbbell Seal Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35761,
+    "name": "Modified Hurdler Stretch",
+    "video_url": "https://youtu.be/85VffOBdpLE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 531,
+    "name": "Thoracic Spine Rotation (Floor)",
+    "video_url": "https://youtu.be/JHck3nsFDVM",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 777,
+    "name": "Side Crunch",
+    "video_url": "https://youtu.be/XfaV6D2uQiw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31880,
+    "name": "Kneeling Cable Trunk Rotation",
+    "video_url": "https://youtu.be/I7stbfs4s0Y?t=189",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31877,
+    "name": "Standing Cable Trunk Anti-Rotation Press",
+    "video_url": "https://www.youtube.com/watch?v=UD0J0YXfBmI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31888,
+    "name": "Ring Push-Up",
+    "video_url": "https://youtu.be/4tuwUu0Z46s",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31891,
+    "name": "Single Leg Box Squat",
+    "video_url": "https://youtu.be/__V4UEzKSBg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31893,
+    "name": "Cossack Shift",
+    "video_url": "https://youtu.be/AQF1a8ZJvn4?t=479",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 121,
+    "name": "Landmine Row",
+    "video_url": "https://www.youtube.com/watch?v=m1BAPmy8bwI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 17251,
+    "name": "Tempo Front Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31878,
+    "name": "Kneeling Cable Trunk Anti-Rotation Press",
+    "video_url": "https://youtu.be/UD0J0YXfBmI?t=143",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 122,
+    "name": "Landmine Press",
+    "video_url": "https://www.youtube.com/watch?v=qFXojXa-RCU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 31879,
+    "name": "Standing Cable Trunk Rotation",
+    "video_url": "https://youtu.be/I7stbfs4s0Y?t=141",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 32285,
+    "name": "Quiz",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 32290,
+    "name": "Cross Leg Reverse Crunch (CLRC)",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 32286,
+    "name": "Weekly Objective",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 32287,
+    "name": "Recipe",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 32288,
+    "name": "Resources/Articles",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 32291,
+    "name": "High Aerobic Multi-shuttle Run (HAMR)",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 19460,
+    "name": "Seated Box Jump",
+    "video_url": "https://youtu.be/64OAo8kINPQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 32292,
+    "name": "Gruseter",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 205,
+    "name": "Hanging V-Up",
+    "video_url": "https://www.youtube.com/watch?v=BThGP0ufXNk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 32668,
+    "name": "Scapular Pull-up (Active Hang)",
+    "video_url": "https://www.youtube.com/watch?v=mtOAYPGRBMc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 32669,
+    "name": "Lateral Line Stretch",
+    "video_url": "https://www.youtube.com/watch?v=kt07LRdWyYE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 204,
+    "name": "L-Sit",
+    "video_url": "https://www.youtube.com/watch?v=n3R-MPRb5lk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 32674,
+    "name": "Straight Leg Hold (6 Inches)",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 32670,
+    "name": "Supine Weighted Pec Stretch",
+    "video_url": "https://www.youtube.com/watch?v=qhR8xTNLZQk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21008,
+    "name": "Buffalo Bar Bench",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21025,
+    "name": "Cable Fly",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21028,
+    "name": "Lateral Box Jump",
+    "video_url": "https://www.youtube.com/watch?v=kJqEVtWkYHo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21033,
+    "name": "High Bar Box Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21034,
+    "name": "Wide Grip Pull-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21074,
+    "name": "Viper Press",
+    "video_url": "https://www.youtube.com/watch?v=smUV5W20mRQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21099,
+    "name": "Snatch Pull + Snatch + Overhead Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21101,
+    "name": "Cossack Squat",
+    "video_url": "https://youtu.be/wrYqfSLWqdE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21129,
+    "name": "Poliquin Step-Up",
+    "video_url": "https://youtu.be/AzbtpwYr2So",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 482,
+    "name": "Power Clean + Push Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 345,
+    "name": "Bear Crawl",
+    "video_url": "https://www.youtube.com/watch?v=t8XLor7unqU",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 21608,
+    "name": "Cable Lateral Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 665,
+    "name": "Continental Clean + Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21610,
+    "name": "Push Press + Power Jerk",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 21611,
+    "name": "Push Press + Power Jerk + Jerk",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 58,
+    "name": "Seated Press",
+    "video_url": "https://vimeo.com/798857840",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22024,
+    "name": "Partial Lateral Raise",
+    "video_url": "https://www.instagram.com/p/Coh-s9eAKVU/",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22025,
+    "name": "Goblet Lunge",
+    "video_url": "https://youtu.be/N9fUKT0PyHU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22033,
+    "name": "Fran",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 22051,
+    "name": "Weighted Shoulder External Rotation",
+    "video_url": "https://www.youtube.com/watch?v=g_zkDp50HN0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22782,
+    "name": "Prone Straight Leg Raise",
+    "video_url": "https://youtu.be/bglzUXkX0o8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22783,
+    "name": "Prone Knee Bent Leg Raise",
+    "video_url": "https://youtu.be/vlPBtku8Sm8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22805,
+    "name": "Bilateral Bent Over Dumbbell Row",
+    "video_url": "https://www.youtube.com/watch?v=ZXpZu_fmheU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 6297,
+    "name": "Pause High Bar Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 804,
+    "name": "Pause Close Grip Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22904,
+    "name": "Dancing Crab (Tabletop Toe Touches)",
+    "video_url": "https://youtu.be/lpt73v4oR8s",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22905,
+    "name": "Pause Power Jerk",
+    "video_url": "https://youtu.be/JCYjY9GV-Bs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22906,
+    "name": "Pause Split Jerk",
+    "video_url": "https://youtu.be/xxFqQ-d_P4M",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22907,
+    "name": "Pause Jerk Dip",
+    "video_url": "https://youtu.be/Eb3E9nLrMBw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 22908,
+    "name": "SkiErg",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 23278,
+    "name": "Jerk Dip",
+    "video_url": "https://youtu.be/NYIgTh-XyYQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 24034,
+    "name": "Preacher Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33422,
+    "name": "Neutral Grip Chin-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33425,
+    "name": "Pike Push-Up",
+    "video_url": "https://www.youtube.com/watch?v=66x0qQiJ-MA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33430,
+    "name": "Bamboo Bar Bench Press",
+    "video_url": "https://www.youtube.com/watch?v=5BJshkoTlAY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 69,
+    "name": "Good Morning",
+    "video_url": "https://vimeo.com/839063828",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33442,
+    "name": "Prone Abdominal Stretch (Cobra Pose)",
+    "video_url": "https://www.youtube.com/watch?v=Nd3j6Avtv6Q",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33443,
+    "name": "Tempo Run (Walk/Jog)",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 33444,
+    "name": "Tempo Run (Jog/Sprint)",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 33445,
+    "name": "Overhead Towel Triceps Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 32293,
+    "name": "Farmer Carry (conditioning)",
+    "video_url": "https://vimeo.com/840583344",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 33510,
+    "name": "Power Clean + Clean",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 315,
+    "name": "Hand Release Push-Up",
+    "video_url": "https://vimeo.com/842919205",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33518,
+    "name": "Kayak",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 33446,
+    "name": "Suitcase Carry",
+    "video_url": "https://www.youtube.com/watch?v=mDmDQm3152E",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 33423,
+    "name": "Neutral Grip Pull-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 46794,
+    "name": "Bird Dog, Bear Crawl Position",
+    "video_url": "https://youtu.be/HMcjIP0fe28",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33916,
+    "name": "Jefferson Curl",
+    "video_url": "https://youtu.be/y_APeWo643w",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33917,
+    "name": "Trunk Crush (Single Leg Elevated)",
+    "video_url": "https://youtu.be/tm_MbvrhEYs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33918,
+    "name": "Seated Pancake Good Morning",
+    "video_url": "https://youtu.be/-P6Ws09aw9I",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33919,
+    "name": "Straddle Leg Lift",
+    "video_url": "https://youtu.be/DCgNKOnJya0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 33920,
+    "name": "Prone External Rotation Liftoff",
+    "video_url": "https://youtu.be/UMqnYkVgT9E",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 27320,
+    "name": "Cat-Cow Pose",
+    "video_url": "https://www.youtube.com/watch?v=y39PrKY_4JM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35016,
+    "name": "Glute Kickback",
+    "video_url": "https://youtu.be/wkkZfPrEU40?t=83",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35017,
+    "name": "Landmine Squat",
+    "video_url": "https://youtu.be/oRVwUtJXLIQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35019,
+    "name": "TRX Reverse Lunge",
+    "video_url": "https://youtu.be/87qrf8SODu8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35020,
+    "name": "Bottom-Up Kettlebell Bench Press",
+    "video_url": "https://youtu.be/5wAND7K73yw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35018,
+    "name": "Landmine Lunge",
+    "video_url": "https://youtu.be/_mimbN3hRR0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 35387,
+    "name": "TRX Squat",
+    "video_url": "https://youtu.be/Re73IUOJqf8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 36861,
+    "name": "Abdominal Dragon Fly",
+    "video_url": "https://youtu.be/SRg4OaSMpQ8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 36863,
+    "name": "Snatch Pull + Snatch",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 36864,
+    "name": "Snatch Pull + Power Snatch",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 36866,
+    "name": "Weighted Chin-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 47164,
+    "name": "Active Lizard Lunge",
+    "video_url": "https://youtu.be/UET3gF3VXdY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 47557,
+    "name": "Rocking Back Roll",
+    "video_url": "https://youtu.be/GN9mqytL1RY?si=CUQGmHyfN3hyZf2g",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 47923,
+    "name": "Captains of Crush Gripper",
+    "video_url": "https://youtu.be/ybFSoxJEl0U?si=tnlI8kLKHRZDT9LD",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 39797,
+    "name": "Prone T Liftoff",
+    "video_url": "https://youtu.be/GwYE71jLtvY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 39798,
+    "name": "High Plank Shoulder Taps",
+    "video_url": "https://youtu.be/8rgurWd-PB8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 39800,
+    "name": "Prone Y Liftoff",
+    "video_url": "https://youtu.be/WJBkwcWVqCg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 310,
+    "name": "Crunch",
+    "video_url": "https://vimeo.com/854463260",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 73,
+    "name": "Push-Up",
+    "video_url": "https://vimeo.com/854462671",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 259,
+    "name": "Sit-Up",
+    "video_url": "https://vimeo.com/854462937",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 40912,
+    "name": "Banded Shoulder Extension",
+    "video_url": "https://youtu.be/JvauW9ZAUSQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 48657,
+    "name": "Bicycle Crunch",
+    "video_url": "https://www.youtube.com/watch?v=1we3bh9uhqY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 48658,
+    "name": "Speed Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 322,
+    "name": "Jumping Jack (Side Straddle Hop)",
+    "video_url": "https://youtu.be/tMp71TX_ixc?si=8I_4C4FSHTd9P2ny",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 42401,
+    "name": "Low Plank",
+    "video_url": "https://youtu.be/ZSIWsBMNxo8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 42402,
+    "name": "Plank Twists",
+    "video_url": "https://youtu.be/fR0tb6agqqA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 42403,
+    "name": "Side Plank Hip Dip+Lift",
+    "video_url": "https://youtu.be/LgaYt4Hi6-g",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 42404,
+    "name": "Foot Rolling",
+    "video_url": "https://youtu.be/d4TPeWMWEQs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 42405,
+    "name": "Standing Calf Stretch (Gastrocnemius & Soleus)",
+    "video_url": "https://youtu.be/2_2GMXTc1BE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 481,
+    "name": "Elevated Pigeon Pose",
+    "video_url": "https://youtu.be/WEVjt3VUNCI?si=P0133QBer4_q2LlY&t=38",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 51865,
+    "name": "Descending Pigeon Pose with Foot Walk",
+    "video_url": "https://youtu.be/WEVjt3VUNCI?si=A0uf58vCmz43ljlG&t=87",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 51866,
+    "name": "Pigeon Good Morning",
+    "video_url": "https://www.youtube.com/watch?v=P8ViLArHYmg&ab_channel=RyanC",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 51883,
+    "name": "Two-Step Agility (Agility Ladder)",
+    "video_url": "https://youtu.be/xx7w23chqVw?si=8WrLe39VEUfNykZF",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 51885,
+    "name": "Standing Power Throw (SPT)",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 53735,
+    "name": "Hanging Leg Raise",
+    "video_url": "https://youtu.be/RuIdJSVTKO4?si=EEyI6P1XxnVRJ2pP",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 198,
+    "name": "Hanging Knee Raise",
+    "video_url": "https://youtu.be/bGg1ae66t6A",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 54472,
+    "name": "Plank + Side Kick",
+    "video_url": "https://www.youtube.com/watch?v=i6pZZGabgR4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 74,
+    "name": "Push Press",
+    "video_url": "https://vimeo.com/865675953",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 244,
+    "name": "Bent-over Dumbbell Rear Delt Raise",
+    "video_url": "https://youtu.be/34gVHrkaiz0?si=4KEyYI26rwN39WJT",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 54892,
+    "name": "Standing Straight Leg Liftoff",
+    "video_url": "https://youtu.be/l6zCbI2BBR8?si=d6yZBKZVkTOrUuoe",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 55268,
+    "name": "Sandbag Get-Up",
+    "video_url": "https://youtu.be/BA38hqDcPX0?si=XjfgwXhYa6kn_Pkb",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 294,
+    "name": "Mountain Climbers",
+    "video_url": "https://youtu.be/BhERlhtzQ1s?si=LsbDzVqCIjz9Ortu",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 55689,
+    "name": "Bent-Over Row",
+    "video_url": "https://vimeo.com/866454513",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 56808,
+    "name": "Lever Row",
+    "video_url": "https://www.youtube.com/watch?v=4C3UwDT4Mks",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 56809,
+    "name": "Platz Squat",
+    "video_url": "https://youtu.be/nlacR0S8Mec?si=s9J5ED5uFSChSr4P&t=22",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 58275,
+    "name": "Zenith Rotations",
+    "video_url": "https://www.youtube.com/watch?v=BFaIxWSXoec",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 58276,
+    "name": "Drop Jump",
+    "video_url": "https://www.youtube.com/watch?v=_dq4lLNqVqM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 58277,
+    "name": "Front Split Slides",
+    "video_url": "https://www.youtube.com/watch?v=pNrx5WILVtw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 60898,
+    "name": "Weighted Dip",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 61269,
+    "name": "Shoulder CARs",
+    "video_url": "https://www.youtube.com/watch?v=kjYVyXWh8-4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 61270,
+    "name": "Dumbbell Shoulder Rotations",
+    "video_url": "https://www.youtube.com/watch?v=4qMoh3-3EpY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 61651,
+    "name": "Side Stretch",
+    "video_url": "https://www.youtube.com/watch?v=nVmCGb_e9Co",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 330,
+    "name": "Box Jump",
+    "video_url": "https://vimeo.com/876371361/7c1437d88c",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 62028,
+    "name": "Hollow Body Rock",
+    "video_url": "https://vimeo.com/876377617/7c1c33e23c",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 62029,
+    "name": "Bear Crawl (Ipsilateral High Hip Variation)",
+    "video_url": "https://vimeo.com/876399275/d4304ceab8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 63532,
+    "name": "Reverse Dead-Bug",
+    "video_url": "https://youtu.be/VQKDdVZb4oM?si=HpfU0Yhruyi8_jMc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 254,
+    "name": "Block Bench Press",
+    "video_url": "https://www.youtube.com/watch?v=Wc24xyoVnBo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 63540,
+    "name": "Plank Knee to Elbow Touch",
+    "video_url": "https://www.youtube.com/watch?v=pI7uWJXcfPE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 63541,
+    "name": "Dead-Bug with Ball",
+    "video_url": "https://youtu.be/bUfeEgFly8w?si=ImAlbTjPedleEssi",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 65035,
+    "name": "EOD Video: Why Strength",
+    "video_url": "https://vimeo.com/881929280",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 65036,
+    "name": "EOD Video: How to Get Strong",
+    "video_url": "https://vimeo.com/881929324",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 65037,
+    "name": "EOD Video: Which Exercises",
+    "video_url": "https://vimeo.com/881929355",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 65038,
+    "name": "EOD Video: What Programming Will Get Me Strong",
+    "video_url": "https://vimeo.com/881929422",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 65039,
+    "name": "EOD Video: Consistency",
+    "video_url": "https://vimeo.com/881929496",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 65040,
+    "name": "EOD Video: Training & Practice",
+    "video_url": "https://vimeo.com/881929588",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 65041,
+    "name": "EOD Video: Metabolically Efficient",
+    "video_url": "https://vimeo.com/881929637",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 66520,
+    "name": "Morning Workout",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 66521,
+    "name": "Afternoon Workout",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 66533,
+    "name": "Weighted Tailor's Pose",
+    "video_url": "https://youtu.be/9KKGK0NiI5k?si=Vxq0noduz6zPkm-u",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 66913,
+    "name": "Kickstand RDL Landmine",
+    "video_url": "https://www.youtube.com/watch?v=Tb7H_1K2_E4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 66914,
+    "name": "Dumbbell Bent-Over Y Raise",
+    "video_url": "https://www.youtube.com/watch?v=yn2Hlm5aFiA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 68402,
+    "name": "Reverse Frog Jump",
+    "video_url": "https://youtu.be/1w9OWquf_P0?si=fHueCsx81HZwF7Ff",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 73230,
+    "name": "Front Pull Down Machine",
+    "video_url": "https://www.google.com/search?q=front+pull+down+machine&sca_esv=586327572&tbm=vid&sxsrf=AM9HkKnKkJcG3QQeRyXzvrcGzARaPBmEAw:1701281486527&source=lnms&sa=X&ved=2ahUKEwjd-6q15-mCAxWyLkQIHWPjBloQ_AUoA3oECAMQBQ&biw=1461&bih=753&dpr=2#fpstate=ive&vld=cid:5ff84b6c,vid:JJ4NwF49s6Q,st:0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 73231,
+    "name": "High Row Machine",
+    "video_url": "https://www.youtube.com/watch?v=ZEQKQJuX8qQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 73969,
+    "name": "Single Arm Cable Pull",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 74371,
+    "name": "Banded Straight Arm Pull-down",
+    "video_url": "https://www.google.com/search?q=banded+straight+arm+pulldown&oq=banded+straight+arm+pulldown&gs_lcrp=EgZjaHJvbWUyCQgAEEUYORiABDIHCAEQABiABDIHCAIQABiABDIICAMQABgWGB4yCAgEEAAYFhgeMggIBRAAGBYYHjIICAYQABgWGB4yCAgHEAAYFhgeMg0ICBAAGIYDGIAEGIoFMg0ICRAAGIYDGIAEGIoF0gEIMzM3N2owajeoAgCwAgA&sourceid=chrome&ie=UTF-8#fpstate=ive&vld=cid:7ac3c314,vid:HA5EYMMrxH8,st:0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 74373,
+    "name": "Landmine Row to Press",
+    "video_url": "https://www.youtube.com/watch?v=Y7ffMbxZBUo&ab_channel=OnnitAcademy",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 74739,
+    "name": "Chest Supported T-Bar Row",
+    "video_url": "https://www.youtube.com/watch?v=in1F5d21vLk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 75883,
+    "name": "Dumbbell Decline Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 76268,
+    "name": "Single Leg Leg Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 76280,
+    "name": "Standing Pancake/Straddle",
+    "video_url": "https://www.youtube.com/watch?v=CJqdb_HKzzY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 76281,
+    "name": "Wide Grip Push-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 76655,
+    "name": "Standing Kettlebell Knee Raise",
+    "video_url": "https://www.youtube.com/watch?v=VV-CDrY5GUs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 77432,
+    "name": "Turkish Sit-Up",
+    "video_url": "https://www.youtube.com/watch?v=A7sXEmRwTQQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 77433,
+    "name": "Single Arm Turkish Sit-Up",
+    "video_url": "https://www.youtube.com/watch?v=KpufjJRtyPc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 77435,
+    "name": "TRX Reverse Flye",
+    "video_url": "https://www.youtube.com/watch?v=jL5H8t9dH_0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 80664,
+    "name": "Suitcase March",
+    "video_url": "https://www.youtube.com/watch?v=MT7tIzmVcKU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 80665,
+    "name": "Suitcase Lunge",
+    "video_url": "https://www.youtube.com/watch?v=aopAoW1cmUk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 781,
+    "name": "Dumbbell Incline Curl",
+    "video_url": "https://www.youtube.com/watch?v=aTYlqC_JacQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 84189,
+    "name": "EZ Barl Curl",
+    "video_url": "https://youtu.be/-gSM-kqNlUw?si=2rmer91gSYPcTl9s",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 84190,
+    "name": "Concentraction Curl",
+    "video_url": "https://youtu.be/VMbDQ8PZazY?si=OK2cA03rRbsqpZK9",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 84252,
+    "name": "Cable Pec Flye",
+    "video_url": "https://www.youtube.com/watch?v=4mfLHnFL0Uw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 456,
+    "name": "Incline Dumbbell Lateral Raise",
+    "video_url": "https://www.youtube.com/watch?v=z3PRz2aVA10",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 84655,
+    "name": "Reminders",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 85066,
+    "name": "Side Plank March",
+    "video_url": "https://www.youtube.com/watch?v=k7MWslnTd6E",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 85087,
+    "name": "Dolphin Pose",
+    "video_url": "https://www.youtube.com/watch?v=W9qEcTjmA78&feature=youtu.be",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 85088,
+    "name": "Eagle Pose",
+    "video_url": "https://www.youtube.com/watch?v=FTWFM-lL5jQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 87831,
+    "name": "Floor Assisted Pull-Up",
+    "video_url": "https://www.youtube.com/watch?v=Wqo7qB7gyhM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 88946,
+    "name": "Russian Twist Ball Slam",
+    "video_url": "https://www.youtube.com/watch?v=qyZ0pAtgo_Y&t=9s",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 88952,
+    "name": "Dumbbell Close Grip Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 93501,
+    "name": "Shoulder External Rotation Raise",
+    "video_url": "https://www.youtube.com/shorts/1cjUbSk37YQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 93935,
+    "name": "Banded Press",
+    "video_url": "https://www.youtube.com/watch?v=dZxyvz3p80w",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 95985,
+    "name": "Weighted Overhead Mobility Stretch w/ Ball",
+    "video_url": "https://youtu.be/dPsucqKY5tI?si=MKN83HprSBq9T1FN&t=67",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 96369,
+    "name": "Kneeling Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 96380,
+    "name": "Rail Press",
+    "video_url": "https://www.youtube.com/watch?v=Wi06iseh0V4&t=4s",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97165,
+    "name": "patrick Step",
+    "video_url": "https://www.youtube.com/watch?v=jAbO12BipQU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 206687,
+    "name": "Tempo Bulgarian Split Squat",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97569,
+    "name": "Standing Hip Stretch",
+    "video_url": "https://www.youtube.com/shorts/Xu_ewsLhbxA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97570,
+    "name": "Shoulder Press Machine",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97571,
+    "name": "ATG Calf Raise",
+    "video_url": "https://youtu.be/m1aMq9W-jDo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97572,
+    "name": "Cardio of Choice",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 97573,
+    "name": "Seated Big Toe Stretch",
+    "video_url": "https://www.youtube.com/shorts/99in1mbPZng",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97574,
+    "name": "Cable Triceps Pushdown straight bar",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97575,
+    "name": "Hip Flossing",
+    "video_url": "https://youtu.be/bMurBKgt9GE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97576,
+    "name": "Cable Chest Press Underhand",
+    "video_url": "https://www.youtube.com/watch?v=uBVsI54gJmU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97578,
+    "name": "Decline Sit Up",
+    "video_url": "https://www.youtube.com/watch?v=0DFaIjw19z4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97579,
+    "name": "Deep Paralette Push Up",
+    "video_url": "https://www.youtube.com/watch?v=xASJNH4h4ew",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97580,
+    "name": "Triceps Ropes Pushdown",
+    "video_url": "https://youtu.be/JDEDaZTEzGE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 98346,
+    "name": "Bird Dog Squares",
+    "video_url": "https://www.youtube.com/watch?v=vbbWunxAf6A",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 98347,
+    "name": "L-Sit Flutter Kick",
+    "video_url": "https://www.youtube.com/watch?v=nWc87MzHDJQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 98348,
+    "name": "Jumping Muscle Up",
+    "video_url": "https://www.youtube.com/watch?v=mdDJuOI5d2E",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 98349,
+    "name": "Seated Pancake",
+    "video_url": "https://www.youtube.com/watch?v=NX6Oli-V8zo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 98820,
+    "name": "Thick Bar Barbell Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99198,
+    "name": "Speed Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99199,
+    "name": "Speed Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99651,
+    "name": "Standing Pike",
+    "video_url": "https://www.youtube.com/watch?v=ipPoSQS8lRw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99667,
+    "name": "Machine Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99668,
+    "name": "Machine Incline Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99677,
+    "name": "TRX Push-Up",
+    "video_url": "https://youtu.be/ir8aAUeZIYk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99678,
+    "name": "TRX Row/Fly Combo",
+    "video_url": "https://youtu.be/9UJhGKsXkRY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99679,
+    "name": "TRX Bicep Curl",
+    "video_url": "https://youtu.be/Bhb7LskHyE8?si=KCij-sSCvmVMRZcg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99680,
+    "name": "TRX Single Arm Row",
+    "video_url": "https://youtu.be/fP50z-rsByQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99681,
+    "name": "TRX Hamstring Curl",
+    "video_url": "https://youtu.be/OIEAPz61114?si=YmtkeCxplMIhRtDE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99682,
+    "name": "TRX Jumping Lunges",
+    "video_url": "https://youtu.be/3o2kT_NUD9U?si=3XfOT2rtrGJ2tZk8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 99683,
+    "name": "TRX Plank",
+    "video_url": "https://youtu.be/vNIUwum4vI8?si=TsYcPR7W_k7OZdtC",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 242,
+    "name": "Incline Dumbbell Bench Press",
+    "video_url": "https://www.youtube.com/watch?v=PZecKOpWOrk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 103842,
+    "name": "One Arm Push-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 321,
+    "name": "Flutter Kick",
+    "video_url": "https://www.youtube.com/watch?v=ZB1SwBRVLCc",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 103850,
+    "name": "Rack Lat Stretch",
+    "video_url": "https://www.youtube.com/watch?v=rwDmo7NrMyo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 104262,
+    "name": "Barbell Burpee",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 104717,
+    "name": "Deficit Push-Up",
+    "video_url": "https://www.youtube.com/watch?v=KadL9HpmWSg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 104730,
+    "name": "Band-Assisted Dip",
+    "video_url": "https://www.youtube.com/watch?v=KuBrpI5BD30",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 104731,
+    "name": "Negative (Eccentric) Dips",
+    "video_url": "https://www.youtube.com/watch?v=Ocg8wyTciVc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 104762,
+    "name": "Single Arm Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105158,
+    "name": "Kneeling Cable Pull Through",
+    "video_url": "https://www.youtube.com/watch?v=vz1Wp_6-otI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105160,
+    "name": "Deep Lunge Rotations",
+    "video_url": "https://www.youtube.com/watch?v=v7VMYyET9Zs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105161,
+    "name": "Supine Lumbar Rotation",
+    "video_url": "https://www.youtube.com/watch?v=QyE63gggyOk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105179,
+    "name": "Lateral Med ball Throw",
+    "video_url": "https://www.youtube.com/watch?v=3xoGPPUVcZc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105182,
+    "name": "Med Ball Explosive Scoop Throw",
+    "video_url": "https://www.youtube.com/watch?v=Pzak0tZG-sA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105183,
+    "name": "Iso-hold Dumbbell Bulgarian Split Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105185,
+    "name": "4 Way Dead-Bug",
+    "video_url": "https://www.youtube.com/watch?v=cK1dy74fVXk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105186,
+    "name": "KB Sumo DL",
+    "video_url": "https://www.youtube.com/shorts/jow7R1XisNc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105187,
+    "name": "Banded Rear Delt Pulls",
+    "video_url": "https://www.youtube.com/shorts/aQSYX1U99Kg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105188,
+    "name": "Depth Push Ups to Explosive Rebound Up",
+    "video_url": "https://www.youtube.com/watch?v=0wOnuMniBdo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105189,
+    "name": "Chest Elevated Push Up on Bar",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105190,
+    "name": "Get Up Sit Up",
+    "video_url": "https://www.youtube.com/watch?v=sTicOz37IFg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105191,
+    "name": "Standing One arm DB Row",
+    "video_url": "https://www.youtube.com/watch?v=Sn-xO0yXuW0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105193,
+    "name": "Standing Tea Pot",
+    "video_url": "https://www.youtube.com/watch?v=trDnvq_5Bbw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 106440,
+    "name": "Seated Dumbbell Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 464,
+    "name": "Banded Dip",
+    "video_url": "https://www.youtube.com/watch?v=uqIYk_sXHqU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 106488,
+    "name": "Tempo Push-Up",
+    "video_url": "https://www.youtube.com/watch?v=udmNnfY8Woc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 295,
+    "name": "Single Leg Balance Touch",
+    "video_url": "https://www.youtube.com/watch?v=4xH5wrBMLIg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 448,
+    "name": "Cable Curls",
+    "video_url": "https://www.youtube.com/watch?v=opFVuRi_3b8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 109349,
+    "name": "Low Bar Stretch",
+    "video_url": "https://youtu.be/X2zDg7RU3TA?si=DEqnyLZlcyMvoxyC",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 109755,
+    "name": "Sport Practice",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 112931,
+    "name": "High Bar Pin Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 114331,
+    "name": "Seated Pin Press Lockout",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 115162,
+    "name": "Star Plank",
+    "video_url": "https://www.youtube.com/watch?v=-9toG6869YY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 115165,
+    "name": "Boat Pose Hold",
+    "video_url": "https://www.youtube.com/watch?v=A8hKOMBiAZM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 117477,
+    "name": "Cable Ab Crunch",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 119077,
+    "name": "Jane Fonda",
+    "video_url": "https://youtu.be/U-HCRrhiZcM?si=ncZ7rEMdvp5Wfksw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 119078,
+    "name": "Banded Abduction",
+    "video_url": "https://youtu.be/aQqOrUmh0e8?si=QzZBOe2-0AfVFf72",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 119512,
+    "name": "Lying Knee Raise",
+    "video_url": "https://www.youtube.com/watch?v=GgvXbYIjYJg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 188,
+    "name": "Bench Press with Feet on Bench",
+    "video_url": "https://www.youtube.com/watch?v=OlpmFvlu65M",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 121948,
+    "name": "Stairmaster",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 125136,
+    "name": "Straight Arm Glute Bridge",
+    "video_url": "https://www.youtube.com/watch?v=Hwj8U961ZEg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 229104,
+    "name": "TRX Bridge",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 214328,
+    "name": "Vertical Pull",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 126088,
+    "name": "Dumbbell Upright Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 126089,
+    "name": "Trap Bar Shrug",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 207470,
+    "name": "Shoulder External Rotation, Prone PAIL/RAILs",
+    "video_url": "https://www.youtube.com/watch?v=8Id4RfxSrzU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 229107,
+    "name": "Hang Power Clean + Front Squat",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 128126,
+    "name": "Sandbag Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 128127,
+    "name": "Sandbag Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 128128,
+    "name": "Sandbag Triceps Overhead Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 128129,
+    "name": "Sandbag Overhead Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 128642,
+    "name": "Pogo Jump",
+    "video_url": "https://www.youtube.com/watch?v=dMnECxl6dsY",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 214329,
+    "name": "Horizontal Pull",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 129278,
+    "name": "Hip Abduction Machine",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 129661,
+    "name": "Straight Arm Pull Down",
+    "video_url": "https://www.youtube.com/watch?v=CqsO1bQl9QI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 97577,
+    "name": "Dead Hang",
+    "video_url": "https://www.youtube.com/watch?v=sRshX8wYOOI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 132528,
+    "name": "After Dinner Intake",
+    "video_url": null,
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 33436,
+    "name": "Triceps Kickbacks",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 96423,
+    "name": "Dumbbell Triceps Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 159,
+    "name": "Triceps Push Down",
+    "video_url": "https://vimeo.com/612830076",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 286,
+    "name": "Overhead Cable Triceps Extension",
+    "video_url": "https://youtube.com/shorts/oJpf8v8cq0w?si=4rCkIfb7OAdMvAtc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 95059,
+    "name": "Dumbbell Overhead Triceps Extensions",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 788,
+    "name": "Seated Triceps Stretch",
+    "video_url": "https://youtu.be/FC39zhEcddc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 132977,
+    "name": "Lateral Raise Machine",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 109370,
+    "name": "Tempo Lever Row",
+    "video_url": "https://www.youtube.com/watch?v=4C3UwDT4Mks",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 137648,
+    "name": "Frog Glute Bridge",
+    "video_url": "https://www.youtube.com/watch?v=aqtXNYdY9VE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 137665,
+    "name": "Transformer Bar",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 138246,
+    "name": "Competition Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 138247,
+    "name": "Curls of Choice",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 138256,
+    "name": "Pause Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 207851,
+    "name": "Week 2 Objective- Fat Loss",
+    "video_url": "https://vimeo.com/904470811/81bfa1792c?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 141111,
+    "name": "Incline Bench Press Multi-Grip/Swiss/Football Bar",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 141114,
+    "name": "Dumbbell Push Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142457,
+    "name": "Board Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142333,
+    "name": "Back Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142363,
+    "name": "Lying Tricep Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142380,
+    "name": "Tempo High Bar Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142381,
+    "name": "Tempo Lat Pulldown",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142391,
+    "name": "Abductor Machine",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142392,
+    "name": "Abs of Choice",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142395,
+    "name": "Adductor Machine",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142397,
+    "name": "Arms of Choice",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142400,
+    "name": "Axle Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142404,
+    "name": "B Stance Romanian Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142411,
+    "name": "Banded Curl",
+    "video_url": "https://www.youtube.com/watch?v=cSvDe6oMFlU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142415,
+    "name": "Banded Goblet Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142420,
+    "name": "Banded Lateral Raise",
+    "video_url": "https://www.youtube.com/watch?v=yfNg5sFndbw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142423,
+    "name": "Banded Pause Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142428,
+    "name": "Banded Push-Up",
+    "video_url": "https://www.youtube.com/watch?v=bmRr-B3xxRs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142432,
+    "name": "Banded Triceps Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142435,
+    "name": "Barbell Good Morning",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142436,
+    "name": "Barbell Incline Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142449,
+    "name": "Bent Over Barbell Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142450,
+    "name": "Bent Over Lateral Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142458,
+    "name": "Board Close Grip Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142464,
+    "name": "Buffalo Bar Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142465,
+    "name": "Buffalo Bar High Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142468,
+    "name": "Cable Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142469,
+    "name": "Cable Hammer Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142472,
+    "name": "Cable Triceps Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142473,
+    "name": "Cable Triceps Push Down",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142476,
+    "name": "Chest Supported Rear Delt Fly",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142477,
+    "name": "Chest Supported Reverse Fly",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142489,
+    "name": "Close Grip Larsen Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142493,
+    "name": "Competition Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142512,
+    "name": "Dumbbell Arnold Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142517,
+    "name": "Dumbbell Floor Fly",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142521,
+    "name": "Dumbbell Goblet Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142523,
+    "name": "Dumbbell Incline Bench Press",
+    "video_url": "https://www.youtube.com/watch?v=Fv5EYoJfRt4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142529,
+    "name": "Dumbbell Romanian Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142532,
+    "name": "Dumbbell Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142533,
+    "name": "EZ Bar Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142534,
+    "name": "Face Pull",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142543,
+    "name": "GHD Back Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142565,
+    "name": "High Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142573,
+    "name": "Incline Dumbbell Fly",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142574,
+    "name": "Incline Dumbbell Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142576,
+    "name": "Incline Smith Machine Bench",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142579,
+    "name": "Isometric Squat Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142582,
+    "name": "Jump Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142584,
+    "name": "Kas Glute Bridge",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142589,
+    "name": "Kettlebell Goblet Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142591,
+    "name": "Kettlebell Romanian Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142594,
+    "name": "Kettlebell Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142595,
+    "name": "Kettlebell Sumo Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142599,
+    "name": "Kettlebell Windmill",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142608,
+    "name": "Lateral Raise",
+    "video_url": "https://youtu.be/TM6se0vr1VA?si=I6MqWIfNGyQqP06h",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142610,
+    "name": "Leg Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142620,
+    "name": "Lying Hamstring Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142621,
+    "name": "Lying Leg Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142633,
+    "name": "Nordic Hamstring Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142637,
+    "name": "Overhead Cable Tricep Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142639,
+    "name": "Overhead Tricep Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142641,
+    "name": "Pause Bench (1ct)",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142645,
+    "name": "Pause Box Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142648,
+    "name": "Pause Deficit Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142649,
+    "name": "Pause Floor Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142651,
+    "name": "Pause Goblet Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142653,
+    "name": "Pause Lat Pulldown",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142654,
+    "name": "Pause Pin Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142655,
+    "name": "Pause Power Clean",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142657,
+    "name": "Pause Push-Up",
+    "video_url": "https://www.youtube.com/watch?v=kVlZhVOZRC4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142658,
+    "name": "Pause Split Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142660,
+    "name": "Pause Strict Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142661,
+    "name": "Pause Sumo Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142662,
+    "name": "Pause Trap Bar Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142663,
+    "name": "Pause Wide Grip Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142669,
+    "name": "Pin Seated Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142671,
+    "name": "Pin Squat + Chains",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142695,
+    "name": "Rear Delt Fly",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142696,
+    "name": "Rear Delt Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142701,
+    "name": "Reverse Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142710,
+    "name": "Rope Triceps Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142711,
+    "name": "Rope Triceps Push Down",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142712,
+    "name": "Row of Choice",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142713,
+    "name": "Ruck",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142724,
+    "name": "Seated Lateral Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142725,
+    "name": "Seated Leg Curl",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142733,
+    "name": "Single Arm Tricep Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142738,
+    "name": "Single Leg Romanian Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142744,
+    "name": "Slingshot Close Grip Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142745,
+    "name": "Smith Machine Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142747,
+    "name": "Smith Machine Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142766,
+    "name": "Stiff Leg Dumbbell Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142773,
+    "name": "T-Bar Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142781,
+    "name": "Tempo Close Grip Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142783,
+    "name": "Tempo Floor Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142785,
+    "name": "Tempo Goblet Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142788,
+    "name": "Tempo Pin Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142789,
+    "name": "Tempo Pin Squat",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142792,
+    "name": "Tempo Romanian Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142799,
+    "name": "Triceps Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142800,
+    "name": "Triceps Kickback",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142802,
+    "name": "Triceps of Choice",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142527,
+    "name": "Dumbbell Overhead Tricep Extension",
+    "video_url": "https://www.youtube.com/watch?v=a9oPnZReIRE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 143686,
+    "name": "Inverted Skull Crusher",
+    "video_url": "https://youtu.be/1lrjpLuXH4w",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 147316,
+    "name": "Wagon Wheel Deadlift",
+    "video_url": "https://www.youtube.com/watch?v=5CPQv1QdbP4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 191,
+    "name": "Snatch Balance",
+    "video_url": "https://www.youtube.com/watch?v=8KKQTdnxWso",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 214340,
+    "name": "Safety Squat Bar Goodmorning",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 211001,
+    "name": "Clam Shell",
+    "video_url": "https://youtu.be/DAAjOdwZdks?si=p3NguONZULuKXlxV&t=9",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 326,
+    "name": "Diamond Push-Up",
+    "video_url": "https://www.youtube.com/watch?v=XtU2VQVuLYs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 211013,
+    "name": "Cable Bent Fly",
+    "video_url": "https://youtu.be/Cj6P91eFXkM?si=XN9U8FZqYHCLyx0j",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 148924,
+    "name": "Machine Assisted Chin-up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 212152,
+    "name": "Man Makers",
+    "video_url": "https://youtube.com/shorts/PtxTwOkOYQE?si=JT84BKhrCqDNR6RV",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 212167,
+    "name": "Sauna",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 149505,
+    "name": "Prone Shoulder Horizontal Abduction",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 149506,
+    "name": "Shoulder Flexion",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 149507,
+    "name": "Shoulder Abduction",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 150302,
+    "name": "Quad Rockers",
+    "video_url": "https://youtu.be/9plk77TgMlo?si=4VoZKvEg-CdF-cS4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142421,
+    "name": "Banded Leg Curl",
+    "video_url": "https://www.youtube.com/watch?v=kEEzzNwFg3E",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 212233,
+    "name": "Back Extension Hold",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 155387,
+    "name": "Towel Chin-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 158926,
+    "name": "Wall Bridge Walk Down + Up",
+    "video_url": "https://www.youtube.com/watch?v=yvXjisvurdI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 211065,
+    "name": "Machine Lat Pulldown",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 162705,
+    "name": "Reaching Sit-Up",
+    "video_url": "https://www.youtube.com/watch?v=id3PR11Xj38",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 163158,
+    "name": "Decline Bench Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 163159,
+    "name": "Single Leg Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 163559,
+    "name": "Pause Dumbbell Bench Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 163969,
+    "name": "Shoulder Shrug",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 165196,
+    "name": "Incline Dumbbell Row",
+    "video_url": "https://www.youtube.com/watch?v=tZUYS7X50so",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 166174,
+    "name": "Paused Snatch",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142771,
+    "name": "Sumo Rack Pull",
+    "video_url": "https://www.youtube.com/watch?v=We5nNbHn6sM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 265,
+    "name": "Reverse Lunge",
+    "video_url": "https://www.youtube.com/watch?v=xrPteyQLGAo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 167425,
+    "name": "Single Arm Dumbbell Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 168679,
+    "name": "Seated Chin-Up",
+    "video_url": "https://www.youtube.com/watch?v=XMgSMPt8jL4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 168682,
+    "name": "Jump Lunge",
+    "video_url": "https://www.youtube.com/watch?v=xaZj-gIHzY8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 168683,
+    "name": "Zercher Carry",
+    "video_url": "https://www.youtube.com/watch?v=yqtWcL9-1_k",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142736,
+    "name": "Single Leg Glute Bridge",
+    "video_url": "https://www.youtube.com/watch?v=neRA-7kSy1s",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 208846,
+    "name": "Hip CARs",
+    "video_url": "https://youtu.be/G494iVXq3lk?si=SqYgFfK6aqEgAnMq",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 170050,
+    "name": "Burgner Warm-Up",
+    "video_url": "https://www.youtube.com/watch?v=I2yIRp3LTgM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 170110,
+    "name": "Cable Bench Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 170159,
+    "name": "Dinny Stone Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 170161,
+    "name": "Horse Stance Hold",
+    "video_url": "https://www.youtube.com/watch?v=op4aI1-NVQE",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 229489,
+    "name": "Pause Snatch Deadlift",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 172934,
+    "name": "Bike (Indoor)",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 208936,
+    "name": "Week 3 Objective- Fat Loss",
+    "video_url": "https://vimeo.com/905238901/7d40d55728?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 208937,
+    "name": "Week 4 Objective - Fat Loss",
+    "video_url": "https://vimeo.com/905242242/c2865af3be?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 174082,
+    "name": "Prone Barbell Row",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 211146,
+    "name": "Placeholder",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 174211,
+    "name": "Chair Sumo Deadlift",
+    "video_url": "https://www.youtube.com/watch?v=hIjVyahRXeU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 174268,
+    "name": "Iso Arm Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 174506,
+    "name": "Close Grip Lat Pull Down",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 174517,
+    "name": "Weighted Pull-Up",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 174668,
+    "name": "Wide Grip Larsen Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 174672,
+    "name": "Wide Grip Spoto Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 175890,
+    "name": "Cable Cross Lateral Raise",
+    "video_url": "https://youtu.be/2OMbdPF7mz4?si=HSBt1PsjYvdoQ0Mm",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 175891,
+    "name": "Cable Upright Row",
+    "video_url": "https://youtu.be/qr3ziolhjvQ?si=d4hotVcVKXc4aYkW",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 175892,
+    "name": "Decline Dumbbell Bench Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 331,
+    "name": "Kettlebell Press",
+    "video_url": "https://www.youtube.com/watch?v=Q3kNvjBMn60",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 175898,
+    "name": "Bottom-Up Kettlebell Press",
+    "video_url": "https://www.youtube.com/watch?v=J5LEpIZSDS0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 178362,
+    "name": "Sit Out",
+    "video_url": "https://www.youtube.com/watch?v=rCOfjHFhKGk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 178363,
+    "name": "Lizard Crawl",
+    "video_url": "https://www.youtube.com/watch?v=uknpT9f0lGo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 178365,
+    "name": "Single Leg Hop",
+    "video_url": "https://www.youtube.com/watch?v=2A9tafevEno",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 180066,
+    "name": "Dip Machine",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 209709,
+    "name": "One arm dumbell press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 209710,
+    "name": "Lying Heel Tap (Spine Lateral Flexion)",
+    "video_url": "http://youtube.com/watch?v=4Ue3F_4kss8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 180917,
+    "name": "Dumbbell JM Press",
+    "video_url": "https://www.youtube.com/watch?v=2PR3m02Bcyc",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 34,
+    "name": "Halting Deadlift",
+    "video_url": "https://www.youtube.com/watch?v=kjQNOP-CuRI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 288,
+    "name": "Dumbbell Fly",
+    "video_url": "https://www.youtube.com/watch?v=Nhvz9EzdJ4U",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 210151,
+    "name": "Transformer Bar: Front Squat",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 210234,
+    "name": "Incline Dumbell Curl",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 210260,
+    "name": "Week 10 Objective - Fat Loss",
+    "video_url": "https://vimeo.com/905594644/77c0f0aff0?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 210235,
+    "name": "Incline Dumbbell Curl",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 210255,
+    "name": "Week 5 Objective - Fat Loss",
+    "video_url": "https://vimeo.com/904549814/284f9e86e7?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 210261,
+    "name": "Week 11 Objective - Fat Loss",
+    "video_url": "https://vimeo.com/905597215/08b198c853?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 210256,
+    "name": "Week 6 Objective - Fat Loss",
+    "video_url": "https://vimeo.com/905243744/ca766a340c?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 210262,
+    "name": "Week 12 Objective - Fat Loss",
+    "video_url": "https://vimeo.com/904468990/0d3a51b39a?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 210205,
+    "name": "Back Rack Step Back",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 210257,
+    "name": "Week 7 Objective - Fat Loss",
+    "video_url": "https://vimeo.com/904455803/a4b1540751?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 199,
+    "name": "Kroc Row",
+    "video_url": "https://www.youtube.com/watch?v=7miN5vkwamQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 210258,
+    "name": "Week 8 Objective - Fat Loss",
+    "video_url": "https://vimeo.com/904457730/ced3595ba5?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 210259,
+    "name": "Week 9 Objective - Fat Loss",
+    "video_url": "https://vimeo.com/905591917/03b2d13a46?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 181309,
+    "name": "Twisting Sit-Up",
+    "video_url": "https://www.youtube.com/watch?v=9C1yGA0Il-o",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 181685,
+    "name": "Power Squat Machine",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 182569,
+    "name": "Barbell Lat Pullover",
+    "video_url": "https://www.youtube.com/watch?v=7Oe6NoChaKo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 182570,
+    "name": "Close Grip Spoto Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 182572,
+    "name": "Candlestick",
+    "video_url": "https://www.youtube.com/watch?v=A6u0hi087v0",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 182648,
+    "name": "Incline Fly",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 182649,
+    "name": "Cable Pullover",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 183039,
+    "name": "Lying Dumbbell Curl",
+    "video_url": "https://www.youtube.com/watch?v=Q7RyGuOAFKM",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 183043,
+    "name": "Seated Row Machine",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 183808,
+    "name": "Walking Lunge + Trunk Rotation",
+    "video_url": "https://www.youtube.com/watch?v=G65aplILBXs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 185528,
+    "name": "Clock Lunge",
+    "video_url": "https://www.youtube.com/watch?v=VJLrtuMvwu8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 187105,
+    "name": "Worlds Greatest Stretch",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 189822,
+    "name": "Seated Leg Lift",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 189823,
+    "name": "Wall-Supported Single Leg Romanian Deadlift",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 190951,
+    "name": "Leg Curl on Ball",
+    "video_url": "https://youtube.com/shorts/xB1lGVzRwWk?si=qwKRqR8Yras-tiV3",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 190952,
+    "name": "Plank Knees to Chest on Ball",
+    "video_url": "https://youtube.com/shorts/n7IjBNgig9I?si=yKU3QTuERwmt0TVR",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 192901,
+    "name": "Active Plank",
+    "video_url": "https://www.youtube.com/watch?v=BKCVygYnSXo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 210370,
+    "name": "Yoke Zercher + Sandbag",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 196110,
+    "name": "Low Intensity Steady-State (LISS)",
+    "video_url": "",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 196502,
+    "name": "Cybex Preacher Curl",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 108882,
+    "name": "Beltless Safety Bar Squat",
+    "video_url": "https://youtu.be/CMn1Z9pzZAk?si=5hk79jccdeoU4zzu",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 210393,
+    "name": "Meal 1",
+    "video_url": "",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 210394,
+    "name": "Meal 2",
+    "video_url": "",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 737,
+    "name": "Seated Good Morning",
+    "video_url": "https://www.youtube.com/watch?v=XKXmApXuVUw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 199775,
+    "name": "Bat Wings",
+    "video_url": "https://youtu.be/_9Y89SAXNrg?si=TKTvWBRVSSOEbWGS",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 199776,
+    "name": "Incline Dumbbell Y Raises",
+    "video_url": "https://youtu.be/gDHQX1iend4?si=uixz0C5pGogZ_Ktk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 199774,
+    "name": "Decline Dumbbell Fly",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 200578,
+    "name": "Dumbbell Shoulder External Rotation (Elbow on Knee)",
+    "video_url": "https://www.youtube.com/watch?v=HeY0G79zbGA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 200579,
+    "name": "Shoulder Capsular CARs",
+    "video_url": "https://www.youtube.com/watch?v=o0wSN2-j8bQ",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142431,
+    "name": "Banded Strict Press",
+    "video_url": "https://www.youtube.com/watch?v=nwjQIADavj8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 20,
+    "name": "Banded Squat",
+    "video_url": "https://www.youtube.com/watch?v=Eaqr79zvqIw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 200600,
+    "name": "Banded Lunge",
+    "video_url": "https://www.youtube.com/watch?v=51dnxGBDjd8",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 200601,
+    "name": "Banded Hip Thrust",
+    "video_url": "https://www.youtube.com/watch?v=2OaqZ-QAiYw",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202169,
+    "name": "Plyometric Pushup",
+    "video_url": "https://youtu.be/zjEHDw569b0?si=aez5khF9R2wRIkm4",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202253,
+    "name": "Assisted Chin-Ups",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202254,
+    "name": "Assisted Dips",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202255,
+    "name": "Bench Press machine",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202256,
+    "name": "Bent Over Two Arm Dumbbell Rows",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202257,
+    "name": "Cable Pressdowns",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202258,
+    "name": "Calf Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202259,
+    "name": "Concept 2 row",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 202260,
+    "name": "Decline Seated Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202261,
+    "name": "Dumbbell Rear Delt Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202262,
+    "name": "EZ bar Reverse Curls",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202263,
+    "name": "Football Bar Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202264,
+    "name": "Interval Running",
+    "video_url": null,
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 202265,
+    "name": "Leg Press Calf Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202266,
+    "name": "Leg Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202267,
+    "name": "Lying Dumbbell Triceps Extension",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202268,
+    "name": "Machine Row",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202269,
+    "name": "Machine Single-Hand Pulldown",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202270,
+    "name": "Negative Dips",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202271,
+    "name": "Paused Rack Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202272,
+    "name": "Paused dumbbell floor fly",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202273,
+    "name": "Rack Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202275,
+    "name": "Sand Dune Climb",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202276,
+    "name": "Side Delt Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202277,
+    "name": "Smith Machine Calf Raise",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202278,
+    "name": "Spoto Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202279,
+    "name": "Steep Incline Bench Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202280,
+    "name": "Stiff Leg Deadlift",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202281,
+    "name": "T-bar rows",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202282,
+    "name": "Weighted Negative Chin ups",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202283,
+    "name": "xml:space=\"preserve\">Incline Dumbbell Tate Press ",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202321,
+    "name": "Decline Press Machine",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202414,
+    "name": "Weighted Lunge",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202547,
+    "name": "Bodyweight Reverse Hyper",
+    "video_url": "https://www.youtube.com/watch?v=3d9_W--eUcI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202569,
+    "name": "Behind the Neck Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 205870,
+    "name": "Week 1 Objective- Fat Loss",
+    "video_url": "https://vimeo.com/905587655/59920ff036?share=copy",
+    "exercise_type": "nutrition"
+  },
+  {
+    "id": 214327,
+    "name": "Welcome to the FiftyThirst \ud83e\udee6",
+    "video_url": "https://youtu.be/ZF3JCdmsKIg",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 216482,
+    "name": "Reverse Wrist curls",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 228298,
+    "name": "Barbell Rollout",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 228299,
+    "name": "Plate Front Raises",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 218233,
+    "name": "Ab Roll-Up",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 218234,
+    "name": "Bench Tuck",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 218235,
+    "name": "Dumbbell Curl to Press",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 220800,
+    "name": "Single Leg Hip Thrust",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 340,
+    "name": "Standing Calf Stretch",
+    "video_url": "https://youtu.be/y01ri_43G50",
+    "exercise_type": "conditioning"
+  },
+  {
+    "id": 221739,
+    "name": "Partner Leg Throw",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 221749,
+    "name": "Reverse Cable Crossover",
+    "video_url": "https://youtube.com/shorts/uhje8lyqlEQ?si=f7BTAmeEfESbcQjo",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 225163,
+    "name": "Landmine Trunk Rotation",
+    "video_url": "https://www.youtube.com/watch?v=e5DP6961WEk",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 491,
+    "name": "Abdominal Penguins",
+    "video_url": "https://www.youtube.com/watch?v=gVCK6QhqAmI",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 105184,
+    "name": "KB Sumo RDL",
+    "video_url": "https://www.youtube.com/watch?v=iFUu1aZM55k",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 142735,
+    "name": "Single Leg Deadlift",
+    "video_url": "https://youtu.be/YMx4z7cnaUA?si=iZUT36hOrY5xtlr2",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 231511,
+    "name": "ShayMaxx Row",
+    "video_url": "https://www.youtube.com/shorts/DgfXke_eVfA",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 231956,
+    "name": "Clean + Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 234430,
+    "name": "Unilateral Lat Pulldown",
+    "video_url": null,
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 235592,
+    "name": "Speed Incline Bench Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 237978,
+    "name": "Speed Deadlift with Bands",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 241296,
+    "name": "Pec Fly",
+    "video_url": "https://youtu.be/z8juzhSsFKU?si=n-EErc3FNs15i6-S",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 244709,
+    "name": "Cable Crunch",
+    "video_url": "https://youtube.com/shorts/ByZJuk85YuE?si=fxqHMd5uq5bG5jaV",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 202274,
+    "name": "Safety Bar Good Morning",
+    "video_url": "https://youtu.be/1Dra9_8DUSQ?si=f-AbP9IjToe103JU",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 245975,
+    "name": "Donkey Calf Raise",
+    "video_url": "https://youtu.be/FtD0qv9P7O0?si=z8ZXsFPGtrNWU1hm",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 253188,
+    "name": "Dumbbell Squeeze Press",
+    "video_url": "https://youtu.be/Aq_wwRslKas?si=6MC4vzjtqwA7RlDC",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 253189,
+    "name": "Bayesian Cable Curls",
+    "video_url": "https://youtube.com/shorts/BaSd7C58L3o?si=Ef3y1hTMcZm9xtDV",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 253861,
+    "name": "Pause Larsen Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 253880,
+    "name": "Complex",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 254813,
+    "name": "Chin-Up Holds",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 257498,
+    "name": "5 Board Press",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 257499,
+    "name": "One Arm Lat Pulldown",
+    "video_url": "https://youtube.com/shorts/a94VLBc4nDs?si=sVOkyS-FdnDYbrLS",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 257557,
+    "name": "Seated Cable Face Pull",
+    "video_url": "",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 257962,
+    "name": "Seal Row",
+    "video_url": "https://youtu.be/4H2ItXwUTp8?si=rv9czBAyJKi_rRBs",
+    "exercise_type": "resistance"
+  },
+  {
+    "id": 260741,
+    "name": "Reverse Barbell Curl",
+    "video_url": "",
+    "exercise_type": "resistance"
+  }
+]

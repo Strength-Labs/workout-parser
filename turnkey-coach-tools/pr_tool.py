@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta, date
 from rich.console import Console
 from rich.text import Text
-from api_client import get_workout_history # Import the new smart function
+from api_client import get_workout_history
 
 console = Console()
 
@@ -23,9 +23,16 @@ def process_workout_history(workouts, start_date=None, end_date=None):
     """Processes workout history to find the best e1RM for every exercise in a date range."""
     best_performances = {}
     for workout in workouts:
-        workout_date = datetime.strptime(workout.get("workout_date"), "%Y-%m-%d").date()
+        # --- THE FIX: Check for a valid date before processing ---
+        workout_date_str = workout.get("workout_date")
+        if not workout_date_str:
+            continue # Skip this workout if it has no date
+        # ---------------------------------------------------------
+        
+        workout_date = datetime.strptime(workout_date_str, "%Y-%m-%d").date()
         if (start_date and workout_date < start_date) or (end_date and workout_date > end_date):
             continue
+
         for exercise in workout.get("assigned_exercises", []):
             lift_name = exercise.get("exercise", {}).get("name", "Unknown").lower()
             for assigned_set in exercise.get("assigned_sets", []):
