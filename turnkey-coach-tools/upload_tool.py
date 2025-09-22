@@ -4,6 +4,16 @@ import os
 import requests
 from api_client import API_BASE_URL, console
 
+try:
+    from rapidfuzz import process
+except ImportError:
+    pass
+
+def get_similar_exercises(exercise_name: str, exercise_names: list[str], limit: int = 5):
+    """Finds similar exercise names using fuzzy matching."""
+    matches = process.extract(exercise_name, exercise_names, limit=limit)
+    return [match[0] for match in matches if match[1] > 80]
+
 def parse_line_as_set(line: str):
     """
     Tries to parse a line as a structured set. If it fails, returns None.
@@ -11,8 +21,24 @@ def parse_line_as_set(line: str):
     line = line.strip()
     base_set = {
         "set_type": "default", "rep_type": "default_rep_type", "distance": 0.0,
-        "distance_unit": None, "time": 0, "body": None
+        "distance_unit": None, "time": 0, "body": None, "reps": None
     }
+    
+    # Time-based format
+    time_match = re.match(r"(\d+)\s*x\s*(\d{1,2}:\d{2})(?:\s*@\s*(RPE\s*\d+\.?\d*))?", line, re.IGNORECASE)
+    if time_match:
+        sets, duration_str, rpe_str = time_match.groups()
+        try:
+            minutes, seconds = map(int, duration_str.split(':'))
+            total_seconds = (minutes * 60) + seconds
+        except ValueError: return None
+        parsed = {**base_set, "sets": int(sets), "time": total_seconds, "weight": None}
+        if rpe_str:
+            parsed["weight_type"] = "RPE"
+            parsed["weight_type_value"] = float(rpe_str.upper().replace("RPE", "").strip())
+        else:
+            parsed["weight_type"] = "bodyweight"
+        return parsed
     
     # RPE-based
     match = re.match(r"(\d+)\s*x\s*([a-zA-Z0-9]+)\s*@\s*RPE\s*(\d+\.?\d*)", line, re.IGNORECASE)
@@ -53,19 +79,18 @@ def parse_line_as_set(line: str):
     return None
 
 def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: dict):
-    """
-    Parses a text file into a list of workout dictionaries and a list of comments to be added.
-    """
+    """Parses a text file into a list of workout dictionaries, with interactive fuzzy matching."""
     with open(plain_text_path, 'r') as f: content = f.read()
     workouts = []
     workout_sections = [s for s in re.split(r'Workout Date:\s*', content) if s.strip()]
+    exercise_names = list(exercise_map.keys())
 
     for section in workout_sections:
         lines = section.strip().split('\n')
         workout = {
             "user_id": user_id, "workout_date": lines[0].strip(),
             "title": None, "weight_type": "lbs", "assigned_exercises": [],
-            "published": True, "comments_to_add": [] # Temporary storage for comments
+            "published": True,
         }
         
         start_line_index = 1
@@ -78,21 +103,21 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
         current_exercise = None
         for line in lines[start_line_index:]:
             stripped_line = line.strip()
-            if not stripped_line or stripped_line == "---" or stripped_line.startswith('('):
+            if not stripped_line or stripped_line == "---" or stripped_line.startswith('(') or stripped_line.startswith('['):
                 continue
             
             is_indented = len(line) > len(line.lstrip())
 
             if is_indented:
-                # Indented lines are notes. Store them for later.
+                if stripped_line.startswith('>'): continue
                 if current_exercise:
-                    # Note is for the current exercise
-                    note_target = {"parent_type": "AssignedExercise", "text": stripped_line}
-                    current_exercise.setdefault("comments_to_add", []).append(note_target)
+                    note_set = {
+                        "set_type": "custom", "body": stripped_line, "priority": len(current_exercise["assigned_sets"]),
+                        "rep_type": "default_rep_type", "distance": 0.0, "distance_unit": None, "time": 0, "reps": None, "sets": None, "weight": None
+                    }
+                    current_exercise["assigned_sets"].append(note_set)
                 else:
-                    # Note is for the whole workout
-                    note_target = {"parent_type": "Workout", "text": stripped_line}
-                    workout.setdefault("comments_to_add", []).append(note_target)
+                    console.print(f"[yellow]Warning: Found indented note with no preceding exercise: '{stripped_line}'[/yellow]")
                 continue
 
             if stripped_line.lower() in exercise_map:
@@ -105,7 +130,34 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
             if parsed_set and current_exercise:
                 parsed_set["priority"] = len(current_exercise["assigned_sets"])
                 current_exercise["assigned_sets"].append(parsed_set)
-            
+            elif parsed_set:
+                 console.print(f"[yellow]Warning: Found a set with no preceding exercise: '{stripped_line}'[/yellow]")
+            else:
+                similar_exercises = get_similar_exercises(stripped_line.lower(), exercise_names)
+                if similar_exercises:
+                    console.print(f"\nExercise [yellow]'{stripped_line}'[/yellow] not found. Did you mean one of these?")
+                    for i, name in enumerate(similar_exercises, 1): console.print(f"  [[bold]{i}[/bold]] {name.title()}")
+                    console.print("  [[bold]s[/bold]] Skip this line")
+
+                    chosen_exercise_name = None
+                    while True:
+                        choice = console.input("Enter a number or 's' to skip > ").lower()
+                        if choice == 's': break
+                        try:
+                            choice_idx = int(choice) - 1
+                            if 0 <= choice_idx < len(similar_exercises):
+                                chosen_exercise_name = similar_exercises[choice_idx]
+                                break
+                        except ValueError: pass
+                        console.print("[red]Invalid input.[/red]")
+                    
+                    if chosen_exercise_name:
+                        if current_exercise: workout["assigned_exercises"].append(current_exercise)
+                        ex_id = exercise_map[chosen_exercise_name]
+                        current_exercise = {"exercise_id": ex_id, "priority": len(workout["assigned_exercises"]), "assigned_sets": []}
+                else:
+                    console.print(f"[yellow]Warning: Could not parse or find match for line: '{stripped_line}'[/yellow]")
+
         if current_exercise:
             workout["assigned_exercises"].append(current_exercise)
         if workout["assigned_exercises"]:
@@ -113,45 +165,15 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
             
     return workouts
 
-def post_comment(token, parent_id, parent_type, body):
-    """Posts a single comment to a workout or assigned exercise."""
-    url = f"{API_BASE_URL}/api/v1/comments"
-    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    params = {"parent_type": parent_type, "parent_id": parent_id}
-    payload = {"body": body}
-    try:
-        response = requests.post(url, headers=headers, params=params, json=payload)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        console.print(f"[yellow]Warning: Could not post comment '{body[:30]}...': {e}[/yellow]")
-
 def upload_workout(token, workout_data):
-    """Uploads a workout and then adds any associated comments."""
+    """Uploads a single workout to the API."""
     url = f"{API_BASE_URL}/api/v1/workouts"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    
-    # Pop our temporary comment storage before sending
-    comments_to_add_to_workout = workout_data.pop("comments_to_add", [])
-    
     try:
         console.print(f"Uploading workout for [cyan]{workout_data['workout_date']}[/cyan]...")
         response = requests.post(url, headers=headers, json=workout_data)
         response.raise_for_status()
-        created_workout = response.json()
         console.print(f"✅ [bold green]Successfully uploaded workout![/bold green]")
-        
-        # --- Step 2: Add Comments ---
-        # Add workout-level comments
-        for comment in comments_to_add_to_workout:
-            post_comment(token, created_workout['id'], "Workout", comment['text'])
-
-        # Add exercise-level comments
-        for i, created_exercise in enumerate(created_workout.get('assigned_exercises', [])):
-            original_exercise = workout_data['assigned_exercises'][i]
-            comments_to_add_to_exercise = original_exercise.get("comments_to_add", [])
-            for comment in comments_to_add_to_exercise:
-                 post_comment(token, created_exercise['id'], "AssignedExercise", comment['text'])
-
     except requests.exceptions.HTTPError as e:
         console.print(f"❌ [bold red]Upload failed.[/bold red] HTTP Error: {e.response.status_code}")
         console.print(f"[dim]API Response: {e.response.text}[/dim]")
