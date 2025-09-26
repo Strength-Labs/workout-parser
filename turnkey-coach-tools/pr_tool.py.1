@@ -19,23 +19,6 @@ def wendler_1rm(weight, reps):
         return weight
     return (weight * reps * 0.0333) + weight
 
-def calculate_wilks(total_kg, bodyweight_kg, gender):
-    """Calculates the Wilks score."""
-    x = bodyweight_kg
-    # Coefficients for the formula
-    if gender.lower() == 'male':
-        a, b, c, d, e, f = -216.0475144, 16.2606339, -0.002388645, -0.00113732, 7.01863E-06, -1.291E-08
-    elif gender.lower() == 'female':
-        a, b, c, d, e, f = 594.31747775582, -27.23842536447, 0.82112226871, -0.00930733913, 4.731582E-05, -9.054E-08
-    else:
-        return 0
-
-    denominator = a + (b*x) + (c*x**2) + (d*x**3) + (e*x**4) + (f*x**5)
-    if denominator == 0:
-        return 0
-        
-    return total_kg * (500 / denominator)
-
 def process_workout_history(workouts, start_date=None, end_date=None):
     """Processes workout history to find the best e1RM for every exercise in a date range."""
     best_performances = {}
@@ -93,9 +76,8 @@ def display_prs(main_lifts, other_lifts, date_range_str, show_other=False):
                 console.print(f"{display_name:<25} [bold green]{perf['e1rm']:.1f}[/bold green] {perf['unit']} on {perf['date']} ([dim]from {perf['weight']} {perf['unit']} x {perf['reps']}[/dim])")
 
 def run_pr_analyzer(token, client):
-    """Main analysis loop for the PR tool with Wilks score functionality."""
+    """Main analysis loop for the PR tool with improved menu flow."""
     client_name = client['full_name']
-    client_gender = None # Variable to store gender for the session
     
     workouts = get_workout_history(token, client)
     if not workouts:
@@ -103,7 +85,6 @@ def run_pr_analyzer(token, client):
         return
 
     while True:
-        # This outer loop is for selecting a date range
         clear_screen()
         console.print(f"Analyzing PRs for: [bold green]{client_name}[/bold green]")
         console.print("\n--- [bold]Select a Date Range[/bold] ---")
@@ -152,10 +133,9 @@ def run_pr_analyzer(token, client):
         
         show_other = False
         while True:
-            # This inner loop is for actions within a selected date range
             display_prs(main_lift_performances, other_lift_performances, date_range_str, show_other=show_other)
             
-            prompt_parts = ["[n]ew date range", "[w]ilks score"]
+            prompt_parts = ["[n]ew date range"]
             if other_lift_performances:
                 prompt_parts.append("[m]ore lifts" if not show_other else "[h]ide other lifts")
             
@@ -164,57 +144,10 @@ def run_pr_analyzer(token, client):
             action = input("> ").lower()
             
             if action == 'n':
-                break # Breaks out of the inner loop to re-select a date range
+                break 
             elif action == 'm' and other_lift_performances:
                 show_other = True
             elif action == 'h' and other_lift_performances:
                 show_other = False
-            elif action == 'w':
-                # --- WILKS SCORE LOGIC ---
-                squat_pr = main_lift_performances.get("squat", {}).get("e1rm", 0)
-                bench_pr = main_lift_performances.get("bench press", {}).get("e1rm", 0)
-                deadlift_pr = main_lift_performances.get("deadlift", {}).get("e1rm", 0)
-    
-                if not all([squat_pr, bench_pr, deadlift_pr]):
-                    console.print("\n[bold red]Cannot calculate Wilks. Missing performance for Squat, Bench, or Deadlift in this period.[/bold red]")
-                    console.input("Press Enter to continue...")
-                    continue
-
-                if not client_gender:
-                    while True:
-                        gender_input = console.input("Enter client gender (m/f): ").lower()
-                        if gender_input in ['m', 'f']:
-                            client_gender = 'male' if gender_input == 'm' else 'female'
-                            break
-                        console.print("[red]Invalid input. Please enter 'm' or 'f'.[/red]")
-
-                try:
-                    bw_input = console.input(f"Enter bodyweight for Wilks Score (e.g., 180 lbs or 82 kg): ").lower()
-                    
-                    if 'kg' in bw_input:
-                        bw_value = float(bw_input.replace('kg', '').strip())
-                        bodyweight_kg = bw_value
-                        bodyweight_lbs = bw_value * 2.20462
-                    else:
-                        bw_value = float(bw_input.replace('lbs', '').strip())
-                        bodyweight_lbs = bw_value
-                        bodyweight_kg = bw_value * 0.453592
-                
-                except (ValueError, IndexError):
-                    console.print(f"\n[bold red]Invalid input. Please enter a number, optionally followed by 'lbs' or 'kg'.[/bold red]")
-                    console.input("Press Enter to continue...")
-                    continue
-                
-                total_lbs = squat_pr + bench_pr + deadlift_pr
-                total_kg = total_lbs * 0.453592
-                score = calculate_wilks(total_kg, bodyweight_kg, client_gender)
-
-                console.print("\n--- [bold]Estimated Wilks Score[/bold] ---")
-                console.print(f"Bodyweight:      {bodyweight_lbs:.1f} lbs ({bodyweight_kg:.1f} kg)")
-                console.print(f"e1RM Total:      {total_lbs:.1f} lbs ({total_kg:.1f} kg)")
-                console.print(f"Client Gender:   {client_gender.title()}")
-                console.print(f"Estimated Wilks: [bold green]{score:.2f}[/bold green]")
-                console.input("\nPress Enter to continue...")
-
             else:
                 input("Invalid choice. Press Enter to continue...")
