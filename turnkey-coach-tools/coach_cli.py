@@ -55,7 +55,7 @@ def browse_history(token, client, coach_user_id):
     safe_client_name = client_name.replace(' ', '_')
     history_filename = f"{safe_client_name}_history_{timestamp}.txt"
     history_filepath = os.path.join(client_dir, history_filename)
-    with open(history_filepath, 'w') as f:
+    with open(history_filepath, 'w', encoding='utf-8') as f:
         f.write(markup_content)
     console.print(f"\nWorkout history saved to:\n[green]{history_filepath}[/green]")
     editor = os.getenv('EDITOR', 'nvim') 
@@ -95,7 +95,7 @@ def run_uploader_tool(token, client, exercise_map):
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             json_filename = f"plan_for_upload_{timestamp}.json"
             json_filepath = os.path.join(client_dir, json_filename)
-            with open(json_filepath, 'w') as f:
+            with open(json_filepath, 'w', encoding='utf-8') as f:
                 json.dump(workouts_to_upload, f, indent=2)
             console.print(f"\n[bold yellow]Debug JSON saved to:[/bold yellow]\n[green]{json_filepath}[/green]\n")
             for workout in workouts_to_upload:
