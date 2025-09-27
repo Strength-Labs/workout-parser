@@ -15,6 +15,10 @@ Each workout begins with a `Workout Date:` line, followed by the date in YYYY-MM
 
 * **Example**: `Workout Date: 2025-08-18`
 
+  
+#### Workout Title
+The first line after the workout date, if it exists and is _not_ the name of an exercise, is the title of the workout. 
+
 #### Exercises
 
 The name of each exercise is on its own, unindented line. It must be a valid exercise name from `exerciselist.json`.
@@ -51,7 +55,7 @@ The prescribed number of sets, reps, weight, time, or distance are represented o
 
 #### Accomplished Sets
 
-When workout data is generated from the API via `json2markup.py`, the lifter's actual performance is displayed on an **unindented** line enclosed in parentheses `()`. The `workout_parser.py` script ignores these lines during upload.
+When workout data is generated from the API via `json2markup.py`, the lifter's actual performance is displayed on an **unindented** line enclosed in parentheses `()`. The `workout_parser.py` script ignores these lines during upload. the '//' comments in the following example are explanatory only, and are not part of the markup language. 
 
 * **Example:**
     ```
@@ -91,6 +95,7 @@ This sample demonstrates various features of the markup language.
 
 ```markdown
 Workout Date: 2025-10-01
+Intensity Day
 
 Squat
 3x5 @ 405
