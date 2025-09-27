@@ -826,18 +826,6 @@ def run_feed(token, coach_user_id, client):
             )
             command_line = console.input("[bold]>[/bold] ")
         else:
-            console.print("\n" + "-" * 50)
-            console.print(
-                "[bold]Options:[/bold]"
-                "\n[bold]m <text>[/bold] - Send message"
-                "\n[bold]c <ID> <text>[/bold] - Reply to comment"
-                "\n[bold]/<query>[/bold] - Search; n/N next/prev; s clear"
-                "\n[bold]j/k[/bold] - down/up; [bold]pgdn/pgup[/bold] - page; [bold]gg[/bold]/[bold]end[/bold] - top/bottom"
-                "\n[bold]v[/bold] - Enter single-keystroke navigation mode (j/k/space/b/g/G, q to exit)"
-                "\n[bold]x [filename][/bold] - Export feed to text file; [bold]o [filename][/bold] - Open exported file in $EDITOR"
-                "\n[bold]u[/bold] - Force refresh"
-                "\n[bold]q[/bold] - Back to tool menu"
-            )
             command_line = console.input("\n[dim]Feed is refreshing... ('q' to go back)[/dim]\n> ")
 
         parts = command_line.split(maxsplit=1)

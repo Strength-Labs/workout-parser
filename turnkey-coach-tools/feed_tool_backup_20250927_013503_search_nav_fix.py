@@ -614,38 +614,14 @@ def run_feed(token, coach_user_id, client):
     last_export_path = None
 
     def nav_mode(events):
-        nonlocal offset, selected_match_idx
+        nonlocal offset
         # Single-keystroke navigation without pressing Enter
         # Linux/macOS: termios/tty; Windows: msvcrt
-        def _selected_event_index():
-            if selected_match_idx is not None and 0 <= selected_match_idx < len(search_matches):
-                return search_matches[selected_match_idx]
-            return None
-
-        def _center_on(index):
-            nonlocal offset
-            if index is None:
-                return
-            if index < offset or index >= offset + page_size:
-                offset = max(0, min(index - page_size // 2, max(0, len(events) - page_size)))
-
-        def _print_nav_help():
-            console.print("[dim]Nav: j/k or arrows move • space/b page • g/G start/end • n/N next/prev match • q or Enter: exit[/dim]")
-
         try:
             if os.name == 'nt':
                 import msvcrt
                 while True:
-                    display_feed(
-                        events,
-                        coach_user_id,
-                        search_query,
-                        False,
-                        offset=offset,
-                        page_size=page_size,
-                        selected_event_index=_selected_event_index(),
-                    )
-                    _print_nav_help()
+                    display_feed(events, coach_user_id, search_query, False, offset=offset, page_size=page_size)
                     ch = msvcrt.getwch()
                     if ch in ('q', '\r', '\n'):
                         break
@@ -663,13 +639,6 @@ def run_feed(token, coach_user_id, client):
                         offset = 0
                     elif ch == 'G':  # go to end
                         offset = max(0, len(events) - page_size)
-                    elif ch in ('n', 'N'):
-                        if search_matches:
-                            if ch == 'n':
-                                selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx + 1) % len(search_matches)
-                            else:
-                                selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx - 1) % len(search_matches)
-                            _center_on(_selected_event_index())
                     # swallow arrow keys (prefix) and map if desired
                     elif ch in ('\x00', '\xe0') and msvcrt.kbhit():
                         code = msvcrt.getwch()
@@ -690,16 +659,7 @@ def run_feed(token, coach_user_id, client):
                 try:
                     tty.setcbreak(fd)
                     while True:
-                        display_feed(
-                            events,
-                            coach_user_id,
-                            search_query,
-                            False,
-                            offset=offset,
-                            page_size=page_size,
-                            selected_event_index=_selected_event_index(),
-                        )
-                        _print_nav_help()
+                        display_feed(events, coach_user_id, search_query, False, offset=offset, page_size=page_size)
                         ch = sys.stdin.read(1)
                         if ch in ('q', '\r', '\n'):
                             break
@@ -717,13 +677,6 @@ def run_feed(token, coach_user_id, client):
                             offset = 0
                         elif ch == 'G':
                             offset = max(0, len(events) - page_size)
-                        elif ch in ('n', 'N'):
-                            if search_matches:
-                                if ch == 'n':
-                                    selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx + 1) % len(search_matches)
-                                else:
-                                    selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx - 1) % len(search_matches)
-                                _center_on(_selected_event_index())
                         elif ch == '\x1b':  # ESC sequence for arrows/pgup/pgdn
                             seq = sys.stdin.read(2)
                             if seq == '[A':  # up
@@ -817,7 +770,7 @@ def run_feed(token, coach_user_id, client):
                 "[bold]Options:[/bold]"
                 "\n[bold]m <text>[/bold] - Send message"
                 "\n[bold]c <ID> <text>[/bold] - Reply to comment"
-                "\n[bold]/<query>[/bold] - Search; n/N next/prev; s clear"
+                "\n[bold]/<query>[/bold] - Search; n/p next/prev; s clear"
                 "\n[bold]j/k[/bold] - down/up; [bold]pgdn/pgup[/bold] - page; [bold]gg[/bold]/[bold]end[/bold] - top/bottom"
                 "\n[bold]v[/bold] - Enter single-keystroke navigation mode (j/k/space/b/g/G, q to exit)"
                 "\n[bold]x [filename][/bold] - Export feed to text file; [bold]o [filename][/bold] - Open exported file in $EDITOR"
@@ -826,18 +779,6 @@ def run_feed(token, coach_user_id, client):
             )
             command_line = console.input("[bold]>[/bold] ")
         else:
-            console.print("\n" + "-" * 50)
-            console.print(
-                "[bold]Options:[/bold]"
-                "\n[bold]m <text>[/bold] - Send message"
-                "\n[bold]c <ID> <text>[/bold] - Reply to comment"
-                "\n[bold]/<query>[/bold] - Search; n/N next/prev; s clear"
-                "\n[bold]j/k[/bold] - down/up; [bold]pgdn/pgup[/bold] - page; [bold]gg[/bold]/[bold]end[/bold] - top/bottom"
-                "\n[bold]v[/bold] - Enter single-keystroke navigation mode (j/k/space/b/g/G, q to exit)"
-                "\n[bold]x [filename][/bold] - Export feed to text file; [bold]o [filename][/bold] - Open exported file in $EDITOR"
-                "\n[bold]u[/bold] - Force refresh"
-                "\n[bold]q[/bold] - Back to tool menu"
-            )
             command_line = console.input("\n[dim]Feed is refreshing... ('q' to go back)[/dim]\n> ")
 
         parts = command_line.split(maxsplit=1)
@@ -918,11 +859,10 @@ def run_feed(token, coach_user_id, client):
         elif command.startswith('/'):
             search_query = command[1:].strip()
             rebuild_matches(display_data["events"], search_query)
-            # Enter nav mode immediately after a search for smoother navigation
-            nav_mode(display_data["events"])  # updates offset and selection
-        elif command in ('n', 'N'):
+            # After new search, center on first match if exists happens in rebuild
+        elif command == 'n':
             if search_matches:
-                selected_match_idx = 0 if selected_match_idx is None else ((selected_match_idx + 1) if command == 'n' else (selected_match_idx - 1)) % len(search_matches)
+                selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx + 1) % len(search_matches)
                 sel = search_matches[selected_match_idx]
                 if sel < offset or sel >= offset + page_size:
                     offset = max(0, min(sel - page_size // 2, max(0, len(display_data["events"]) - page_size)))

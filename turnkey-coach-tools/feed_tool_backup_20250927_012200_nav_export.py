@@ -5,8 +5,6 @@ import re
 import html
 import threading
 import copy
-import sys
-import glob
 from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from rich.console import Console
@@ -442,136 +440,29 @@ def post_workout_comment(token, parent_id, parent_type, comment_body):
         console.print(f"\n[bold red]Failed to post comment:[/bold red] {err}")
         return False
 
-# --- Export helper ---
-
-def _export_unified_feed_text(client, events, client_dir, filename=None):
-    client_name = client.get('full_name')
-    client_id = client.get('id')
-    ts = datetime.now(timezone.utc).astimezone().strftime('%Y%m%d_%H%M%S')
-    safe_client = (client_name or f"client_{client_id}").replace(' ', '_')
-    fname = filename or f"Unified_Feed_{safe_client}_{ts}.txt"
-    export_path = os.path.join(client_dir, fname)
-
-    # Load workouts cache to enrich context (exercise name / workout date)
-    workouts_path = os.path.join(client_dir, f"workouts_user_{client_id}.json")
-    workouts = _load_json(workouts_path, [])
-    workout_by_id = {}
-    exercise_info_by_id = {}
-    for w in workouts:
-        wid = w.get('id')
-        workout_by_id[wid] = w
-        wdate = w.get('workout_date')
-        for ex in w.get('assigned_exercises', []) or []:
-            exercise_info_by_id[ex.get('id')] = {
-                'exercise_name': (ex.get('exercise') or {}).get('name'),
-                'workout_date': wdate,
-                'workout_id': wid,
-            }
-
-    lines = []
-    header = [
-        f"Unified Feed Export",
-        f"Client: {client_name} (ID {client_id})",
-        f"Generated: {datetime.now(timezone.utc).astimezone().strftime('%Y-%m-%d %H:%M:%S %Z')}",
-        "",
-    ]
-    lines.extend(header)
-
-    for ev in events:
-        when = ev.get('timestamp')
-        if isinstance(when, str):
-            when = _parse_ts(when)
-        when_str = when.astimezone().strftime('%Y-%m-%d %H:%M') if isinstance(when, datetime) else ''
-        ev_type = ev.get('type')
-        author = ev.get('author') or 'Unknown'
-        content = clean_text(ev.get('content') or '')
-
-        context = ''
-        if ev_type == 'workout_comment':
-            ptype = ev.get('parent_type')
-            pid = ev.get('parent_id')
-            if ptype == 'Workout' and pid in workout_by_id:
-                w = workout_by_id.get(pid)
-                wdate = w.get('workout_date') or ''
-                title = w.get('title') or ''
-                context = f" on Workout {wdate}{' - ' + title if title else ''}"
-            elif ptype == 'AssignedExercise' and pid in exercise_info_by_id:
-                info = exercise_info_by_id.get(pid)
-                ex_name = info.get('exercise_name') or 'Exercise'
-                wdate = info.get('workout_date') or ''
-                context = f" on {ex_name} (Workout {wdate})"
-
-        lines.append(f"[{ev_type}] {when_str} by {author}{context}")
-        if content:
-            for ln in content.split('\n'):
-                lines.append(f"  {ln}")
-        else:
-            lines.append("  (no text)")
-        lines.append("")
-
-    with open(export_path, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(lines))
-    console.print(f"\n[green]Exported feed to:[/green] {export_path}")
-    return export_path
-
-# --- Editor and file helpers ---
-
-def _latest_export_file(client_dir):
-    pattern = os.path.join(client_dir, "Unified_Feed_*.txt")
-    files = glob.glob(pattern)
-    if not files:
-        return None
-    files.sort(key=lambda p: os.path.getmtime(p), reverse=True)
-    return files[0]
-
-
-def _open_in_editor(path):
-    editor = os.getenv('EDITOR', 'nvim')
-    try:
-        # Preserve cwd behavior similar to browse_history
-        dirpath = os.path.dirname(path)
-        fname = os.path.basename(path)
-        original = os.getcwd()
-        try:
-            os.chdir(dirpath)
-            os.system(f"{editor} {fname}")
-        finally:
-            os.chdir(original)
-    except Exception:
-        console.print(f"[red]Could not open editor for {path}[/red]")
-
 # --- Display and Main Loop ---
-def display_feed(feed, coach_user_id, search_term=None, is_refreshing=False, offset=0, page_size=20, selected_event_index=None):
-    """Displays the unified feed with paging, search highlight, and status."""
+def display_feed(feed, coach_user_id, search_term=None, is_refreshing=False):
+    """Displays the unified feed with styling and status."""
     clear_screen()
     title = "[bold cyan]Unified Feed[/bold cyan]"
     if is_refreshing:
         title += " [yellow](Refreshing...)[/yellow]"
     console.print(Panel(title, expand=False))
-
-    total = len(feed)
-    if total == 0:
+    
+    if not feed:
         console.print("[bold yellow]No activity found in the feed.[/bold yellow]")
         return
-
-    start = max(0, min(offset, max(0, total - 1)))
-    end = min(total, start + page_size)
-
-    for idx in range(start, end):
-        item = feed[idx]
+        
+    for item in feed:
         cleaned_content = clean_text(item.get('content') or "")
         display_text = cleaned_content or "[dim]Message body is empty.[/dim]"
 
         if search_term and search_term.lower() in cleaned_content.lower():
             display_text = re.sub(f'({re.escape(search_term)})', r'[bold yellow]\1[/bold yellow]', display_text, flags=re.IGNORECASE)
-
+        
         is_coach = (item.get('author_id') == coach_user_id)
         border_style = "blue" if is_coach else "default"
-
-        # Distinct border if this is the currently selected search match
-        if selected_event_index is not None and idx == selected_event_index:
-            border_style = "magenta"
-
+        
         if is_coach:
             display_text = f"[blue]>>>[/blue] {display_text}"
 
@@ -582,7 +473,7 @@ def display_feed(feed, coach_user_id, search_term=None, is_refreshing=False, off
         title_text.append(f"[{item_type}] ", style=type_style)
         title_text.append(f"{item['timestamp'].strftime('%Y-%m-%d %H:%M')} ", style="dim")
         title_text.append(f"by {item['author']}", style="bold")
-
+        
         subtitle = None
         if item['type'] == 'workout_comment':
             alias_id = item.get('alias_id')
@@ -592,10 +483,6 @@ def display_feed(feed, coach_user_id, search_term=None, is_refreshing=False, off
 
         console.print(Panel(display_text, title=title_text, subtitle=subtitle, border_style=border_style, padding=(0, 1)))
 
-    # Footer with paging status and help
-    status = f"[dim]Showing {start+1}-{end} of {total}. Offset {start}. Page size {page_size}[/dim]"
-    console.print(status)
-
 def run_feed(token, coach_user_id, client):
     """Main interactive loop for the Unified Feed tool with asynchronous caching."""
     client_dir = os.path.join(CLIENT_DATA_DIR, str(client['id']))
@@ -604,162 +491,6 @@ def run_feed(token, coach_user_id, client):
 
     feed_data = {"events": [], "conversation_id": None, "alias_map": {}, "is_refreshing": True}
     feed_data_lock = threading.Lock()
-
-    # Paging and search state
-    page_size = 20
-    offset = 0
-    search_query = None
-    search_matches = []  # list of event indexes
-    selected_match_idx = None  # index into search_matches
-    last_export_path = None
-
-    def nav_mode(events):
-        nonlocal offset, selected_match_idx
-        # Single-keystroke navigation without pressing Enter
-        # Linux/macOS: termios/tty; Windows: msvcrt
-        def _selected_event_index():
-            if selected_match_idx is not None and 0 <= selected_match_idx < len(search_matches):
-                return search_matches[selected_match_idx]
-            return None
-
-        def _center_on(index):
-            nonlocal offset
-            if index is None:
-                return
-            if index < offset or index >= offset + page_size:
-                offset = max(0, min(index - page_size // 2, max(0, len(events) - page_size)))
-
-        def _print_nav_help():
-            console.print("[dim]Nav: j/k or arrows move • space/b page • g/G start/end • n/N next/prev match • q or Enter: exit[/dim]")
-
-        try:
-            if os.name == 'nt':
-                import msvcrt
-                while True:
-                    display_feed(
-                        events,
-                        coach_user_id,
-                        search_query,
-                        False,
-                        offset=offset,
-                        page_size=page_size,
-                        selected_event_index=_selected_event_index(),
-                    )
-                    _print_nav_help()
-                    ch = msvcrt.getwch()
-                    if ch in ('q', '\r', '\n'):
-                        break
-                    elif ch == 'j':
-                        if offset + page_size < len(events):
-                            offset += 1
-                    elif ch == 'k':
-                        if offset > 0:
-                            offset -= 1
-                    elif ch == ' ':  # space -> page down
-                        offset = min(offset + page_size, max(0, len(events) - page_size))
-                    elif ch in ('b', 'B'):
-                        offset = max(offset - page_size, 0)
-                    elif ch == 'g':  # go to top
-                        offset = 0
-                    elif ch == 'G':  # go to end
-                        offset = max(0, len(events) - page_size)
-                    elif ch in ('n', 'N'):
-                        if search_matches:
-                            if ch == 'n':
-                                selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx + 1) % len(search_matches)
-                            else:
-                                selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx - 1) % len(search_matches)
-                            _center_on(_selected_event_index())
-                    # swallow arrow keys (prefix) and map if desired
-                    elif ch in ('\x00', '\xe0') and msvcrt.kbhit():
-                        code = msvcrt.getwch()
-                        if code == 'P':  # down arrow
-                            if offset + page_size < len(events):
-                                offset += 1
-                        elif code == 'H':  # up arrow
-                            if offset > 0:
-                                offset -= 1
-                        elif code == 'I':  # pgup
-                            offset = max(offset - page_size, 0)
-                        elif code == 'Q':  # pgdn
-                            offset = min(offset + page_size, max(0, len(events) - page_size))
-            else:
-                import termios, tty
-                fd = sys.stdin.fileno()
-                old_settings = termios.tcgetattr(fd)
-                try:
-                    tty.setcbreak(fd)
-                    while True:
-                        display_feed(
-                            events,
-                            coach_user_id,
-                            search_query,
-                            False,
-                            offset=offset,
-                            page_size=page_size,
-                            selected_event_index=_selected_event_index(),
-                        )
-                        _print_nav_help()
-                        ch = sys.stdin.read(1)
-                        if ch in ('q', '\r', '\n'):
-                            break
-                        elif ch == 'j':
-                            if offset + page_size < len(events):
-                                offset += 1
-                        elif ch == 'k':
-                            if offset > 0:
-                                offset -= 1
-                        elif ch == ' ':  # space -> page down
-                            offset = min(offset + page_size, max(0, len(events) - page_size))
-                        elif ch in ('b', 'B'):
-                            offset = max(offset - page_size, 0)
-                        elif ch == 'g':
-                            offset = 0
-                        elif ch == 'G':
-                            offset = max(0, len(events) - page_size)
-                        elif ch in ('n', 'N'):
-                            if search_matches:
-                                if ch == 'n':
-                                    selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx + 1) % len(search_matches)
-                                else:
-                                    selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx - 1) % len(search_matches)
-                                _center_on(_selected_event_index())
-                        elif ch == '\x1b':  # ESC sequence for arrows/pgup/pgdn
-                            seq = sys.stdin.read(2)
-                            if seq == '[A':  # up
-                                if offset > 0:
-                                    offset -= 1
-                            elif seq == '[B':  # down
-                                if offset + page_size < len(events):
-                                    offset += 1
-                            elif seq == '[5':  # might be PgUp (needs ~)
-                                _ = sys.stdin.read(1)
-                                offset = max(offset - page_size, 0)
-                            elif seq == '[6':  # PgDn
-                                _ = sys.stdin.read(1)
-                                offset = min(offset + page_size, max(0, len(events) - page_size))
-                finally:
-                    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        except Exception:
-            console.print("[red]Navigation mode not available on this terminal.[/red]")
-
-    def rebuild_matches(events, term):
-        nonlocal search_matches, selected_match_idx, offset
-        search_matches = []
-        selected_match_idx = None
-        if not term:
-            return
-        term_lower = term.lower()
-        for i, ev in enumerate(events):
-            content = clean_text(ev.get('content') or "").lower()
-            if term_lower in content:
-                search_matches.append(i)
-        if search_matches:
-            selected_match_idx = 0
-            # Center on first match
-            sel = search_matches[selected_match_idx]
-            if sel < offset or sel >= offset + page_size:
-                offset = max(0, min(sel - page_size // 2, max(0, len(events) - page_size)))
 
     # Load last materialized feed if present
     if os.path.exists(cache_path):
@@ -786,58 +517,21 @@ def run_feed(token, coach_user_id, client):
     refresh_thread = threading.Thread(target=fetch_and_aggregate_data, args=(token, client, feed_data_lock, feed_data))
     refresh_thread.start()
 
+    search_query = None
     while True:
         with feed_data_lock:
             display_data = copy.deepcopy(feed_data)
 
-        # Rebuild matches if needed (e.g., after a refresh changed events)
-        if search_query is not None:
-            rebuild_matches(display_data["events"], search_query)
-
-        selected_event_index = None
-        if selected_match_idx is not None and 0 <= selected_match_idx < len(search_matches):
-            selected_event_index = search_matches[selected_match_idx]
-
-        display_feed(
-            display_data["events"],
-            coach_user_id,
-            search_query,
-            display_data["is_refreshing"],
-            offset=offset,
-            page_size=page_size,
-            selected_event_index=selected_event_index,
-        )
+        display_feed(display_data["events"], coach_user_id, search_query, display_data["is_refreshing"])
 
         if not display_data["is_refreshing"] and refresh_thread.is_alive():
             refresh_thread.join(timeout=0.1)
 
         if not display_data["is_refreshing"]:
             console.print("\n" + "-" * 50)
-            console.print(
-                "[bold]Options:[/bold]"
-                "\n[bold]m <text>[/bold] - Send message"
-                "\n[bold]c <ID> <text>[/bold] - Reply to comment"
-                "\n[bold]/<query>[/bold] - Search; n/N next/prev; s clear"
-                "\n[bold]j/k[/bold] - down/up; [bold]pgdn/pgup[/bold] - page; [bold]gg[/bold]/[bold]end[/bold] - top/bottom"
-                "\n[bold]v[/bold] - Enter single-keystroke navigation mode (j/k/space/b/g/G, q to exit)"
-                "\n[bold]x [filename][/bold] - Export feed to text file; [bold]o [filename][/bold] - Open exported file in $EDITOR"
-                "\n[bold]u[/bold] - Force refresh"
-                "\n[bold]q[/bold] - Back to tool menu"
-            )
+            console.print("[bold]Options:[/bold] \n[bold]m <text>[/bold] - Send message\n[bold]c <ID> <text>[/bold] - Reply to comment\n[bold]/<query>[/bold] - Search\n[bold]u[/bold] - Force refresh\n[bold]q[/bold] - Back to tool menu")
             command_line = console.input("[bold]>[/bold] ")
         else:
-            console.print("\n" + "-" * 50)
-            console.print(
-                "[bold]Options:[/bold]"
-                "\n[bold]m <text>[/bold] - Send message"
-                "\n[bold]c <ID> <text>[/bold] - Reply to comment"
-                "\n[bold]/<query>[/bold] - Search; n/N next/prev; s clear"
-                "\n[bold]j/k[/bold] - down/up; [bold]pgdn/pgup[/bold] - page; [bold]gg[/bold]/[bold]end[/bold] - top/bottom"
-                "\n[bold]v[/bold] - Enter single-keystroke navigation mode (j/k/space/b/g/G, q to exit)"
-                "\n[bold]x [filename][/bold] - Export feed to text file; [bold]o [filename][/bold] - Open exported file in $EDITOR"
-                "\n[bold]u[/bold] - Force refresh"
-                "\n[bold]q[/bold] - Back to tool menu"
-            )
             command_line = console.input("\n[dim]Feed is refreshing... ('q' to go back)[/dim]\n> ")
 
         parts = command_line.split(maxsplit=1)
@@ -853,58 +547,11 @@ def run_feed(token, coach_user_id, client):
             continue
 
         should_refresh = False
-
-        # Navigation
-        if command == 'j':
-            if offset + page_size < len(display_data["events"]):
-                offset += 1
-        elif command == 'k':
-            if offset > 0:
-                offset -= 1
-        elif command == 'pgdn':
-            offset = min(offset + page_size, max(0, len(display_data["events"]) - page_size))
-        elif command == 'pgup':
-            offset = max(offset - page_size, 0)
-        elif command == 'gg':
-            offset = 0
-        elif command == 'end':
-            offset = max(0, len(display_data["events"]) - page_size)
-
-        # Export
-        elif command == 'x':
-            filename = None
-            if len(parts) > 1:
-                filename = parts[1].strip()
-            last_export_path = _export_unified_feed_text(client, display_data["events"], client_dir, filename)
-            console.input("\n[dim]Export complete. Press Enter to continue.[/dim]")
-
-        # Open in editor
-        elif command == 'o':
-            path = None
-            if len(parts) > 1:
-                cand = parts[1].strip()
-                path = cand if os.path.isabs(cand) else os.path.join(client_dir, cand)
-            else:
-                path = last_export_path or _latest_export_file(client_dir)
-            if path and os.path.exists(path):
-                _open_in_editor(path)
-            else:
-                console.print("[yellow]No exported file found to open. Use 'x' to export first or specify a filename.[/yellow]")
-
-        # Refresh
-        elif command == 'u':
+        if command == 'u':
             should_refresh = True
-
-        # Enter navigation mode
-        elif command == 'v':
-            nav_mode(display_data["events"])  # updates offset internally
-
-        # Messaging
         elif command == 'm':
             if len(parts) > 1 and post_message(token, display_data["conversation_id"], parts[1]):
                 should_refresh = True
-
-        # Comment reply
         elif command == 'c':
             if len(parts) > 1:
                 comment_id_parts = parts[1].split(maxsplit=1)
@@ -913,32 +560,10 @@ def run_feed(token, coach_user_id, client):
                     target_event = next((e for e in display_data["events"] if str(e.get('comment_id')) == str(real_id_str)), None) if real_id_str else None
                     if target_event and post_workout_comment(token, target_event['parent_id'], target_event['parent_type'], comment_id_parts[1]):
                         should_refresh = True
-
-        # Search
         elif command.startswith('/'):
             search_query = command[1:].strip()
-            rebuild_matches(display_data["events"], search_query)
-            # Enter nav mode immediately after a search for smoother navigation
-            nav_mode(display_data["events"])  # updates offset and selection
-        elif command in ('n', 'N'):
-            if search_matches:
-                selected_match_idx = 0 if selected_match_idx is None else ((selected_match_idx + 1) if command == 'n' else (selected_match_idx - 1)) % len(search_matches)
-                sel = search_matches[selected_match_idx]
-                if sel < offset or sel >= offset + page_size:
-                    offset = max(0, min(sel - page_size // 2, max(0, len(display_data["events"]) - page_size)))
-        elif command == 'p':
-            if search_matches:
-                selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx - 1) % len(search_matches)
-                sel = search_matches[selected_match_idx]
-                if sel < offset or sel >= offset + page_size:
-                    offset = max(0, min(sel - page_size // 2, max(0, len(display_data["events"]) - page_size)))
-        elif command == 's':
-            search_query = None
-            search_matches = []
-            selected_match_idx = None
         else:
-            # Unknown input clears search highlight but keeps offset
-            pass
+            search_query = None
 
         if should_refresh and not refresh_thread.is_alive():
             with feed_data_lock:
