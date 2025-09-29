@@ -59,12 +59,14 @@ def parse_line_as_set(line: str):
         return parsed
 
     # Weight-based
-    match = re.match(r"(\d+)\s*x\s*([a-zA-Z0-9]+)\s*@\s*(\d+\.?\d*)", line, re.IGNORECASE)
+    match = re.match(r"(\d+)\s*x\s*([a-zA-Z0-9]+)\s*@\s*(\d+\.?\d*)(?:\s*(lbs|kg))?", line, re.IGNORECASE)
     if match:
-        sets, reps, weight = match.groups()
+        sets, reps, weight, units = match.groups()
         parsed = {**base_set, "sets": int(sets), "weight": float(weight), "weight_type": "default_weight_type"}
         if reps.upper() == 'AMRAP': parsed["rep_type"] = "AMRAP"
         else: parsed["reps"] = int(reps)
+        if units:  # Store parsed units for workout-level detection
+            parsed["parsed_units"] = units.lower()
         return parsed
 
     # No weight
@@ -101,6 +103,7 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
                 start_line_index = 2
 
         current_exercise = None
+        kg_detected = False
         for line in lines[start_line_index:]:
             stripped_line = line.strip()
             if not stripped_line or stripped_line == "---" or stripped_line.startswith('(') or stripped_line.startswith('['):
@@ -130,6 +133,8 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
             if parsed_set and current_exercise:
                 parsed_set["priority"] = len(current_exercise["assigned_sets"])
                 current_exercise["assigned_sets"].append(parsed_set)
+                if parsed_set.get("parsed_units") == "kg":
+                    kg_detected = True
             elif parsed_set:
                  console.print(f"[yellow]Warning: Found a set with no preceding exercise: '{stripped_line}'[/yellow]")
             else:
@@ -161,6 +166,9 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
         if current_exercise:
             workout["assigned_exercises"].append(current_exercise)
         if workout["assigned_exercises"]:
+            if kg_detected:
+                workout["weight_type"] = "kgs"
+                console.print(f"[green]Detected kg units—setting workout weight_type to 'kgs' for API compatibility.[/green]")
             workouts.append(workout)
             
     return workouts

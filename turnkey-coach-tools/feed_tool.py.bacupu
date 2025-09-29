@@ -107,8 +107,10 @@ def _refresh_messages_cache(token, client_full_name, client_dir, initial_max_pag
                 any_new = True
                 if mid > (max_id_seen or 0):
                     max_id_seen = mid
+        # Stop early if nothing new found on this page and we already had a watermark
         if last_seen_id is not None and new_in_page == 0:
             break
+        # If fewer than per_page, it's the last page
         if len(items) < per_page:
             break
     if any_new:
@@ -150,9 +152,11 @@ def _fetch_workout_detail(token, workout_id):
 def _update_workouts_cache_incremental(token, client, client_dir):
     client_id = client['id']
     index = _load_workouts_index(client_dir, client_id)
+    # Load existing detailed workouts
     workouts_path = os.path.join(client_dir, f"workouts_user_{client_id}.json")
     existing_workouts = _load_json(workouts_path, [])
     existing_map = {w.get('id'): w for w in existing_workouts if isinstance(w, dict)}
+    # Get summaries and diff by updated_at
     summaries = _fetch_workouts_summary(token, client_id)
     changed_ids = []
     updated_index = index.get('workouts', {})
@@ -164,7 +168,9 @@ def _update_workouts_cache_incremental(token, client, client_dir):
         prev = updated_index.get(str(wid), {}).get('updated_at')
         if not prev or (updated_at and updated_at != prev) or (wid not in existing_map):
             changed_ids.append(wid)
+        # Prime index with current value; we'll save it after fetching details
         updated_index[str(wid)] = {"updated_at": updated_at}
+    # Fetch only changed workout details concurrently
     if changed_ids:
         headers = {"Authorization": f"Bearer {token}"}
         with ThreadPoolExecutor(max_workers=8) as pool:
@@ -174,6 +180,7 @@ def _update_workouts_cache_incremental(token, client, client_dir):
                 detail = fut.result()
                 if detail:
                     existing_map[wid] = detail
+        # Write merged list back (sorted by workout_date if available)
         merged = list(existing_map.values())
         try:
             merged.sort(key=lambda w: w.get('workout_date') or '')
@@ -184,9 +191,11 @@ def _update_workouts_cache_incremental(token, client, client_dir):
                 json.dump(merged, f, indent=4, ensure_ascii=False)
         except Exception:
             pass
+    # Save updated index
     index['workouts'] = updated_index
     index['last_summary_sync'] = datetime.now(timezone.utc).isoformat()
     _save_workouts_index(client_dir, index)
+    # Return full detailed workouts and which ones changed
     final_workouts = list(existing_map.values()) if existing_map else existing_workouts
     return final_workouts, set(changed_ids)
 
@@ -196,6 +205,7 @@ def _extract_comments_from_workouts(workouts):
         return comments
     for workout in workouts:
         workout_id = workout.get('id')
+        # Workout-level comments
         for comment in workout.get('comments', []) or []:
             cid = comment.get('id')
             ts = _parse_ts(comment.get('updated_at'))
@@ -212,6 +222,7 @@ def _extract_comments_from_workouts(workouts):
                 "parent_type": parent_type,
                 "comment_id": str(cid) if cid is not None else f"Workout-{workout_id}"
             })
+        # Exercise-level comments
         for exercise in workout.get('assigned_exercises', []) or []:
             ex_id = exercise.get('id')
             for comment in exercise.get('comments', []) or []:
@@ -235,6 +246,7 @@ def _extract_comments_from_workouts(workouts):
 # --- Data Fetching Functions ---
 
 def download_workouts(token, client_id, client_dir):
+    """Downloads full workout details for a client, including comments."""
     headers = {"Authorization": f"Bearer {token}"}
     list_url = f"{API_BASE_URL}/api/v1/workouts"
     params = {"user_id": client_id, "sort": "ascending", "published": True}
@@ -257,6 +269,7 @@ def download_workouts(token, client_id, client_dir):
         return []
 
 def get_client_messages(token, client_id, client_full_name):
+    """Fetches the full conversation for a specific client from the API."""
     headers = {"Authorization": f"Bearer {token}"}
     conversations_url = f"{API_BASE_URL}/api/v1/conversations"
     try:
@@ -282,6 +295,7 @@ def get_client_messages(token, client_id, client_full_name):
         return conversation_id, []
 
 def get_workout_comments(workouts_data):
+    """Extracts all comments from a list of detailed workout objects."""
     comments = []
     if not workouts_data: return comments
     for workout in workouts_data:
@@ -306,57 +320,64 @@ def get_workout_comments(workouts_data):
     return comments
 
 def fetch_and_aggregate_data(token, client, feed_data_lock, feed_data):
+    """
+    Incrementally refreshes messages and workouts, rebuilds the unified feed,
+    and updates the shared state plus the feed cache file.
+    Designed to be run in a background thread.
+    """
+    client_id = client["id"]
+    client_full_name = client["full_name"]
+    client_dir = os.path.join(CLIENT_DATA_DIR, str(client_id))
+    # 1) Messages: refresh cache (resolve conversation_id if needed)
+    messages_cache = _refresh_messages_cache(token, client_full_name, client_dir)
+    conversation_id = messages_cache.get('conversation_id')
+    # 2) Workouts/comments: update only changed workouts using updated_at diff
+    workouts, _changed = _update_workouts_cache_incremental(token, client, client_dir)
+    # 3) Build events from caches
+    all_events = []
+    for msg in (messages_cache.get('messages') or {}).values():
+        ts = _parse_ts(msg.get('created_at'))
+        user = msg.get('user') or {}
+        all_events.append({
+            "type": "message",
+            "content": msg.get('body'),
+            "author_id": user.get('id'),
+            "author": user.get('full_name'),
+            "timestamp": ts,
+        })
+    all_events.extend(_extract_comments_from_workouts(workouts))
+    all_events = [e for e in all_events if e.get('timestamp') is not None]
+    all_events.sort(key=lambda x: x['timestamp'])
+    # 4) Assign alias IDs for workout comments (stable by comment_id)
+    comment_alias_map = {}
+    alias_counter = 1
+    for item in reversed(all_events):
+        if item['type'] == 'workout_comment':
+            item['alias_id'] = str(alias_counter)
+            comment_alias_map[str(alias_counter)] = item.get('comment_id')
+            alias_counter += 1
+    # 5) Update shared state
+    with feed_data_lock:
+        feed_data["events"] = all_events
+        feed_data["conversation_id"] = conversation_id
+        feed_data["alias_map"] = comment_alias_map
+        feed_data["is_refreshing"] = False
+    # 6) Persist feed cache
+    cache_path = os.path.join(client_dir, "feed_cache.json")
+    events_to_cache = [dict(event) for event in all_events]
+    for event in events_to_cache:
+        if isinstance(event.get('timestamp'), datetime):
+            event['timestamp'] = event['timestamp'].isoformat()
     try:
-        client_id = client["id"]
-        client_full_name = client["full_name"]
-        client_dir = os.path.join(CLIENT_DATA_DIR, str(client_id))
-        messages_cache = _refresh_messages_cache(token, client_full_name, client_dir)
-        conversation_id = messages_cache.get('conversation_id')
-        workouts, _changed = _update_workouts_cache_incremental(token, client, client_dir)
-        all_events = []
-        for msg in (messages_cache.get('messages') or {}).values():
-            ts = _parse_ts(msg.get('created_at'))
-            user = msg.get('user') or {}
-            all_events.append({
-                "type": "message",
-                "content": msg.get('body'),
-                "author_id": user.get('id'),
-                "author": user.get('full_name'),
-                "timestamp": ts,
-            })
-        all_events.extend(_extract_comments_from_workouts(workouts))
-        all_events = [e for e in all_events if e.get('timestamp') is not None]
-        all_events.sort(key=lambda x: x['timestamp'])
-        comment_alias_map = {}
-        alias_counter = 1
-        for item in reversed(all_events):
-            if item['type'] == 'workout_comment':
-                item['alias_id'] = str(alias_counter)
-                comment_alias_map[str(alias_counter)] = item.get('comment_id')
-                alias_counter += 1
-        with feed_data_lock:
-            feed_data["events"] = all_events
-            feed_data["conversation_id"] = conversation_id
-            feed_data["alias_map"] = comment_alias_map
-            feed_data["is_refreshing"] = False
-        cache_path = os.path.join(client_dir, "feed_cache.json")
-        events_to_cache = [dict(event) for event in all_events]
-        for event in events_to_cache:
-            if isinstance(event.get('timestamp'), datetime):
-                event['timestamp'] = event['timestamp'].isoformat()
-        try:
-            with open(cache_path, 'w', encoding='utf-8') as f:
-                json.dump({"events": events_to_cache, "conversation_id": conversation_id, "alias_map": comment_alias_map}, f, ensure_ascii=False)
-        except Exception:
-            console.print("[red]Failed to save feed cache.[/red]")
-    except Exception as e:
-        console.print(f"[red]Error in fetch_and_aggregate_data: {e}[/red]")
-        with feed_data_lock:
-            feed_data["is_refreshing"] = False
+        with open(cache_path, 'w', encoding='utf-8') as f:
+            json.dump({"events": events_to_cache, "conversation_id": conversation_id, "alias_map": comment_alias_map}, f, ensure_ascii=False)
+    except Exception:
+        pass
 
 # --- API Posting Functions ---
 
 def post_message(token, conversation_id, message_body):
+    """Posts a new message to a conversation."""
     if not conversation_id:
         console.print("\n[bold red]Cannot send message: Conversation ID is missing.[/bold red]")
         return False
@@ -372,6 +393,7 @@ def post_message(token, conversation_id, message_body):
         return False
 
 def post_workout_comment(token, parent_id, parent_type, comment_body):
+    """Posts a new comment to a workout or assigned exercise."""
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     url = f"{API_BASE_URL}/api/v1/comments"
     params = {"parent_type": parent_type, "parent_id": parent_id}
@@ -393,6 +415,7 @@ def _export_unified_feed_text(client, events, client_dir, filename=None):
     safe_client = (client_name or f"client_{client_id}").replace(' ', '_')
     fname = filename or f"Unified_Feed_{safe_client}_{ts}.txt"
     export_path = os.path.join(client_dir, fname)
+    # Load workouts cache to enrich context (exercise name / workout date)
     workouts_path = os.path.join(client_dir, f"workouts_user_{client_id}.json")
     workouts = _load_json(workouts_path, [])
     workout_by_id = {}
@@ -462,6 +485,7 @@ def _latest_export_file(client_dir):
 def _open_in_editor(path):
     editor = os.getenv('EDITOR', 'nvim')
     try:
+        # Preserve cwd behavior similar to browse_history
         dirpath = os.path.dirname(path)
         fname = os.path.basename(path)
         original = os.getcwd()
@@ -476,6 +500,7 @@ def _open_in_editor(path):
 # --- Display and Main Loop ---
 
 def display_feed(feed, coach_user_id, search_term=None, is_refreshing=False, offset=0, page_size=20, selected_event_index=None):
+    """Displays the unified feed with paging, search highlight, and status."""
     clear_screen()
     title = "[bold cyan]Unified Feed[/bold cyan]"
     if is_refreshing:
@@ -495,6 +520,7 @@ def display_feed(feed, coach_user_id, search_term=None, is_refreshing=False, off
             display_text = re.sub(f'({re.escape(search_term)})', r'[bold yellow]\1[/bold yellow]', display_text, flags=re.IGNORECASE)
         is_coach = (item.get('author_id') == coach_user_id)
         border_style = "blue" if is_coach else "default"
+        # Distinct border if this is the currently selected search match
         if selected_event_index is not None and idx == selected_event_index:
             border_style = "magenta"
         if is_coach:
@@ -512,24 +538,29 @@ def display_feed(feed, coach_user_id, search_term=None, is_refreshing=False, off
             subtitle.append("Reply with: ", style="dim")
             subtitle.append(f"c {alias_id}", style="bold cyan")
         console.print(Panel(display_text, title=title_text, subtitle=subtitle, border_style=border_style, padding=(0, 1)))
+    # Footer with paging status and help
     status = f"[dim]Showing {start+1}-{end} of {total}. Offset {start}. Page size {page_size}[/dim]"
     console.print(status)
 
 def run_feed(token, coach_user_id, client):
+    """Main interactive loop for the Unified Feed tool with asynchronous caching."""
     client_dir = os.path.join(CLIENT_DATA_DIR, str(client['id']))
     os.makedirs(client_dir, exist_ok=True)
     cache_path = os.path.join(client_dir, "feed_cache.json")
     feed_data = {"events": [], "conversation_id": None, "alias_map": {}, "is_refreshing": True}
     feed_data_lock = threading.Lock()
+    # Paging and search state
     page_size = 20
     offset = 0
     search_query = None
-    search_matches = []
-    selected_match_idx = None
+    search_matches = [] # list of event indexes
+    selected_match_idx = None # index into search_matches
     last_export_path = None
 
     def nav_mode(events):
         nonlocal offset, selected_match_idx
+        # Single-keystroke navigation without pressing Enter
+        # Linux/macOS: termios/tty; Windows: msvcrt
         def _selected_event_index():
             if selected_match_idx is not None and 0 <= selected_match_idx < len(search_matches):
                 return search_matches[selected_match_idx]
@@ -565,13 +596,13 @@ def run_feed(token, coach_user_id, client):
                     elif ch == 'k':
                         if offset > 0:
                             offset -= 1
-                    elif ch == ' ':
+                    elif ch == ' ': # space -> page down
                         offset = min(offset + page_size, max(0, len(events) - page_size))
                     elif ch in ('b', 'B'):
                         offset = max(offset - page_size, 0)
-                    elif ch == 'g':
+                    elif ch == 'g': # go to top
                         offset = 0
-                    elif ch == 'G':
+                    elif ch == 'G': # go to end
                         offset = max(0, len(events) - page_size)
                     elif ch in ('n', 'N'):
                         if search_matches:
@@ -580,17 +611,18 @@ def run_feed(token, coach_user_id, client):
                             else:
                                 selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx - 1) % len(search_matches)
                             _center_on(_selected_event_index())
+                    # swallow arrow keys (prefix) and map if desired
                     elif ch in ('\x00', '\xe0') and msvcrt.kbhit():
                         code = msvcrt.getwch()
-                        if code == 'P':
+                        if code == 'P': # down arrow
                             if offset + page_size < len(events):
                                 offset += 1
-                        elif code == 'H':
+                        elif code == 'H': # up arrow
                             if offset > 0:
                                 offset -= 1
-                        elif code == 'I':
+                        elif code == 'I': # pgup
                             offset = max(offset - page_size, 0)
-                        elif code == 'Q':
+                        elif code == 'Q': # pgdn
                             offset = min(offset + page_size, max(0, len(events) - page_size))
             else:
                 import termios, tty
@@ -618,7 +650,7 @@ def run_feed(token, coach_user_id, client):
                         elif ch == 'k':
                             if offset > 0:
                                 offset -= 1
-                        elif ch == ' ':
+                        elif ch == ' ': # space -> page down
                             offset = min(offset + page_size, max(0, len(events) - page_size))
                         elif ch in ('b', 'B'):
                             offset = max(offset - page_size, 0)
@@ -633,37 +665,24 @@ def run_feed(token, coach_user_id, client):
                                 else:
                                     selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx - 1) % len(search_matches)
                                 _center_on(_selected_event_index())
-                        elif ch == '\x1b':
+                        elif ch == '\x1b': # ESC sequence for arrows/pgup/pgdn
                             seq = sys.stdin.read(2)
-                            if seq == '[A':
+                            if seq == '[A': # up
                                 if offset > 0:
                                     offset -= 1
-                            elif seq == '[B':
+                            elif seq == '[B': # down
                                 if offset + page_size < len(events):
                                     offset += 1
-                            elif seq == '[5':
+                            elif seq == '[5': # might be PgUp (needs ~)
                                 _ = sys.stdin.read(1)
                                 offset = max(offset - page_size, 0)
-                            elif seq == '[6':
+                            elif seq == '[6': # PgDn
                                 _ = sys.stdin.read(1)
                                 offset = min(offset + page_size, max(0, len(events) - page_size))
                 finally:
                     termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         except Exception:
             console.print("[red]Navigation mode not available on this terminal.[/red]")
-
-def run_feed(token, coach_user_id, client):
-    client_dir = os.path.join(CLIENT_DATA_DIR, str(client['id']))
-    os.makedirs(client_dir, exist_ok=True)
-    cache_path = os.path.join(client_dir, "feed_cache.json")
-    feed_data = {"events": [], "conversation_id": None, "alias_map": {}, "is_refreshing": True}
-    feed_data_lock = threading.Lock()
-    page_size = 20
-    offset = 0
-    search_query = None
-    search_matches = []
-    selected_match_idx = None
-    last_export_path = None
 
     def rebuild_matches(events, term):
         nonlocal search_matches, selected_match_idx, offset
@@ -678,10 +697,12 @@ def run_feed(token, coach_user_id, client):
                 search_matches.append(i)
         if search_matches:
             selected_match_idx = 0
+            # Center on first match
             sel = search_matches[selected_match_idx]
             if sel < offset or sel >= offset + page_size:
                 offset = max(0, min(sel - page_size // 2, max(0, len(events) - page_size)))
 
+    # Load last materialized feed if present
     if os.path.exists(cache_path):
         try:
             with open(cache_path, 'r', encoding='utf-8') as f:
@@ -696,44 +717,39 @@ def run_feed(token, coach_user_id, client):
                 feed_data["alias_map"] = cached_data.get("alias_map", {})
         except Exception:
             pass
+    # If conversation_id is still missing, try messages cache
     if not feed_data.get("conversation_id"):
         msg_cache = _load_messages_cache(client_dir)
         feed_data["conversation_id"] = msg_cache.get("conversation_id")
-    offset = max(0, len(feed_data["events"]) - page_size)
-    refresh_thread = None
+    # Kick off background refresh
+    refresh_thread = threading.Thread(target=fetch_and_aggregate_data, args=(token, client, feed_data_lock, feed_data))
+    refresh_thread.start()
 
     while True:
         with feed_data_lock:
             display_data = copy.deepcopy(feed_data)
+        # Rebuild matches if needed (e.g., after a refresh changed events)
         if search_query is not None:
             rebuild_matches(display_data["events"], search_query)
         selected_event_index = None
         if selected_match_idx is not None and 0 <= selected_match_idx < len(search_matches):
             selected_event_index = search_matches[selected_match_idx]
-        is_refreshing = refresh_thread is not None and refresh_thread.is_alive()
-        if is_refreshing:
-            refresh_thread.join(timeout=1.0)
-            with feed_data_lock:
-                display_data = copy.deepcopy(feed_data)
-            is_refreshing = refresh_thread is not None and refresh_thread.is_alive()
-        if not is_refreshing and display_data["is_refreshing"]:
-            offset = max(0, len(display_data["events"]) - page_size)
-            with feed_data_lock:
-                feed_data["is_refreshing"] = False
-            display_data["is_refreshing"] = False
         display_feed(
             display_data["events"],
             coach_user_id,
             search_query,
-            is_refreshing,
+            display_data["is_refreshing"],
             offset=offset,
             page_size=page_size,
             selected_event_index=selected_event_index,
         )
-        if is_refreshing:
+        if not display_data["is_refreshing"] and refresh_thread.is_alive():
+            refresh_thread.join(timeout=0.1)
+        # Navigation clarification: Show commands only when actionable
+        if display_data["is_refreshing"]:
             console.print("\n[bold]Feed Refreshing...[/bold]")
             console.print("[dim]Available: [bold]q[/bold] - Back to tool menu; [bold]u[/bold] - Force refresh[/dim]")
-            prompt_text = "\n[dim]Refreshing... (q to go back)[/dim]\n> "
+            command_line = console.input("\n[dim]Refreshing... (q to go back)[/dim]\n> ")
         else:
             console.print("\n[bold]Commands (press Enter after):[/bold]")
             console.print("[bold]m <text>[/bold] - Send message")
@@ -744,22 +760,23 @@ def run_feed(token, coach_user_id, client):
             console.print("[bold]x [filename][/bold] - Export feed to text file; [bold]o [filename][/bold] - Open exported file in $EDITOR")
             console.print("[bold]u[/bold] - Force refresh")
             console.print("[bold]q[/bold] - Back to tool menu")
-            prompt_text = "\n> "
+            command_line = console.input("\n> ")
 
-        command_line = console.input(prompt_text)
         parts = command_line.split(maxsplit=1)
         command = parts[0].lower() if parts else ""
 
         if command == 'q':
-            if refresh_thread is not None and refresh_thread.is_alive():
+            if refresh_thread.is_alive():
                 console.print("[yellow]Waiting for background refresh to finish before exiting...[/yellow]")
                 refresh_thread.join()
             break
 
-        if is_refreshing and command != 'u':
+        # Only process q/u during refresh
+        if display_data["is_refreshing"] and command != 'u':
             continue
 
         should_refresh = False
+        # Navigation
         if command == 'j':
             if offset + page_size < len(display_data["events"]):
                 offset += 1
@@ -774,12 +791,14 @@ def run_feed(token, coach_user_id, client):
             offset = 0
         elif command == 'end':
             offset = max(0, len(display_data["events"]) - page_size)
+        # Export
         elif command == 'x':
             filename = None
             if len(parts) > 1:
                 filename = parts[1].strip()
             last_export_path = _export_unified_feed_text(client, display_data["events"], client_dir, filename)
             console.input("\n[dim]Export complete. Press Enter to continue.[/dim]")
+        # Open in editor
         elif command == 'o':
             path = None
             if len(parts) > 1:
@@ -791,14 +810,17 @@ def run_feed(token, coach_user_id, client):
                 _open_in_editor(path)
             else:
                 console.print("[yellow]No exported file found to open. Use 'x' to export first or specify a filename.[/yellow]")
+        # Refresh
         elif command == 'u':
             should_refresh = True
+        # Enter navigation mode
         elif command == 'v':
-            nav_mode(display_data["events"])
-            offset = max(0, len(display_data["events"]) - page_size)
+            nav_mode(display_data["events"]) # updates offset internally
+        # Messaging
         elif command == 'm':
             if len(parts) > 1 and post_message(token, display_data["conversation_id"], parts[1]):
                 should_refresh = True
+        # Comment reply
         elif command == 'c':
             if len(parts) > 1:
                 comment_id_parts = parts[1].split(maxsplit=1)
@@ -807,29 +829,32 @@ def run_feed(token, coach_user_id, client):
                     target_event = next((e for e in display_data["events"] if str(e.get('comment_id')) == str(real_id_str)), None) if real_id_str else None
                     if target_event and post_workout_comment(token, target_event['parent_id'], target_event['parent_type'], comment_id_parts[1]):
                         should_refresh = True
+        # Search
         elif command.startswith('/'):
-            search_query = command[1:].strip() if len(parts) > 1 else ""
+            search_query = command[1:].strip()
             rebuild_matches(display_data["events"], search_query)
-            nav_mode(display_data["events"])
-            offset = max(0, len(display_data["events"]) - page_size)
+            # Enter nav mode immediately after a search for smoother navigation
+            nav_mode(display_data["events"]) # updates offset and selection
         elif command in ('n', 'N'):
             if search_matches:
                 selected_match_idx = 0 if selected_match_idx is None else ((selected_match_idx + 1) if command == 'n' else (selected_match_idx - 1)) % len(search_matches)
                 sel = search_matches[selected_match_idx]
-                offset = max(0, min(sel - page_size // 2, max(0, len(display_data["events"]) - page_size)))
+                if sel < offset or sel >= offset + page_size:
+                    offset = max(0, min(sel - page_size // 2, max(0, len(display_data["events"]) - page_size)))
         elif command == 'p':
             if search_matches:
                 selected_match_idx = 0 if selected_match_idx is None else (selected_match_idx - 1) % len(search_matches)
                 sel = search_matches[selected_match_idx]
-                offset = max(0, min(sel - page_size // 2, max(0, len(display_data["events"]) - page_size)))
+                if sel < offset or sel >= offset + page_size:
+                    offset = max(0, min(sel - page_size // 2, max(0, len(display_data["events"]) - page_size)))
         elif command == 's':
             search_query = None
             search_matches = []
             selected_match_idx = None
-            offset = max(0, len(display_data["events"]) - page_size)
         else:
+            # Unknown input clears search highlight but keeps offset
             pass
-        if should_refresh and (refresh_thread is None or not refresh_thread.is_alive()):
+        if should_refresh and not refresh_thread.is_alive():
             with feed_data_lock:
                 feed_data["is_refreshing"] = True
             refresh_thread = threading.Thread(target=fetch_and_aggregate_data, args=(token, client, feed_data_lock, feed_data))

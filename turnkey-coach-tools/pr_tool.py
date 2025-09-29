@@ -40,12 +40,9 @@ def process_workout_history(workouts, start_date=None, end_date=None):
     """Processes workout history to find the best e1RM for every exercise in a date range."""
     best_performances = {}
     for workout in workouts:
-        # --- THE FIX: Check for a valid date before processing ---
         workout_date_str = workout.get("workout_date")
         if not workout_date_str:
-            continue # Skip this workout if it has no date
-        # ---------------------------------------------------------
-        
+            continue
         workout_date = datetime.strptime(workout_date_str, "%Y-%m-%d").date()
         if (start_date and workout_date < start_date) or (end_date and workout_date > end_date):
             continue
@@ -95,7 +92,7 @@ def display_prs(main_lifts, other_lifts, date_range_str, show_other=False):
 def run_pr_analyzer(token, client):
     """Main analysis loop for the PR tool with Wilks score functionality."""
     client_name = client['full_name']
-    client_gender = None # Variable to store gender for the session
+    client_gender = None
     
     workouts = get_workout_history(token, client)
     if not workouts:
@@ -103,7 +100,6 @@ def run_pr_analyzer(token, client):
         return
 
     while True:
-        # This outer loop is for selecting a date range
         clear_screen()
         console.print(f"Analyzing PRs for: [bold green]{client_name}[/bold green]")
         console.print("\n--- [bold]Select a Date Range[/bold] ---")
@@ -120,7 +116,7 @@ def run_pr_analyzer(token, client):
         date_range_str = "All Time"
 
         if choice == 'q':
-            break
+            return
         elif choice == 'a':
             pass
         elif choice == '3':
@@ -152,25 +148,25 @@ def run_pr_analyzer(token, client):
         
         show_other = False
         while True:
-            # This inner loop is for actions within a selected date range
             display_prs(main_lift_performances, other_lift_performances, date_range_str, show_other=show_other)
             
-            prompt_parts = ["[n]ew date range", "[w]ilks score"]
+            prompt_parts = ["[n]ew date range", "[w]ilks score", "[q]uit"]
             if other_lift_performances:
-                prompt_parts.append("[m]ore lifts" if not show_other else "[h]ide other lifts")
+                prompt_parts.insert(-1, "[m]ore lifts" if not show_other else "[h]ide other lifts")
             
             print("\n" + "-"*50)
             print(' | '.join(prompt_parts))
             action = input("> ").lower()
             
             if action == 'n':
-                break # Breaks out of the inner loop to re-select a date range
+                break
+            elif action == 'q':
+                return
             elif action == 'm' and other_lift_performances:
                 show_other = True
             elif action == 'h' and other_lift_performances:
                 show_other = False
             elif action == 'w':
-                # --- WILKS SCORE LOGIC ---
                 squat_pr = main_lift_performances.get("squat", {}).get("e1rm", 0)
                 bench_pr = main_lift_performances.get("bench press", {}).get("e1rm", 0)
                 deadlift_pr = main_lift_performances.get("deadlift", {}).get("e1rm", 0)
