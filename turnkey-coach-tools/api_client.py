@@ -93,10 +93,10 @@ def get_workout_history(token, client, force_refresh=False):
     os.makedirs(client_dir, exist_ok=True)
     if force_refresh:
         workouts = _download_workouts_from_api(token, client_id)
-        with open(workout_cache_path, 'w') as f: json.dump(workouts, f, indent=4)
+        with open(workout_cache_path, 'w', encoding='utf-8') as f: json.dump(workouts, f, indent=4)
         return workouts
     if os.path.exists(workout_cache_path):
-        with open(workout_cache_path, 'r') as f:
+        with open(workout_cache_path, 'r', encoding='utf-8') as f:
             existing_workouts = json.load(f)
         if not existing_workouts:
             return get_workout_history(token, client, force_refresh=True)
@@ -109,7 +109,7 @@ def get_workout_history(token, client, force_refresh=False):
         if new_workouts:
             console.print(f"[green]Found {len(new_workouts)} new workouts. Updating cache...[/green]")
             all_workouts = existing_workouts + new_workouts
-            with open(workout_cache_path, 'w') as f: json.dump(all_workouts, f, indent=4)
+            with open(workout_cache_path, 'w', encoding='utf-8') as f: json.dump(all_workouts, f, indent=4)
             return all_workouts
         else:
             console.print("[dim]Workout history is up to date.[/dim]")
