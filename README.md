@@ -35,7 +35,7 @@ Turnkey Coach Tools provides coaches with powerful CLI utilities to interact wit
 
 1. Ensure you have Python 3.7+ installed
 2. Clone the repository containing these tools
-3. Navigate to the `turnkey-coach-tools` directory
+3. Navigate to the `workout-parser` directory
 4. Install dependencies:
 
 ```bash
