@@ -1,467 +1,167 @@
+# Turnkey Coach Tools
 
-# Workout Parser and Uploader
+A comprehensive set of command-line interface (CLI) tools designed for fitness coaches using the Turnkey Coach platform. These tools streamline client management, workout analysis, and data interaction through an intuitive terminal-based application.
 
-A Python suite for parsing workout plans from plain text files into JSON and uploading them to the Barbell Logic Turnkey Coach API (`POST /api/v1/workouts`). The suite includes five scripts:
-* **`workout_downloader.py`**: downloads workouts from the Turnkey Coach API in JSON format
-* **`json2markup.py`**: converts downloaded JSON workouts into a plain text strength workout markup format.
-- **`workout_parser.py`**: Converts plain text workout files (e.g., `john.txt`) into JSON (e.g., `john.json`) compatible with the API.
-- **`workout_uploader.py`**: Authenticates with the Turnkey Coach API and uploads JSON workouts to the `POST /api/v1/workouts` endpoint.
-- **`fetch_exercises.py`**: Retrieves the exercise list from the API (`GET /api/v1/exercises`) and saves it as `exerciselist.json` for use by `workout_parser.py`.
-* **`pr_downloader.py`**: Retrieves and sorts the PRs as stored on the Turnkey Coach servers.
-* **`pr_analyzer.py`**: Outputs the highest estimated one-rep-maximums over a particular time period, using workouts in JSON format downloaded with **workout_downloader.py**.
+Note: There is a Dummies' Guide to using these tools currently [here](https://docs.google.com/document/d/1EnBFnMKmasEkQG9uq_fyoxqqoBcQIRP4y1ocV4-1FdI/edit?usp=sharing)
+## Table of Contents
+
+- [Description](#description)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Tools Overview](#tools-overview)
+- [Dependencies](#dependencies)
+- [API Client](#api-client)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Description
+
+Turnkey Coach Tools provides coaches with powerful CLI utilities to interact with the Turnkey Coach API. The suite includes tools for viewing unified feeds, analyzing personal records, browsing workout histories, uploading workouts, and managing client data. Built with Python, it leverages modern libraries for a rich user experience and efficient data handling.
 
 ## Features
 
-- **Parsing** (`workout_parser.py`):
-  - Parses workouts in a markdown-like format with tab-indented notes.
-  - Supports weight-based (e.g., `3x5 @ 400`), RPE-based (e.g., `1x1 @ RPE 10`), AMRAP (e.g., `1xAMRAP @ 135`), distance-based (e.g., `2.5 miles @ 00:20:00`), and text-based (e.g., `2x8 @ light`) sets.
-  - Uses fuzzy matching to resolve unrecognized exercise names.
-  - Requires `exerciselist.json` in the script’s directory for exercise ID mapping.
-  - Generates JSON files (e.g., `input.txt` → `input.json`).
-
-- **Uploading** (`workout_uploader.py`):
-  - Authenticates with the Turnkey Coach API using email and password.
-  - Caches access tokens in `.tokencache` for reuse within 1 hour.
-  - Uploads single or multiple workout JSON objects to the API.
-
-- **Exercise List Retrieval** (`fetch_exercises.py`):
-  - Fetches the exercise list from the API and saves as `exerciselist.json`.
-  - Uses the same authentication mechanism as `workout_uploader.py`.
-  - See the [API Documentation](https://app.turnkey.coach/api-docs/index.html) for endpoint details.
-
-## The Strength Coaching Markup Language
-
-See [Markup Documentation](markup.md) for details. 
-
-## Barbell Logic Context
-
-The suite supports Barbell Logic’s training principles, including:
-- RPE-based programming (e.g., `1x1 @ RPE 10`).
-- AMRAP sets (e.g., `1xAMRAP @ 135`).
-- Main lifts: `Squat`, `Bench Press`, `Deadlift`, `Press`.
-
-For specific requirements or API details, refer to the [API Documentation](https://app.turnkey.coach/api-docs/index.html) or open a GitHub issue.
+- **Client Management**: Authenticate and select from your list of clients
+- **Unified Feed**: Aggregate and interact with messages and workout comments in chronological order
+- **PR Analysis**: Calculate estimated 1RM using Wendler's formula and compute Wilks scores
+- **Actual PRs Viewer**: Fetch and display official personal records directly from the API
+- **Workout History Browser**: Save formatted workout histories to markup files for review in your editor
+- **Workout Uploader**: Parse workout text files and upload to the platform with fuzzy exercise matching
+- **Utilities**: Add notes, clean up directories, refresh caches, and update exercise lists
+- **Caching**: Intelligent caching of workout data and messages to reduce API calls
+- **Rich CLI**: Beautiful terminal interface with panels, tables, and interactive menus
 
 ## Installation
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/strength-labs/workout-parser.git
-   cd workout-parser
-   ```
-2. **Install Dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. **Prepare `exerciselist.json`**: Put `exerciselist.json` in the same directory as the script.
+1. Ensure you have Python 3.7+ installed
+2. Clone the repository containing these tools
+3. Navigate to the `turnkey-coach-tools` directory
+4. Install dependencies:
 
-Fetch the exercise list from the API using `fetch_exercises.py` (see "Usage: Fetching the Exercise List") or manually create it (see "Updating exerciselist.json").
+```bash
+pip install requests rich rapidfuzz
+```
+
+Note: `rapidfuzz` is required for the workout uploader's fuzzy matching feature. If not needed, you can omit it, but the uploader will have reduced functionality.
 
 ## Usage
 
-Here’s documentation for `workout_downloader.py` based on its actual code and command-line usage:
+1. Run the main CLI application:
 
----
-
-### Downloading Workouts with `workout_downloader.py`
-
-This script authenticates with the Turnkey Coach API and downloads workouts for a specified user, including all comments and full workout details.
-
-**Command-Line Usage:**
-
-1. Make sure `workout_downloader.py` is in your working directory.
-
-2. Run the script from the command line and provide required arguments:
-   ```bash
-   python workout_downloader.py --user_id <USER_ID> [--start_date YYYY-MM-DD] [--end_date YYYY-MM-DD]
-   ```
-   - `--user_id` (required): The client user ID to download workouts for.  
-     *To find the user ID, see the calendar page URL in the Turnkey Coach web app (e.g., `https://app.turnkey.coach/calendar?id=9999#current_view=month` — use the number after `id=`).*
-   - `--start_date` (optional): Filter workouts from this date (format `YYYY-MM-DD`).
-   - `--end_date` (optional): Filter workouts up to this date (format `YYYY-MM-DD`).
-
-3. When prompted, enter your Turnkey Coach API email and password.  
-   - The script will use a cached token from `.tokencache` if available and valid (tokens last 1 hour).
-   - If no valid token is found, authentication is performed.
-
-4. The script fetches all workouts for the specified user (and date range, if provided), then downloads full details for each workout, including comments.
-
-5. All retrieved workouts are saved into a file named:
-   ```
-   workouts_user_<USER_ID>.json
-   ```
-   For example: `workouts_user_9999.json`
-
-6. You’ll see console output indicating progress and any errors.
-
-**Example:**
 ```bash
-python workout_downloader.py --user_id 9999 --start_date 2025-01-01 --end_date 2025-08-31
+python coach_cli.py
 ```
 
-**Notes:**
-- The script requires an internet connection and valid credentials for the Turnkey Coach API.
-- The API base URL defaults to `https://app.turnkey.coach`, but can be overridden by the `API_BASE_URL` environment variable.
-- If you encounter authentication errors, double-check your email and password.
-- Errors and progress (such as successful downloads or failures) are printed to the console.
+2. Enter your Turnkey Coach email and password when prompted
+3. Select a client from the displayed list
+4. Choose from the available tools in the client menu
 
----
+### Keyboard Shortcuts
 
-Let me know if you want this integrated into your README or need further details!
+- Use arrow keys or j/k for navigation in feeds
+- Press `q` to quit menus
+- Press `u` to refresh data
+- In feed view: `m` to send message, `c` to reply to comments, `/` to search
 
-### Fetching the Exercise List with `fetch_exercises.py`
+## Tools Overview
 
-**Command-Line Usage:**
-1. Ensure you are in the directory containing `fetch_exercises.py`.
-2. Run the script from the command line:
-   ```bash
-   python fetch_exercises.py
-   ```
-3. You will be prompted to enter your email and password for the Turnkey Coach API.
-   - The script authenticates your credentials.
-   - If authentication succeeds, it fetches the list of exercises and saves it as `exerciselist.json` in the same directory.
-4. **Tip:** If you need to run the script again, you can overwrite or update `exerciselist.json` as needed. Cached tokens are stored in `.tokencache` and reused for 1 hour to avoid repeated logins.
+### 1. Unified Feed
+- Combines messages from conversations and comments from workouts
+- Chronological timeline of all client interactions
+- Search functionality with highlighting
+- Reply to messages or workout comments directly
+- Export feed to text file for archiving
 
-### Parsing Workouts with `workout_parser.py`
+### 2. Estimated 1RMs (from history)
+- Analyzes workout history to find best performances
+- Calculates estimated 1RM using Wendler's formula
+- Supports date range filtering (3 months, 6 months, year, all time, custom)
+- Wilks score calculation for powerlifting totals
+- Displays main lifts (Squat, Bench Press, Deadlift, Press) prominently
 
-**Command-Line Usage:**
-1. Make sure `workout_parser.py`, `exerciselist.json`, and your input file (e.g., `john.txt`) are in the same directory.
-2. Run the script from the command line:
-   ```bash
-   python workout_parser.py
-   ```
-3. The script will prompt you for:
-   - **Client User ID** (integer, e.g., `9999`):  
-     To find the client user ID, go to the calendar page for the client in the Turnkey Coach web app.  
-     The user ID appears in the URL, for example:  
-     ```
-     https://app.turnkey.coach/calendar?id=9999#current_view=month
-     ```
-     The number after `id=` is the client user ID you should enter when prompted.
-   - **Input file path** (e.g., `john.txt`). Include the relative or absolute path if the file is not in the current directory.
-4. During parsing:
-   - For any exercise name not recognized, you will be prompted to:
-     - Select a suggested match (fuzzy matching).
-     - Enter a different exercise name (must match one from `exerciselist.json`).
-     - Skip the exercise (sets `exercise_id` to `null`).
-5. When parsing is complete, a JSON file (same base name as your input file, e.g., `john.json`) is created in the same directory.
-6. **Tip:** If you see errors about missing files or unrecognized exercises, check that paths are correct and `exerciselist.json` is up to date.
+### 3. Actual PRs (from API)
+- Fetches official personal records stored in the platform
+- Shows both actual 1RM and estimated 1RM for multi-rep sets
+- Date range filtering
+- Displays all lifts, not just main compound movements
 
-### Uploading Workouts with `workout_uploader.py`
+### 4. Browse & Save Workout History
+- Downloads and caches detailed workout data
+- Formats workouts into readable markup
+- Opens saved files in your default editor ($EDITOR)
+- Incremental caching to avoid re-downloading unchanged data
 
-**Command-Line Usage:**
-1. Ensure the JSON file you want to upload (e.g., `john.json`) is in the same directory as `workout_uploader.py`.
-2. Run the script from the command line:
-   ```bash
-   python workout_uploader.py
-   ```
-3. You will be prompted to enter:
-   - Your email and password for Turnkey Coach API authentication.
-   - The path to the JSON file you wish to upload (e.g., `john.json`). You can enter `q` to quit.
-4. The script authenticates, caches the token in `.tokencache`, and uploads each workout from the JSON file.
-5. **Tip:** If you receive authentication errors, double-check your credentials. If you get API errors, review the API response and ensure your JSON file matches the expected format.
+### 5. Upload Workout from File
+- Parses workout text files in custom markup format
+- Fuzzy matching for exercise names using RapidFuzz
+- Interactive selection for ambiguous matches
+- Supports various set formats (weight/reps, RPE, percentage, time-based)
+- Auto-detects weight units (lbs/kg)
 
-### Example Workflow
-1. Create `john.txt`:
+### Utilities
+- **Add a Quick Note**: Create timestamped notes in client directories
+- **Clean Up Directory**: Remove temporary files and generated exports
+- **Force Refresh Workout History**: Clear cache and re-download data
+- **Update Exercise List**: Download latest exercise database from API
 
+## Dependencies
+
+- **requests**: HTTP library for API communication
+- **rich**: Terminal styling and interactive elements
+- **rapidfuzz** (optional): Fuzzy string matching for exercise names
+- **Standard library**: json, datetime, os, re, etc.
+
+## API Client
+
+The `api_client.py` module provides shared functionality:
+
+- Authentication with token caching
+- Client list retrieval
+- Workout history downloading with incremental updates
+- Exercise list management
+- Shared helper functions for text cleaning and caching
+
+## File Structure
 
 ```
-Workout Date: 2025-08-20
-
-Deadlift
-1x5 @ 360
-Bench Press
-1x5 @ 227.5
-2x5 @ 192.5
- 
----
-Workout Date: 2025-08-27
-
-Squat
-1x5 @ RM
-  Work up to a heavy single.
-Press
-1x5 @ 170
-2x5 @ 145
-1xAMRAP @ 135
-```
-
-
-2. Run `fetch_exercises.py` to generate `exerciselist.json`.
-3. Run `workout_parser.py` to generate `john.json`.
-4. Run `workout_uploader.py` to upload `john.json` to the API.
-
-#### Alternate workflow.
-1. Download client workouts using `workout_downloader.py`.
-2. Convert JSON workouts to plain text format with `json2markup.py`.
-3. Read the `.txt` file or upload it to LLM for analysis.
-4. Use `pr_analyzer.py` to check the best efforts of a lifter over a period of time.
-5. Use `pr_downwloader.py` to keep client PRs accessible in a console window while working.
-
-
-## Input File Format (for `workout_parser.py`)
-
-The input file uses a markdown-like structure with tab-indented notes.
-
-### Structure
-- **Workout Date**: Begins with `Workout Date:` followed by `YYYY-MM-DD`.
-- **Exercises**: Non-indented lines matching names in `exerciselist.json`.
-- **Sets**: Non-indented in the format `3x5@300` or `3xAMRAP@300`.
-- **Notes**: Tab-indented lines under an exercise (start with `\s+`).
-- **Blank Lines**: Ignored.
-
-### Example Input File (`john.txt`)
-```
-Workout Date: 2025-08-20
-
-Deadlift
-1x5 @ 360
-Bench Press
-1x5 @ 227.5
-2x5 @ 192.5
-
-Workout Date: 2025-08-27
-
-Squat
-1x5 @ 315
-    Work up to a heavy single.
-
-Press
-1x5 @ 170
-2x5 @ 145
-1xAMRAP @ 135
-```
-
-### Format Details
-- **Workout Date**: `Workout Date: YYYY-MM-DD`
-- **Exercises**: Non-indented, must match `exerciselist.json` (case-insensitive) or be resolved via prompts.
-- **Sets**:
-  - **Weight-based**: `setsxreps @ weight`
-  - **RPE-based**: `setsxreps @ RPE value`
-  - **AMRAP**: `setsxAMRAP @ weight`
-  - **Distance-based**: `distance unit @ HH:MM:SS`
-  - **Text-based**: `setsxreps @ description`
-- **Notes**: Tab-indented (e.g., `    Work up to a heavy single.`).
-
-### Notes on Indentation
-- Use **tabs** (preferred) or **spaces** for notes (detected via regex `^\s+`).
-- Exercises and sets must be non-indented or minimally indented.
-- Consistent indentation (e.g., one tab per note) is recommended.
-
-## Output JSON Format (from `workout_parser.py`)
-
-The output JSON aligns with the `POST /api/v1/workouts` endpoint (see [API Documentation](https://app.turnkey.coach/api-docs/index.html)):
-
-- **Top-level**: Array of workout objects.
-- **Workout object**:
-  - `user_id`: Integer (e.g., `9999`).
-  - `workout_date`: String (e.g., `2025-08-20`).
-  - `weight_type`: String (default: `"lbs"`).
-  - `assigned_exercises`: Array of exercise objects.
-- **Exercise object**:
-  - `exercise_id`: Integer (from `exerciselist.json` or `null` if skipped).
-  - `priority`: Integer (order of exercises, starting at 0).
-  - `assigned_sets`: Array of set objects.
-- **Set object**:
-  - `priority`: Integer (order of sets).
-  - `sets`: Integer.
-  - `reps`: Integer (`0` for AMRAP).
-  - `weight`: Float (optional).
-  - `weight_type`: String (e.g., `"default_weight_type"`, `"RPE"`).
-  - `weight_type_value`: Integer (optional, for RPE).
-  - `rep_type`: String (e.g., `"default_rep_type"`, `"AMRAP"`).
-  - `set_type`: String (e.g., `"default"`, `"custom"`).
-  - `body`: String (optional, for text-based sets or notes).
-  - `distance`: Float (optional).
-  - `distance_unit`: String (e.g., `"miles"`, optional).
-  - `time`: Integer (seconds, optional).
-
-### Example Output (`john.json`)
-```json
-[
-  {
-    "user_id": 9999,
-    "workout_date": "2025-08-20",
-    "weight_type": "lbs",
-    "assigned_exercises": [
-      {
-        "exercise_id": 1008,
-        "priority": 0,
-        "assigned_sets": [
-          {
-            "priority": 0,
-            "sets": 1,
-            "reps": 5,
-            "weight": 360.0,
-            "weight_type": "default_weight_type",
-            "rep_type": "default_rep_type",
-            "set_type": "default"
-          }
-        ]
-      },
-      {
-        "exercise_id": 1007,
-        "priority": 1,
-        "assigned_sets": [
-          {
-            "priority": 0,
-            "sets": 1,
-            "reps": 5,
-            "weight": 227.5,
-            "weight_type": "default_weight_type",
-            "rep_type": "default_rep_type",
-            "set_type": "default"
-          },
-          {
-            "priority": 1,
-            "sets": 2,
-            "reps": 5,
-            "weight": 192.5,
-            "weight_type": "default_weight_type",
-            "rep_type": "default_rep_type",
-            "set_type": "default"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "user_id": 9999,
-    "workout_date": "2025-08-27",
-    "weight_type": "lbs",
-    "assigned_exercises": [
-      {
-        "exercise_id": 794,
-        "priority": 0,
-        "assigned_sets": [
-          {
-            "priority": 0,
-            "sets": 1,
-            "reps": 5,
-            "weight": 315.0,
-            "weight_type": "default_weight_type",
-            "rep_type": "default_rep_type",
-            "set_type": "default"
-          },
-          {
-            "priority": 1,
-            "set_type": "custom",
-            "body": "Work up to a heavy single."
-          }
-        ]
-      },
-      {
-        "exercise_id": 1009,
-        "priority": 1,
-        "assigned_sets": [
-          {
-            "priority": 0,
-            "sets": 1,
-            "reps": 5,
-            "weight": 170.0,
-            "weight_type": "default_weight_type",
-            "rep_type": "default_rep_type",
-            "set_type": "default"
-          },
-          {
-            "priority": 1,
-            "sets": 2,
-            "reps": 5,
-            "weight": 145.0,
-            "weight_type": "default_weight_type",
-            "rep_type": "default_rep_type",
-            "set_type": "default"
-          },
-          {
-            "priority": 2,
-            "sets": 1,
-            "reps": 0,
-            "weight": 135.0,
-            "weight_type": "default_weight_type",
-            "rep_type": "AMRAP",
-            "set_type": "default"
-          }
-        ]
-      }
-    ]
-  }
-]
-```
-
-## Updating `exerciselist.json`
-
-If you cannot fetch the exercise list via `fetch_exercises.py`, manually create `exerciselist.json` with exercises matching the API’s IDs.
-
-Example:
-```json
-[
-  {
-    "id": 794,
-    "name": "Squat",
-    "video_url": null,
-    "exercise_type": "resistance"
-  },
-  {
-    "id": 1007,
-    "name": "Bench Press",
-    "video_url": null,
-    "exercise_type": "resistance"
-  },
-  {
-    "id": 1008,
-    "name": "Deadlift",
-    "video_url": null,
-    "exercise_type": "resistance"
-  },
-  {
-    "id": 1009,
-    "name": "Press",
-    "video_url": null,
-    "exercise_type": "resistance"
-  }
-]
-```
-
-## Requirements
-
-Dependencies are listed in `requirements.txt`:
-```
-requests==2.32.3
-rapidfuzz==3.14.0
+turnkey-coach-tools/
+├── coach_cli.py          # Main CLI application
+├── api_client.py         # Shared API functions
+├── feed_tool.py          # Unified feed functionality
+├── pr_tool.py            # Estimated PR analyzer
+├── actual_prs_tool.py    # Actual PRs viewer
+├── format_tool.py        # Workout markup formatter
+├── upload_tool.py        # Workout uploader
+├── exerciselist.json     # Exercise database (downloaded)
+├── plan.txt              # Example workout plan
+├── messages_cache.json   # Cached messages (generated)
+├── workouts_index.json   # Workout cache index (generated)
+└── feed_cache.json       # Feed cache (generated)
 ```
 
 ## Contributing
 
-Contributions are welcome! Follow these steps:
-1. Fork the repository.
-2. Create a branch: `git checkout -b feature/your-feature`.
-3. Commit changes: `git commit -m "Add your feature"`.
-4. Push: `git push origin feature/your-feature`.
-5. Open a Pull Request.
+Contributions are welcome! Please:
 
-For issues or feature requests, open an issue on GitHub.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+Ensure code follows Python best practices and includes appropriate error handling.
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the MIT License - see the LICENSE file in the parent directory for details.
 
-## Notes
+## Support
 
-- **Exercise IDs**: Ensure `exerciselist.json` matches the API’s exercise IDs (e.g., 794 for `Squat`, 1007 for `Bench Press`). See the [API Documentation](https://app.turnkey.coach/api-docs/index.html).
-- **API Endpoint**: The uploader uses `https://app.turnkey.coach` by default. Set the `API_BASE_URL` environment variable to override.
-- **Token Caching**: Access tokens are cached in `.tokencache` for 1 hour.
-- **Bodyweight and Light Sets**: Sets like `2x8 @ light` are parsed as `set_type: "custom"`. Contact the developer for specific `weight_type` values (e.g., `weight: 0`).
-- **Time-Based Sets**: For time-based sets (e.g., `2x30s @ bodyweight`), contact the developer to add support.
-- **Workout ID**: The API may require a `workout_id`. Contact the developer to add mapping logic or input support.
+For issues or questions:
 
-## Troubleshooting
+- Check the Turnkey Coach API documentation
+- Ensure all dependencies are installed
+- Verify your account has appropriate permissions
+- Clear caches (`messages_cache.json`, `workouts_index.json`) if experiencing issues
 
-- **Missing `exerciselist.json`**: Run `fetch_exercises.py` or manually create it.
-- **Unrecognized Exercises**: Update `exerciselist.json` or use fuzzy matching prompts.
-- **Incorrect Note Parsing**: Ensure notes are tab-indented.
-- **Authentication Issues**: Verify email/password and API base URL. Check the [API Documentation](https://app.turnkey.coach/api-docs/index.html).
-- **API Errors**: Check the API response in the uploader’s error message. Refer to the [API Documentation](https://app.turnkey.coach/api-docs/index.html) for schema details.
-- **Contact**: For issues or enhancements (e.g., RPE validation, time-based sets), open a GitHub issue.
-
----
-
+Last updated: 2025-09-30

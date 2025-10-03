@@ -2,6 +2,8 @@
 
 A comprehensive set of command-line interface (CLI) tools designed for fitness coaches using the Turnkey Coach platform. These tools streamline client management, workout analysis, and data interaction through an intuitive terminal-based application.
 
+Note: There is a Dummies' Guide to using these tools currently [here](https://docs.google.com/document/d/1EnBFnMKmasEkQG9uq_fyoxqqoBcQIRP4y1ocV4-1FdI/edit?usp=sharing).
+
 ## Table of Contents
 
 - [Description](#description)
