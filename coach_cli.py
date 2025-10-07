@@ -7,6 +7,7 @@ from datetime import datetime
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
+from settings import get_default_editor
 
 # Import our shared functions
 from api_client import get_access_token, get_clients, clear_screen, get_workout_history, load_exercise_map, update_exercise_list, CLIENT_DATA_DIR
@@ -59,13 +60,17 @@ def browse_history(token, client, coach_user_id):
     with open(history_filepath, 'w', encoding='utf-8') as f:
         f.write(markup_content)
     console.print(f"\nWorkout history saved to:\n[green]{history_filepath}[/green]")
-    editor = os.getenv('EDITOR', 'nvim') 
-    console.print(f"\nOpening history in [bold green]{editor}[/bold green]...")
+   
+    # Pull default editor from settings
+    editor_cmd = get_default_editor()
+    editor_name = ' '.join(editor_cmd)  # Human-readable for the console—fancy, huh?
+    
+    console.print(f"\nOpening history in [bold green]{editor_name}[/bold green]...")
     console.print("[dim]Close the editor to continue...[/dim]")
     original_dir = os.getcwd()
     try:
         os.chdir(client_dir)
-        subprocess.run([editor, history_filename], shell=False, check=False)
+        subprocess.run(editor_cmd + [history_filename], shell=False, check=False)  # Append the filename like a boss
     finally:
         os.chdir(original_dir)
 
@@ -109,22 +114,32 @@ def run_uploader_tool(token, client, exercise_map):
         console.print("[red]Invalid input.[/red]")
         console.input("Press Enter to continue.")
 
-# --- NEW FEATURE FUNCTIONS ---
+# --- UPGRADED NOTE FEATURE (Because Even Lone Wolves Deserve Nice Things) ---
 def add_note(client):
-    """Opens an editor to create a new, timestamped note in the client's directory."""
+    """Opens an editor to create a new, timestamped note in the client's directory.
+    File gets created empty first—no more 'file not found' tantrums."""
     client_dir = os.path.join(CLIENT_DATA_DIR, str(client['id']))
+    os.makedirs(client_dir, exist_ok=True)  # Paranoid mkdir, because why not?
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     note_filename = f"note_{timestamp}.txt"
+    note_filepath = os.path.join(client_dir, note_filename)
     
-    editor = os.getenv('EDITOR', 'nvim')
-    console.print(f"\nOpening a new note in [bold green]{editor}[/bold green]...")
-    console.print(f"[dim]File will be saved as {note_filename} in the client's directory.[/dim]")
+    # Create the empty file upfront—like a gentleman holding the door
+    with open(note_filepath, 'w', encoding='utf-8') as f:
+        f.write("")  # Blank canvas for your profound ramblings
+    
+    # Pull the editor from settings (your one-time "tell me your prefs" bribe pays off here)
+    editor_cmd = get_default_editor()
+    editor_name = ' '.join(editor_cmd)  # Pretty-print for the console—humans eat that up
+    
+    console.print(f"\nOpening a new note in [bold green]{editor_name}[/bold green]...")
+    console.print(f"[dim]File saved as {note_filename} in {client_dir}. Scribble away.[/dim]")
     console.print("[dim]Close the editor to continue...[/dim]")
-
+    
     original_dir = os.getcwd()
     try:
         os.chdir(client_dir)
-        subprocess.run([editor, note_filename], shell=False, check=False)
+        subprocess.run(editor_cmd + [note_filename], shell=False, check=False)  # Append filename, execute like a pro
     finally:
         os.chdir(original_dir)
 
@@ -218,12 +233,12 @@ def show_tool_menu(token, user_id, client, exercise_map):
 def main():
     """The main application loop."""
     clear_screen()
-    console.print(Panel("[bold blue]Turnkey Coach CLI[/bold blue]", expand=False))
+    console.print(Panel("[bold blue]Turnkey Coach Tools CLI[/bold blue]", expand=False))
     
     token, user_id = get_access_token()
     if not token or not user_id:
         sys.exit("Could not authenticate. Exiting.")
-
+    _ = get_default_editor()  # Triggers prompt if needed, discards return
     exercise_map = load_exercise_map()
     if not exercise_map:
         console.print("[yellow]`exerciselist.json` not found.[/yellow]")
