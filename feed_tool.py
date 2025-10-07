@@ -7,11 +7,13 @@ import threading
 import copy
 import sys
 import glob
+import subprocess
 from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
+from settings import get_default_editor # added to make editor defaults more sensible
 
 # Import shared functions from the api_client.py file
 from api_client import API_BASE_URL, CLIENT_DATA_DIR, clean_text, clear_screen
@@ -460,18 +462,22 @@ def _latest_export_file(client_dir):
     return files[0]
 
 def _open_in_editor(path):
-    editor = os.getenv('EDITOR', 'nvim')
+    """Opens the file in the user's preferred editor, because life's too short for pico."""
+    editor_cmd = get_default_editor()
+    editor_name = ' '.join(editor_cmd)  # For that sweet console ego stroke
+    
+    console.print(f"\nOpening [cyan]{os.path.basename(path)}[/cyan] in [bold green]{editor_name}[/bold green]...")
+    console.print("[dim]Close the editor to continue...[/dim]")
+    
+    original_dir = os.getcwd()
     try:
-        dirpath = os.path.dirname(path)
-        fname = os.path.basename(path)
-        original = os.getcwd()
-        try:
-            os.chdir(dirpath)
-            os.system(f"{editor} {fname}")
-        finally:
-            os.chdir(original)
-    except Exception:
-        console.print(f"[red]Could not open editor for {path}[/red]")
+        # Sneaky chdir to the file's dir, because relative paths are a gamble
+        file_dir = os.path.dirname(os.path.abspath(path))
+        os.chdir(file_dir)
+        filename = os.path.basename(path)
+        subprocess.run(editor_cmd + [filename], shell=False, check=False)
+    finally:
+        os.chdir(original_dir)  # Bounce back like nothing happened
 
 # --- Display and Main Loop ---
 
