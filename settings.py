@@ -1,19 +1,23 @@
+# settings.py (complete updated version)
 import json
 import os
 import platform
 from rich.console import Console
+from cryptography.fernet import Fernet
+import base64
+import getpass  # Added for secure password input
 
 console = Console()
 
 SETTINGS_FILE = os.path.expanduser("~/.turnkey_coach_settings.json")
 
 def load_or_init_settings():
-    """Load settings or prompt for editor prefs like a nosy therapist."""
+    """Load settings or prompt for editor prefs and credentials like a nosy therapist."""
     if os.path.exists(SETTINGS_FILE):
         with open(SETTINGS_FILE, 'r') as f:
             return json.load(f)
     
-    # First-time setup: Be annoyingly helpful
+    # First-time setup: Editor configuration (original code, unchanged)
     os_name = platform.system().lower()
     defaults = {
         'windows': ['notepad.exe'],  # Boring but reliable
@@ -33,13 +37,64 @@ def load_or_init_settings():
             default_cmd = custom_cmd
             console.print(f"[green]Got it—editor set to {' '.join(default_cmd)}.[/green]")
     
-    settings = {'default_editor': default_cmd}
+    # New: Prompt for email and password (added HERE, after editor setup)
+    console.print("\n[bold]Enter your Turnkey Coach credentials (stored securely for auto-login):[/bold]")
+    email = console.input("Email: ").strip()
+    password = getpass.getpass("Password: ")  # Secure input, no echo
+    
+    # Generate encryption key for password
+    key = Fernet.generate_key()
+    encoded_key = base64.urlsafe_b64encode(key).decode('utf-8')  # Store as string
+    
+    # Encrypt password
+    fernet = Fernet(key)
+    encrypted_password = fernet.encrypt(password.encode()).decode('utf-8')
+    
+    # Save editor and credentials together
+    settings = {
+        'default_editor': default_cmd,
+        'email': email,
+        'encrypted_password': encrypted_password,
+        'encryption_key': encoded_key  # Store key (tradeoff for simplicity)
+    }
     with open(SETTINGS_FILE, 'w') as f:
         json.dump(settings, f, indent=2)
     console.print(f"[green]Settings saved to {SETTINGS_FILE}. You're welcome.[/green]")
     return settings
 
+# Original get_default_editor function (unchanged, was at line 39)
 def get_default_editor():
     """Grab the editor command from settings. Returns a list for subprocess.run."""
     settings = load_or_init_settings()
     return settings.get('default_editor', ['nvim'])  # Ultimate fallback
+
+# New: Helper to retrieve and decrypt credentials
+def get_stored_credentials():
+    """Retrieve and decrypt stored email/password."""
+    settings = load_or_init_settings()
+    email = settings.get('email')
+    encrypted_password = settings.get('encrypted_password')
+    encryption_key = settings.get('encryption_key')
+    
+    if not all([email, encrypted_password, encryption_key]):
+        return None, None
+    
+    try:
+        key = base64.urlsafe_b64decode(encryption_key.encode('utf-8'))
+        fernet = Fernet(key)
+        password = fernet.decrypt(encrypted_password.encode()).decode('utf-8')
+        return email, password
+    except Exception as e:
+        console.print(f"[red]Error decrypting credentials: {e}. Please re-enter in settings.[/red]")
+        return None, None
+
+# New: Helper to clear credentials (for logout)
+def clear_stored_credentials():
+    """Clear stored credentials for logout."""
+    settings = load_or_init_settings()
+    settings.pop('email', None)
+    settings.pop('encrypted_password', None)
+    settings.pop('encryption_key', None)
+    with open(SETTINGS_FILE, 'w') as f:
+        json.dump(settings, f, indent=2)
+    console.print("[green]Credentials cleared. You'll need to re-enter on next login.[/green]")

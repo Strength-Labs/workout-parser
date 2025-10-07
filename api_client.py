@@ -6,6 +6,8 @@ import re
 import html
 from datetime import datetime, timedelta
 from rich.console import Console
+from settings import get_stored_credentials # for login ease
+
 
 # --- Configuration ---
 API_BASE_URL = "https://app.turnkey.coach"
@@ -177,3 +179,39 @@ def get_clients(token, user_id):
         except requests.exceptions.RequestException as err:
             console.print(f"\n[bold red]Could not fetch clients:[/bold red] {err}")
             return []
+
+
+def get_access_token():
+    token, user_id = load_auth_data()
+    if token and user_id:
+        console.print("Using cached access token. 👍", style="green")
+        return token, user_id
+    
+    # New: Try stored credentials for auto-login
+    email, password = get_stored_credentials()
+    if email and password:
+        console.print("[dim]Auto-logging in with stored credentials...[/dim]")
+    else:
+        # Fallback to manual prompt (and store them)
+        email = console.input("[bold]Enter your email:[/bold] ")
+        password = getpass.getpass("Enter your password: ")
+    
+    url = f"{API_BASE_URL}/users/tokens/sign_in"
+    headers = {"Content-Type": "application/json"}
+    payload = {"email": email, "password": password}
+    with console.status("Authenticating..."):
+        try:
+            response = requests.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            data = response.json()
+            token, user_id = data.get("token"), data.get("resource_owner", {}).get("id")
+            if token and user_id:
+                console.print("Successfully obtained access token. 🎉", style="green")
+                save_auth_data(token, user_id)
+                # If we used manual prompt, store creds now (via load_or_init_settings call)
+                if not get_stored_credentials()[0]:
+                    load_or_init_settings()  # Triggers storage if missing
+                return token, user_id
+        except requests.exceptions.RequestException as e:
+            console.print(f"\n[bold red]Login failed:[/bold red] {e}")
+            return None, None

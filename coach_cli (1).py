@@ -7,7 +7,6 @@ from datetime import datetime
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from rich.text import Text  # Added for explicit text rendering
 from settings import get_default_editor, get_stored_credentials, clear_stored_credentials
 
 # Import our shared functions
@@ -36,12 +35,11 @@ def select_client(token, user_id):
         table.add_row(str(i + 1), client['full_name'], str(client['id']), ", ".join(client['coaches']))
     console.print(table)
     while True:
-        console.print("\n")  # Spacer for clarity
-        console.print(Text("Options:", style="dim"))
-        console.print(Text("  [l] Logout (clear credentials)", style="dim"))  # Use Text to avoid markdown
-        console.print(Text("  [s] Adjust Settings (editor, credentials)", style="dim"))
-        console.print(Text("{:>80}".format("Enter a number to select a client, or 'q' to quit > "), style="bold green"), end="")
-        choice = input("").strip().lower()  # Raw input for clean capture
+        console.print("\n[dim]Options:[/dim]")
+        console.print("[dim]  [l] Logout (clear credentials)[/dim]")  # Fixed: No extra backslashes
+        console.print("[dim]  [s] Adjust Settings (editor, credentials)[/dim]")
+        console.print("[bold green]{:>80}".format("Enter a number to select a client, or 'q' to quit > "), end="")
+        choice = input("").strip().lower()  # Raw input to avoid rich styling issues
         if choice == 'q':
             return None
         if choice == 'l':
@@ -60,7 +58,7 @@ def select_client(token, user_id):
             if 0 <= index < len(clients):
                 return clients[index]
             else:
-                console.print("[bold red]Invalid number,请 try again.[/bold red]")
+                console.print("[bold red]Invalid number, please try again.[/bold red]")
         except ValueError:
             console.print("[bold red]Invalid input, please enter a number or option.[/bold red]")
 
@@ -200,7 +198,7 @@ def show_tool_menu(token, user_id, client, exercise_map):
             console.input("Workout history has been refreshed. Press Enter to continue.")
         elif choice == 'u':
             if update_exercise_list(token):
-                enterprise_map = load_exercise_map()
+                exercise_map = load_exercise_map()
                 if not exercise_map: sys.exit("Failed to reload exercise list.")
             console.input("Press Enter to continue.")
         elif choice == 'q':
@@ -267,7 +265,6 @@ def main():
             sys.exit("Cannot proceed without an exercise list. Exiting.")
 
     while True:
-        clear_screen() # clear the screen before showing client list
         selected_client = select_client(token, user_id)
         if selected_client is None:
             break  # Exit on 'q' or logout from select_client

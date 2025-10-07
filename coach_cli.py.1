@@ -1,13 +1,12 @@
 import os
 import sys
 import json
-import glob
+import glob # <-- Import the correct module
 import subprocess
 from datetime import datetime
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from rich.text import Text  # Added for explicit text rendering
 from settings import get_default_editor, get_stored_credentials, clear_stored_credentials
 
 # Import our shared functions
@@ -28,41 +27,20 @@ def select_client(token, user_id):
         console.print("[bold red]No clients found.[/bold red]")
         return None
     table = Table(title="Your Clients", border_style="green")
-    table.add_column("#", style="dim", width=4)
-    table.add_column("Client Name", style="bold", min_width=20)
-    table.add_column("Client ID", style="cyan", width=12)
-    table.add_column("Coaches")
+    table.add_column("#", style="dim", width=4); table.add_column("Client Name", style="bold", min_width=20)
+    table.add_column("Client ID", style="cyan", width=12); table.add_column("Coaches")
     for i, client in enumerate(clients):
         table.add_row(str(i + 1), client['full_name'], str(client['id']), ", ".join(client['coaches']))
     console.print(table)
     while True:
-        console.print("\n")  # Spacer for clarity
-        console.print(Text("Options:", style="dim"))
-        console.print(Text("  [l] Logout (clear credentials)", style="dim"))  # Use Text to avoid markdown
-        console.print(Text("  [s] Adjust Settings (editor, credentials)", style="dim"))
-        console.print(Text("{:>80}".format("Enter a number to select a client, or 'q' to quit > "), style="bold green"), end="")
-        choice = input("").strip().lower()  # Raw input for clean capture
-        if choice == 'q':
-            return None
-        if choice == 'l':
-            clear_stored_credentials()
-            if os.path.exists(TOKEN_CACHE_FILE):
-                os.remove(TOKEN_CACHE_FILE)
-            console.print("[green]Logged out. Bye![/green]")
-            sys.exit()
-        if choice == 's':
-            adjust_settings()
-            clear_screen()
-            console.print(table)  # Redisplay table after settings change
-            continue
+        choice = console.input("\nEnter a number to select a client, or '[bold]q[/bold]' to quit > ")
+        if choice.lower() == 'q': return None
         try:
             index = int(choice) - 1
-            if 0 <= index < len(clients):
-                return clients[index]
-            else:
-                console.print("[bold red]Invalid number,请 try again.[/bold red]")
-        except ValueError:
-            console.print("[bold red]Invalid input, please enter a number or option.[/bold red]")
+            if 0 <= index < len(clients): return clients[index]
+            else: console.print("[bold red]Invalid number, please try again.[/bold red]")
+        except ValueError: console.print("[bold red]Invalid input, please enter a number.[/bold red]")
+
 
 def browse_history(token, client, coach_user_id):
     """Generates a markup file and opens it in an editor inside the client's directory."""
@@ -83,14 +61,16 @@ def browse_history(token, client, coach_user_id):
         f.write(markup_content)
     console.print(f"\nWorkout history saved to:\n[green]{history_filepath}[/green]")
    
+    # Pull default editor from settings
     editor_cmd = get_default_editor()
-    editor_name = ' '.join(editor_cmd)
+    editor_name = ' '.join(editor_cmd)  # Human-readable for the console—fancy, huh?
+    
     console.print(f"\nOpening history in [bold green]{editor_name}[/bold green]...")
     console.print("[dim]Close the editor to continue...[/dim]")
     original_dir = os.getcwd()
     try:
         os.chdir(client_dir)
-        subprocess.run(editor_cmd + [history_filename], shell=False, check=False)
+        subprocess.run(editor_cmd + [history_filename], shell=False, check=False)  # Append the filename like a boss
     finally:
         os.chdir(original_dir)
 
@@ -108,38 +88,79 @@ def run_uploader_tool(token, client, exercise_map):
         console.print(f"  [[bold]{i+1}[/bold]] {filename}")
     console.print("  [[bold]q[/bold]] Cancel")
     choice = console.input("\n> ")
-    if choice.lower() == 'q':
-        return
+    if choice.lower() == 'q': return
     try:
         index = int(choice) - 1
         if 0 <= index < len(txt_files):
             filepath = os.path.join(client_dir, txt_files[index])
-            workouts = parse_workouts_from_file(filepath, client_id, exercise_map)
-            for workout in workouts:
+            workouts_to_upload = parse_workouts_from_file(filepath, client_id, exercise_map)
+            if not workouts_to_upload:
+                console.print("[red]Could not parse any valid workouts from the file.[/red]")
+                console.input("\nPress Enter to continue.")
+                return
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            json_filename = f"plan_for_upload_{timestamp}.json"
+            json_filepath = os.path.join(client_dir, json_filename)
+            with open(json_filepath, 'w', encoding='utf-8') as f:
+                json.dump(workouts_to_upload, f, indent=2)
+            console.print(f"\n[bold yellow]Debug JSON saved to:[/bold yellow]\n[green]{json_filepath}[/green]\n")
+            for workout in workouts_to_upload:
                 upload_workout(token, workout)
+            console.input("\nUpload process finished. Press Enter to continue.")
         else:
-            console.print("[bold red]Invalid number, please try again.[/bold red]")
+            console.print("[red]Invalid selection.[/red]")
             console.input("Press Enter to continue.")
     except ValueError:
-        console.print("[bold red]Invalid input, please enter a number.[/bold red]")
+        console.print("[red]Invalid input.[/red]")
         console.input("Press Enter to continue.")
 
+# --- UPGRADED NOTE FEATURE (Because Even Lone Wolves Deserve Nice Things) ---
+def add_note(client):
+    """Opens an editor to create a new, timestamped note in the client's directory.
+    File gets created empty first—no more 'file not found' tantrums."""
+    client_dir = os.path.join(CLIENT_DATA_DIR, str(client['id']))
+    os.makedirs(client_dir, exist_ok=True)  # Paranoid mkdir, because why not?
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    note_filename = f"note_{timestamp}.txt"
+    note_filepath = os.path.join(client_dir, note_filename)
+    
+    # Create the empty file upfront—like a gentleman holding the door
+    with open(note_filepath, 'w', encoding='utf-8') as f:
+        f.write("")  # Blank canvas for your profound ramblings
+    
+    # Pull the editor from settings (your one-time "tell me your prefs" bribe pays off here)
+    editor_cmd = get_default_editor()
+    editor_name = ' '.join(editor_cmd)  # Pretty-print for the console—humans eat that up
+    
+    console.print(f"\nOpening a new note in [bold green]{editor_name}[/bold green]...")
+    console.print(f"[dim]File saved as {note_filename} in {client_dir}. Scribble away.[/dim]")
+    console.print("[dim]Close the editor to continue...[/dim]")
+    
+    original_dir = os.getcwd()
+    try:
+        os.chdir(client_dir)
+        subprocess.run(editor_cmd + [note_filename], shell=False, check=False)  # Append filename, execute like a pro
+    finally:
+        os.chdir(original_dir)
+
 def clean_client_directory(client):
-    """Cleans up a client directory by deleting all files except cached workouts and messages."""
-    client_id = client['id']
-    client_dir = os.path.join(CLIENT_DATA_DIR, str(client_id))
-    if not os.path.exists(client_dir):
-        console.print(f"[yellow]No directory found for client {client['full_name']}.[/yellow]")
-        console.input("Press Enter to continue.")
-        return
-    
+    """Interactively deletes temporary/generated files from a client's directory."""
+    client_dir = os.path.join(CLIENT_DATA_DIR, str(client['id']))
+    console.print(f"\nScanning [cyan]{client_dir}[/cyan] for temporary files...")
+
     files_to_delete = []
-    for f in os.listdir(client_dir):
-        if not (f.startswith("workouts_user_") or f == "messages_cache.json" or f == "workouts_index.json"):
-            files_to_delete.append(f)
+    # FIX: Removed "note_*.txt" from this list to protect your notes
+    patterns_to_delete = ["plan_for_upload_*.json", "*_history_*.txt", "plan.txt"]
+
+    for pattern in patterns_to_delete:
+        full_pattern = os.path.join(client_dir, pattern)
+        # FIX: Use glob.glob instead of tempfile.glob.glob
+        files_to_delete.extend([os.path.basename(f) for f in glob.glob(full_pattern)])
     
+    files_to_delete = sorted(list(set(files_to_delete)))
+
     if not files_to_delete:
-        console.print(f"[yellow]No files to clean up in {client_dir}.[/yellow]")
+        console.print("[green]No temporary files to delete.[/green]")
         console.input("Press Enter to continue.")
         return
     
@@ -200,7 +221,7 @@ def show_tool_menu(token, user_id, client, exercise_map):
             console.input("Workout history has been refreshed. Press Enter to continue.")
         elif choice == 'u':
             if update_exercise_list(token):
-                enterprise_map = load_exercise_map()
+                exercise_map = load_exercise_map()
                 if not exercise_map: sys.exit("Failed to reload exercise list.")
             console.input("Press Enter to continue.")
         elif choice == 'q':
@@ -220,6 +241,7 @@ def adjust_settings():
         
         choice = console.input("\n> ").lower()
         if choice == '1':
+            # Re-prompt for editor
             settings = load_or_init_settings()
             console.print("\n[bold]Enter new editor command (e.g., 'code -w' or 'nvim'):[/bold]")
             custom_cmd = console.input("> ").strip().split()
@@ -229,6 +251,7 @@ def adjust_settings():
                     json.dump(settings, f, indent=2)
                 console.print("[green]Editor updated.[/green]")
         elif choice == '2':
+            # Re-prompt and re-encrypt creds
             email = console.input("[bold]New Email:[/bold] ").strip()
             password = getpass.getpass("New Password: ")
             key = Fernet.generate_key()
@@ -267,10 +290,28 @@ def main():
             sys.exit("Cannot proceed without an exercise list. Exiting.")
 
     while True:
-        clear_screen() # clear the screen before showing client list
+        clear_screen()
         selected_client = select_client(token, user_id)
+        console.print("\n[bold green]{:>80}".format("Enter a number to select a client, or 'q' to quit"))  # Right-justified, bold, green
+        console.print("[dim]Options:[/dim]")
+        console.print("[dim]  [l] Logout (clear credentials)[/dim]")
+        console.print("[dim]  [s] Adjust Settings (editor, credentials)[/dim]")
+        
         if selected_client is None:
-            break  # Exit on 'q' or logout from select_client
+            choice = console.input("\nEnter option > ").lower()
+            if choice == 'l':
+                clear_stored_credentials()
+                if os.path.exists(TOKEN_CACHE_FILE):
+                    os.remove(TOKEN_CACHE_FILE)
+                console.print("[green]Logged out. Bye![/green]")
+                sys.exit()
+            elif choice == 's':
+                adjust_settings()
+                continue
+            elif choice == 'q':
+                break
+            else:
+                continue
         get_workout_history(token, selected_client)
         show_tool_menu(token, user_id, selected_client, exercise_map)
 
