@@ -48,7 +48,7 @@ def select_client(token, user_id):
             return None
         if choice == 'l':
             clear_stored_credentials()
-            if 'TOKEN_CACHE_FILE' in globals() and os.path.exists(TOKEN_CACHE_FILE):
+            if os.path.exists(TOKEN_CACHE_FILE):
                 os.remove(TOKEN_CACHE_FILE)
             console.print("[green]Logged out. Bye![/green]")
             sys.exit()
@@ -73,9 +73,11 @@ def browse_history(token, client, coach_user_id):
     client_dir = os.path.join(CLIENT_DATA_DIR, str(client['id']))
     workouts = get_workout_history(token, client)
     valid_workouts = [w for w in workouts if w.get('workout_date')]
-    if not valid_workouts:
+    workouts = valid_workouts
+    if not workouts:
         console.input("\nCould not load workout history. Press Enter to return.")
         return
+    valid_workouts = [w for w in workouts if w.get('workout_date')]
     valid_workouts.sort(key=lambda w: w['workout_date'])
     markup_content = format_workouts_to_markup(valid_workouts, coach_user_id)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -171,18 +173,15 @@ def clean_client_directory(client):
 
 def run_ai_chat(token, user_id, client, exercise_map): 
     """AI chat for workout assistance."""
-    import tempfile
-    import os
-
     # Load workout history
     workouts = get_workout_history(token, client)
     valid_workouts = [w for w in workouts if w.get('workout_date')]
-    if not valid_workouts:
+    workouts = valid_workouts
+    if not workouts:
         console.print("[red]No workout history found.[/red]")
         console.input("Press Enter to continue.")
         return
-    valid_workouts.sort(key=lambda w: w['workout_date'])
-    markup_content = format_workouts_to_markup(valid_workouts, user_id)
+    markup_content = format_workouts_to_markup(workouts, user_id)
     
     # Load markup guide
     try:
@@ -219,7 +218,7 @@ def run_ai_chat(token, user_id, client, exercise_map):
     
     if provider == 'xai':
         client_ai = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
-        model = "grok-4"  # Updated to common xAI model; change if "grok-3" works
+        model = "grok-beta"
     else:
         client_ai = OpenAI(api_key=api_key)
         model = "gpt-4"
@@ -242,43 +241,23 @@ def run_ai_chat(token, user_id, client, exercise_map):
         user_input = console.input("You: ").strip()
         if user_input.lower() == 'quit':
             break
-        
-        # Core AI call for non-commands
-        if user_input.lower() not in ['open', 'upload', 'quit']:
-            messages.append({"role": "user", "content": user_input})
-            try:
-                response = client_ai.chat.completions.create(
-                    model=model,
-                    messages=messages,
-                    temperature=0.7  # Adjustable for response style
-                )
-                ai_reply = response.choices[0].message.content
-                messages.append({"role": "assistant", "content": ai_reply})
-                console.print(f"AI: {ai_reply}")
-                last_response = ai_reply
-            except Exception as e:
-                console.print(f"[red]AI error: {e}[/red]")
-            continue
-        
         if user_input.lower() == 'open':
             if last_response:
+                # Save to temp file and open
+                import tempfile
                 with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
                     f.write(last_response)
                     temp_path = f.name
                 editor_cmd = get_default_editor()
-                original_dir = os.getcwd()
-                try:
-                    os.chdir(os.path.dirname(temp_path) if os.path.dirname(temp_path) else original_dir)
-                    subprocess.run(editor_cmd + [os.path.basename(temp_path)], shell=False, check=False)
-                finally:
-                    os.chdir(original_dir)
+                subprocess.run(editor_cmd + [temp_path], shell=False, check=False)
                 os.unlink(temp_path)
             else:
                 console.print("[red]No response to open.[/red]")
             continue
-        
         if user_input.lower() == 'upload':
             if last_response:
+                # Parse and upload
+                import tempfile
                 with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
                     f.write(last_response)
                     temp_path = f.name
@@ -286,10 +265,22 @@ def run_ai_chat(token, user_id, client, exercise_map):
                 for workout in workouts_parsed:
                     upload_workout(token, workout)
                 os.unlink(temp_path)
-                console.print("[green]Upload complete.[/green]")
             else:
                 console.print("[red]No response to upload.[/red]")
             continue
+        messages.append({"role": "user", "content": user_input})
+        try:
+            response = client_ai.chat.completions.create(
+                model=model,
+                messages=messages
+            )
+            ai_response = response.choices[0].message.content
+            console.print(f"AI: {ai_response}")
+            messages.append({"role": "assistant", "content": ai_response})
+            last_response = ai_response
+        except Exception as e:
+            console.print(f"[red]Error: {e}[/red]")
+    console.input("Press Enter to continue.")
 
 
 def show_tool_menu(token, user_id, client, exercise_map):
@@ -417,5 +408,4 @@ def main():
 if __name__ == "__main__":
     main()
     console.print("\nExiting. Goodbye!", style="dim")
-
 

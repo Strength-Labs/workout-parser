@@ -98,3 +98,23 @@ def clear_stored_credentials():
     with open(SETTINGS_FILE, 'w') as f:
         json.dump(settings, f, indent=2)
     console.print("[green]Credentials cleared. You'll need to re-enter on next login.[/green]")
+
+# New: Helper to retrieve and decrypt LLM credentials
+def get_llm_credentials():
+    """Retrieve and decrypt stored LLM provider and API key."""
+    settings = load_or_init_settings()
+    provider = settings.get('llm_provider')
+    encrypted_key = settings.get('llm_encrypted_key')
+    encryption_key = settings.get('encryption_key')
+    
+    if not all([provider, encrypted_key, encryption_key]):
+        return None, None
+    
+    try:
+        key = base64.urlsafe_b64decode(encryption_key.encode('utf-8'))
+        fernet = Fernet(key)
+        api_key = fernet.decrypt(encrypted_key.encode()).decode('utf-8')
+        return provider, api_key
+    except Exception as e:
+        console.print(f"[red]Error decrypting LLM key: {e}. Please re-enter.[/red]")
+        return None, None

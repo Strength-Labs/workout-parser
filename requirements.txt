@@ -6,3 +6,4 @@ rich
 cryptography # for password encryption
 
 
+openai
