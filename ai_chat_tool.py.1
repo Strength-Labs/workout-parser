@@ -1,0 +1,74 @@
+import os
+import json
+import tempfile
+import subprocess
+import base64
+from cryptography.fernet import Fernet
+from openai import OpenAI
+from rich.console import Console
+
+# Import shared functions
+from api_client import get_workout_history
+from format_tool import format_workouts_to_markup
+from upload_tool import parse_workouts_from_file, upload_workout
+from settings import get_default_editor, get_llm_credentials
+
+console = Console()
+
+def run_ai_chat(token, user_id, client, exercise_map):
+    """AI chat for workout assistance."""
+    print("Debug: AI chat started")
+    try:
+        workouts = get_workout_history(token, client)
+    except Exception as e:
+        print(f"Error loading workout history: {e}")
+        input("Press Enter to continue.")
+        return
+    # Load workout history
+    workouts = get_workout_history(token, client)
+    valid_workouts = [w for w in workouts if w.get('workout_date')]
+    print(f"Debug: Loaded {len(workouts)} workouts, {len(valid_workouts)} valid")
+    if not valid_workouts:
+        console.print("[red]No workout history found.[/red]")
+        input("Press Enter to continue.")
+        return
+    valid_workouts.sort(key=lambda w: w['workout_date'])
+    markup_content = format_workouts_to_markup(valid_workouts, user_id)
+
+    # Load markup guide
+    try:
+        with open("markup.md", "r") as f:
+            markup_guide = f.read()
+    except FileNotFoundError:
+        markup_guide = "Markup guide not found. Use standard workout formatting."
+
+    system_prompt = f"You are an AI assistant for strength coaching. Use the following markup guide for workouts: {markup_guide}. The client's workout history is: {markup_content}"
+
+    # Get LLM credentials
+    provider, api_key = get_llm_credentials()
+    if not provider:
+        provider = console.input("Provider (openai/xai): ").strip().lower()
+        api_key = console.input("API Key: ").strip()
+        save = console.input("Save to settings? (y/n): ").lower()
+        if save == 'y':
+            from settings import load_or_init_settings, SETTINGS_FILE
+            settings = load_or_init_settings()
+            key_str = settings.get('encryption_key')
+            if key_str:
+                key = base64.urlsafe_b64decode(key_str.encode('utf-8'))
+                fernet = Fernet(key)
+                encrypted_key = fernet.encrypt(api_key.encode()).decode('utf-8')
+                settings['llm_provider'] = provider
+                settings['llm_encrypted_key'] = encrypted_key
+                with open(SETTINGS_FILE, 'w') as f:
+                    json.dump(settings, f, indent=2)
+                console.print("[green]Saved.[/green]")
+
+    if provider == 'xai':
+        try:
+            client_ai = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
+        except Exception as e:
+            console.print(f"[red]Error setting up xAI client: {e}[/red]")
+            input("Press Enter to continue.")
+            return
+        model = "grok-4"

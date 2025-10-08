@@ -19,6 +19,7 @@ from pr_tool import run_pr_analyzer
 from format_tool import format_workouts_to_markup
 from actual_prs_tool import run_actual_prs_viewer
 from upload_tool import parse_workouts_from_file, upload_workout
+from ai_chat_tool import run_ai_chat
 
 console = Console()
 
@@ -169,128 +170,23 @@ def clean_client_directory(client):
     console.input("Press Enter to continue.")
 
 
-def run_ai_chat(token, user_id, client, exercise_map): 
-    """AI chat for workout assistance."""
-    import tempfile
-    import os
-
-    # Load workout history
-    workouts = get_workout_history(token, client)
-    valid_workouts = [w for w in workouts if w.get('workout_date')]
-    if not valid_workouts:
-        console.print("[red]No workout history found.[/red]")
-        console.input("Press Enter to continue.")
-        return
-    valid_workouts.sort(key=lambda w: w['workout_date'])
-    markup_content = format_workouts_to_markup(valid_workouts, user_id)
-    
-    # Load markup guide
+def add_note(client):
+    """Add a quick note to the client directory."""
+    from api_client import CLIENT_DATA_DIR
+    client_id = client['id']
+    client_dir = os.path.join(CLIENT_DATA_DIR, str(client_id))
+    os.makedirs(client_dir, exist_ok=True)
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    note_filename = f"note-{date_str}.txt"
+    editor_cmd = get_default_editor()
+    original_dir = os.getcwd()
     try:
-        with open("markup.md", "r") as f:
-            markup_guide = f.read()
-    except FileNotFoundError:
-        markup_guide = "Markup guide not found. Use standard workout formatting."
-    
-    system_prompt = f"You are an AI assistant for strength coaching. Use the following markup guide for workouts: {markup_guide}. The client's workout history is: {markup_content}"
-    
-    # Get LLM credentials
-    from settings import get_llm_credentials
-    provider, api_key = get_llm_credentials()
-    from openai import OpenAI
-    if not provider:
-        provider = console.input("Provider (openai/xai): ").strip().lower()
-        api_key = console.input("API Key: ").strip()
-        save = console.input("Save to settings? (y/n): ").lower()
-        if save == 'y':
-            from settings import load_or_init_settings, SETTINGS_FILE
-            import base64
-            from cryptography.fernet import Fernet
-            settings = load_or_init_settings()
-            key_str = settings.get('encryption_key')
-            if key_str:
-                key = base64.urlsafe_b64decode(key_str.encode('utf-8'))
-                fernet = Fernet(key)
-                encrypted_key = fernet.encrypt(api_key.encode()).decode('utf-8')
-                settings['llm_provider'] = provider
-                settings['llm_encrypted_key'] = encrypted_key
-                with open(SETTINGS_FILE, 'w') as f:
-                    json.dump(settings, f, indent=2)
-                console.print("[green]Saved.[/green]")
-    
-    if provider == 'xai':
-        client_ai = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
-        model = "grok-4"  # Updated to common xAI model; change if "grok-3" works
-    else:
-        client_ai = OpenAI(api_key=api_key)
-        model = "gpt-4"
-    
-    # Custom context
-    custom_context = ""
-    if console.input("Upload custom context file? (y/n): ").lower() == 'y':
-        path = console.input("File path: ").strip()
-        try:
-            with open(path, 'r') as f:
-                custom_context = f.read()
-            system_prompt += f"\nAdditional context: {custom_context}"
-        except Exception as e:
-            console.print(f"[red]Error loading file: {e}[/red]")
-    
-    messages = [{"role": "system", "content": system_prompt}]
-    console.print("[bold]AI Chat Mode[/bold] - Type 'quit' to exit, 'open' to open last response in editor, 'upload' to upload last workout.")
-    last_response = ""
-    while True:
-        user_input = console.input("You: ").strip()
-        if user_input.lower() == 'quit':
-            break
-        
-        # Core AI call for non-commands
-        if user_input.lower() not in ['open', 'upload', 'quit']:
-            messages.append({"role": "user", "content": user_input})
-            try:
-                response = client_ai.chat.completions.create(
-                    model=model,
-                    messages=messages,
-                    temperature=0.7  # Adjustable for response style
-                )
-                ai_reply = response.choices[0].message.content
-                messages.append({"role": "assistant", "content": ai_reply})
-                console.print(f"AI: {ai_reply}")
-                last_response = ai_reply
-            except Exception as e:
-                console.print(f"[red]AI error: {e}[/red]")
-            continue
-        
-        if user_input.lower() == 'open':
-            if last_response:
-                with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-                    f.write(last_response)
-                    temp_path = f.name
-                editor_cmd = get_default_editor()
-                original_dir = os.getcwd()
-                try:
-                    os.chdir(os.path.dirname(temp_path) if os.path.dirname(temp_path) else original_dir)
-                    subprocess.run(editor_cmd + [os.path.basename(temp_path)], shell=False, check=False)
-                finally:
-                    os.chdir(original_dir)
-                os.unlink(temp_path)
-            else:
-                console.print("[red]No response to open.[/red]")
-            continue
-        
-        if user_input.lower() == 'upload':
-            if last_response:
-                with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-                    f.write(last_response)
-                    temp_path = f.name
-                workouts_parsed = parse_workouts_from_file(temp_path, client['id'], exercise_map)
-                for workout in workouts_parsed:
-                    upload_workout(token, workout)
-                os.unlink(temp_path)
-                console.print("[green]Upload complete.[/green]")
-            else:
-                console.print("[red]No response to upload.[/red]")
-            continue
-
+        os.chdir(client_dir)
+        subprocess.run(editor_cmd + [note_filename], shell=False, check=False)
+    finally:
+        os.chdir(original_dir)
+    console.print(f"[green]Note saved to {note_filename}.[/green]")
+    console.input("Press Enter to continue.")
 
 def show_tool_menu(token, user_id, client, exercise_map):
     """Displays the main tool menu for a selected client."""
