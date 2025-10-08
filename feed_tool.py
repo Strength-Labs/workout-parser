@@ -533,7 +533,6 @@ def run_feed(token, coach_user_id, client):
     search_matches = []
     selected_match_idx = None
     last_export_path = None
-
     def nav_mode(events):
         nonlocal offset, selected_match_idx
         def _selected_event_index():
@@ -658,18 +657,6 @@ def run_feed(token, coach_user_id, client):
         except Exception:
             console.print("[red]Navigation mode not available on this terminal.[/red]")
 
-def run_feed(token, coach_user_id, client):
-    client_dir = os.path.join(CLIENT_DATA_DIR, str(client['id']))
-    os.makedirs(client_dir, exist_ok=True)
-    cache_path = os.path.join(client_dir, "feed_cache.json")
-    feed_data = {"events": [], "conversation_id": None, "alias_map": {}, "is_refreshing": True}
-    feed_data_lock = threading.Lock()
-    page_size = 20
-    offset = 0
-    search_query = None
-    search_matches = []
-    selected_match_idx = None
-    last_export_path = None
 
     def rebuild_matches(events, term):
         nonlocal search_matches, selected_match_idx, offset
