@@ -116,7 +116,7 @@ def run_ai_chat(token, user_id, client, exercise_map):
     elif provider == 'openai':
         try:
             client_ai = OpenAI(api_key=api_key)
-            model = "gpt-5-mini"
+            model = "gpt-5"
         except Exception as e:
             console.print(f"[red]Error setting up OpenAI client: {e}[/red]")
             input("Press Enter to continue.")
@@ -210,7 +210,7 @@ def run_ai_chat(token, user_id, client, exercise_map):
 
         try:
             extra_params = {}
-            if not model.startswith(("gpt-5-", "o1-")):
+            if not model.startswith(("gpt-5", "o1-")):
                 extra_params["temperature"] = 0.7
                 if provider == 'openai':
                     extra_params['max_completion_tokens'] = 1500
