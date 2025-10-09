@@ -35,7 +35,7 @@ def run_ai_chat(token, user_id, client, exercise_map):
 
     # Load markup guide
     try:
-        with open("markup.md", "r") as f:
+        with open("markup.md", "r", encoding='utf-8') as f:
             markup_guide = f.read()
     except FileNotFoundError:
         markup_guide = "Markup guide not found. Use standard workout formatting."
@@ -76,7 +76,7 @@ def run_ai_chat(token, user_id, client, exercise_map):
                     for idx in indices:
                         if 0 <= idx < len(files):
                             filepath = os.path.join(context_dir, files[idx])
-                            with open(filepath, 'r') as f:
+                            with open(filepath, 'r', encoding='utf-8') as f:
                                 custom_context += f.read() + "\n\n"
                     console.print(f"[green]Loaded context from {len(indices)} file(s)[/green]")
                 except ValueError:
@@ -100,7 +100,7 @@ def run_ai_chat(token, user_id, client, exercise_map):
                 encrypted_key = fernet.encrypt(api_key.encode()).decode('utf-8')
                 settings['llm_provider'] = provider
                 settings['llm_encrypted_key'] = encrypted_key
-                with open(SETTINGS_FILE, 'w') as f:
+                with open(SETTINGS_FILE, 'w', encoding='utf-8') as f:
                     json.dump(settings, f, indent=2)
                 console.print("[green]Saved.[/green]")
 
@@ -144,19 +144,19 @@ def run_ai_chat(token, user_id, client, exercise_map):
             client_id = client['id']
             client_dir = os.path.join(os.path.expanduser("~/TurnkeyClients"), str(client_id))
             os.makedirs(client_dir, exist_ok=True)
-            with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.txt', dir=client_dir) as temp_file:
+            with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.txt', dir=client_dir, encoding='utf-8') as temp_file:
                 temp_file.write(last_response)
                 temp_path = temp_file.name
             editor_cmd = get_default_editor()
             subprocess.run(editor_cmd + [temp_path], check=False)
-            with open(temp_path, 'r') as f:
+            with open(temp_path, 'r', encoding='utf-8') as f:
                 edited_content = f.read().strip()
             messages[-1]["content"] = edited_content
             console.print("[green]Updated last response with edited content.[/green]")
             save_name = input("Save edited plan to client directory? Enter filename (or blank to skip): ").strip()
             if save_name:
                 save_path = os.path.join(client_dir, save_name)
-                with open(save_path, 'w') as f:
+                with open(save_path, 'w', encoding='utf-8') as f:
                     f.write(edited_content)
                 console.print(f"[green]Saved to {save_path}[/green]")
             os.remove(temp_path)
@@ -171,7 +171,7 @@ def run_ai_chat(token, user_id, client, exercise_map):
                     console.print("No previous response.")
                     continue
                 content = messages[-1]["content"]
-                with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.txt') as temp_file:
+                with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.txt', encoding='utf-8') as temp_file:
                     temp_file.write(content)
                     temp_path = temp_file.name
                 workouts_parsed = parse_workouts_from_file(temp_path, client['id'], exercise_map)

@@ -272,7 +272,7 @@ def adjust_settings():
             encrypted_password = fernet.encrypt(password.encode()).decode('utf-8')
             settings = load_or_init_settings()
             settings['email'] = email
-            settings['encrypted_word'] = encrypted_password
+            settings['encrypted_password'] = encrypted_password
             settings['encryption_key'] = encoded_key
             with open(SETTINGS_FILE, 'w') as f:
                 json.dump(settings, f, indent=2)
