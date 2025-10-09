@@ -210,15 +210,16 @@ def run_ai_chat(token, user_id, client, exercise_map):
 
         try:
             extra_params = {}
-            if provider == 'openai':
-                extra_params['max_completion_tokens'] = 1500
-            else:
-                extra_params['max_tokens'] = 1500
+            if not model.startswith(("gpt-5-", "o1-")):
+                extra_params["temperature"] = 0.7
+                if provider == 'openai':
+                    extra_params['max_completion_tokens'] = 1500
+                else:
+                    extra_params['max_tokens'] = 1500
 
             response = client_ai.chat.completions.create(
                 model=model,
                 messages=messages,
-                temperature=0.7,  # Adjust for creativity if needed
                 **extra_params
             )
             ai_response = response.choices[0].message.content.strip()
