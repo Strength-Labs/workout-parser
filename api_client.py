@@ -38,13 +38,16 @@ def clean_text(raw_html):
 
 # --- Data Loading and Updating ---
 def load_exercise_map():
-    """Loads exerciselist.json and creates a name-to-ID mapping."""
+    """Loads exerciselist.json and creates a name-to-ID mapping with exercise types.
+
+    Returns dict with structure: {exercise_name_lower: {'id': id, 'type': exercise_type}}
+    """
     try:
         filepath = get_exercise_list_file()
         exercises = safe_json_load(filepath)
         if exercises is None:
             raise FileNotFoundError()
-        return {ex['name'].lower(): ex['id'] for ex in exercises}
+        return {ex['name'].lower(): {'id': ex['id'], 'type': ex.get('exercise_type', 'resistance')} for ex in exercises}
     except FileNotFoundError:
         console.print("[bold red]Error: `exerciselist.json` not found.[/bold red]")
         return None

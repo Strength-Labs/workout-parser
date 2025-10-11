@@ -20,7 +20,9 @@ from pr_tool import run_pr_analyzer
 from format_tool import format_workouts_to_markup
 from actual_prs_tool import run_actual_prs_viewer
 from upload_tool import parse_workouts_from_file, upload_workout
+from metrics_tool import upload_metric, get_client_metrics
 from ai_chat_tool import run_ai_chat
+from metrics_tool import run_metrics_tool
 
 console = Console()
 
@@ -79,7 +81,11 @@ def browse_history(token, client, coach_user_id):
         console.input("\nCould not load workout history. Press Enter to return.")
         return
     valid_workouts.sort(key=lambda w: w['workout_date'])
-    markup_content = format_workouts_to_markup(valid_workouts, coach_user_id)
+
+    # Fetch metrics for this client
+    metrics = get_client_metrics(token, client['id'])
+
+    markup_content = format_workouts_to_markup(valid_workouts, coach_user_id, metrics=metrics)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     safe_client_name = client_name.replace(' ', '_')
     history_filename = f"{safe_client_name}_history_{timestamp}.txt"
@@ -101,15 +107,19 @@ def browse_history(token, client, coach_user_id):
 
 
 def run_uploader_tool(token, client, exercise_map):
-    """UI flow for the workout uploader tool."""
+    """UI flow for the workout and nutrition uploader tool.
+
+    Supports uploading both training calendar workouts and nutrition calendar assignments
+    from the same file or separate files.
+    """
     client_id = client['id']
     client_dir = get_client_dir(client_id)
     if not os.path.exists(client_dir) or not any(f.endswith('.txt') for f in os.listdir(client_dir)):
-        console.print(f"[yellow]No workout .txt files found in {client_dir}[/yellow]")
+        console.print(f"[yellow]No assignment .txt files found in {client_dir}[/yellow]")
         console.input("Press Enter to continue.")
         return
     txt_files = [f for f in os.listdir(client_dir) if f.endswith('.txt')]
-    console.print("\n[bold]Select a workout file to upload:[/bold]")
+    console.print("\n[bold]Select a file to upload (workouts, nutrition, or mixed):[/bold]")
     for i, filename in enumerate(txt_files):
         console.print(f"  [[bold]{i+1}[/bold]] {filename}")
     console.print("  [[bold]q[/bold]] Cancel")
@@ -120,9 +130,23 @@ def run_uploader_tool(token, client, exercise_map):
         index = int(choice) - 1
         if 0 <= index < len(txt_files):
             filepath = os.path.join(client_dir, txt_files[index])
-            workouts = parse_workouts_from_file(filepath, client_id, exercise_map)
-            for workout in workouts:
-                upload_workout(token, workout)
+            assignments, metrics = parse_workouts_from_file(filepath, client_id, exercise_map)
+
+            # Separate workouts and nutrition assignments for summary
+            workouts = [a for a in assignments if a.get('workout_type') == 'default']
+            nutrition = [a for a in assignments if a.get('workout_type') == 'nutrition']
+
+            # Upload all assignments (both types use same API endpoint)
+            console.print(f"\n[cyan]Uploading {len(workouts)} workout(s) and {len(nutrition)} nutrition assignment(s)...[/cyan]")
+            for assignment in assignments:
+                upload_workout(token, assignment)
+
+            # Upload metrics
+            if metrics:
+                console.print(f"\n[cyan]Uploading {len(metrics)} metric(s)...[/cyan]")
+                for metric in metrics:
+                    upload_metric(token, metric)
+
             console.print("[green]Upload complete.[/green]")
         else:
             console.print("[bold red]Invalid number, please try again.[/bold red]")
@@ -198,8 +222,9 @@ def show_tool_menu(token, user_id, client, exercise_map):
         console.print("  [bold]2.[/bold] Estimated 1RMs (from history)")
         console.print("  [bold]3.[/bold] Actual PRs (from API)")
         console.print("  [bold]4.[/bold] Browse & Save Workout History")
-        console.print("  [bold]5.[/bold] Upload Workout from File")
+        console.print("  [bold]5.[/bold] Upload Workouts/Nutrition from File")
         console.print("  [bold]6.[/bold] AI Chat")
+        console.print("  [bold]7.[/bold] Program Metrics")
         console.print("\n[bold]Utilities:[/bold]")
         console.print("  [bold]n.[/bold] Add a Quick Note")
         console.print("  [bold]c.[/bold] Clean Up Directory")
@@ -220,6 +245,8 @@ def show_tool_menu(token, user_id, client, exercise_map):
             run_uploader_tool(token, client, exercise_map)
         elif choice == '6':
             run_ai_chat(token, user_id, client, exercise_map)
+        elif choice == '7':
+            run_metrics_tool(token, client)
         elif choice == 'n':
             add_note(client)
         elif choice == 'c':

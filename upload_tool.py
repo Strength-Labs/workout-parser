@@ -10,6 +10,64 @@ try:
 except ImportError:
     pass
 
+def parse_line_as_metric(line: str):
+    """
+    Tries to parse a line as a metric entry.
+    Format: @metric_name: value unit [notes]
+    Examples:
+        @weight: 185.5 lbs
+        @body_fat: 15.2%
+        @sleep: 7.5 hours feeling rested
+
+    Returns metric dict or None if not a metric line.
+    """
+    line = line.strip()
+
+    # Check if line starts with @
+    if not line.startswith('@'):
+        return None
+
+    # Remove @ and split by colon
+    if ':' not in line:
+        return None
+
+    metric_part, value_part = line[1:].split(':', 1)
+    metric_type = metric_part.strip().lower()
+    value_part = value_part.strip()
+
+    # Parse value part: "value unit optional notes"
+    # Try to extract numeric value first
+    value_match = re.match(r'([\d.]+)\s*(%|lbs|kg|inches|cm|hours|bpm|ms|/10)?(.*)$', value_part, re.IGNORECASE)
+
+    if not value_match:
+        return None
+
+    value_str, unit, notes = value_match.groups()
+
+    try:
+        value = float(value_str)
+    except ValueError:
+        return None
+
+    # Clean up unit
+    if unit:
+        unit = unit.strip()
+        # Normalize units
+        if unit == '/10':
+            unit = '1-10'
+    else:
+        unit = ''
+
+    # Clean up notes
+    notes = notes.strip() if notes else ''
+
+    return {
+        'metric_type': metric_type,
+        'value': value,
+        'unit': unit,
+        'notes': notes
+    }
+
 def get_similar_exercises(exercise_name: str, exercise_names: list[str], limit: int = 5):
     """Finds similar exercise names using fuzzy matching."""
     matches = process.extract(exercise_name, exercise_names, limit=limit)
@@ -82,24 +140,56 @@ def parse_line_as_set(line: str):
     return None
 
 def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: dict):
-    """Parses a text file into a list of workout dictionaries, with interactive fuzzy matching."""
+    """Parses a text file into a list of workout/nutrition dictionaries and metrics, with interactive fuzzy matching.
+
+    Supports both "Workout Date:" (training calendar) and "Nutrition Date:" (nutrition calendar) entries.
+    Both types can be mixed in the same file.
+
+    Returns:
+        tuple: (workouts, metrics) - lists of workout/nutrition and metric dictionaries
+    """
     content = read_text_file(plain_text_path)
     workouts = []
-    workout_sections = [s for s in re.split(r'Workout Date:\s*', content) if s.strip()]
+    metrics = []
+
+    # Split by both "Workout Date:" and "Nutrition Date:"
+    # Use a regex that captures the header type and preserves it
+    sections = re.split(r'(Workout Date|Nutrition Date):\s*', content)
+
+    # sections will be like: ['', 'Workout Date', '2025-10-01\nSquat...', 'Nutrition Date', '2025-10-01\nMeal Pictures...']
+    # Process in pairs (header, content)
     exercise_names = list(exercise_map.keys())
 
-    for section in workout_sections:
+    for i in range(1, len(sections), 2):
+        if i + 1 >= len(sections):
+            break
+
+        date_type = sections[i]  # Either "Workout Date" or "Nutrition Date"
+        section = sections[i + 1]  # The content after the date header
+
+        if not section.strip():
+            continue
+
+        # Determine workout_type based on date header
+        workout_type_value = "nutrition" if date_type == "Nutrition Date" else "default"
+
         lines = section.strip().split('\n')
+        workout_date = lines[0].strip()
+
+        # Log what type of assignment we're parsing
+        assignment_type_label = "nutrition assignment" if workout_type_value == "nutrition" else "workout"
+        console.print(f"[dim]Parsing {assignment_type_label} for {workout_date}...[/dim]")
+
         workout = {
-            "user_id": user_id, "workout_date": lines[0].strip(),
+            "user_id": user_id, "workout_date": workout_date,
             "title": None, "weight_type": "lbs", "assigned_exercises": [],
-            "published": True,
+            "published": True, "workout_type": workout_type_value,
         }
-        
+
         start_line_index = 1
         if len(lines) > 1:
             potential_title = lines[1].strip()
-            if potential_title and potential_title.lower() not in exercise_map and not re.match(r"^\d+\s*x", potential_title):
+            if potential_title and potential_title.lower() not in exercise_map and not re.match(r"^\d+\s*x", potential_title) and not potential_title.startswith('@'):
                 workout["title"] = potential_title
                 start_line_index = 2
 
@@ -108,6 +198,19 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
         for line in lines[start_line_index:]:
             stripped_line = line.strip()
             if not stripped_line or stripped_line == "---" or stripped_line.startswith('(') or stripped_line.startswith('['):
+                continue
+
+            # Check if line is a metric
+            parsed_metric = parse_line_as_metric(stripped_line)
+            if parsed_metric:
+                # Add workout date and user_id to metric
+                metric_data = {
+                    "user_id": user_id,
+                    "metric_date": workout_date,
+                    **parsed_metric
+                }
+                metrics.append(metric_data)
+                console.print(f"[cyan]Found metric:[/cyan] {parsed_metric['metric_type']} = {parsed_metric['value']} {parsed_metric['unit']}")
                 continue
             
             is_indented = len(line) > len(line.lstrip())
@@ -125,8 +228,19 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
                 continue
 
             if stripped_line.lower() in exercise_map:
+                exercise_info = exercise_map[stripped_line.lower()]
+                ex_id = exercise_info['id'] if isinstance(exercise_info, dict) else exercise_info
+                ex_type = exercise_info.get('type', 'resistance') if isinstance(exercise_info, dict) else 'resistance'
+
+                # Validate exercise type matches workout type
+                if workout_type_value == "nutrition" and ex_type != "nutrition":
+                    console.print(f"[yellow]Warning: '{stripped_line}' is a {ex_type} exercise, not a nutrition item. Skipping.[/yellow]")
+                    continue
+                elif workout_type_value == "default" and ex_type == "nutrition":
+                    console.print(f"[yellow]Warning: '{stripped_line}' is a nutrition item, not a training exercise. Skipping.[/yellow]")
+                    continue
+
                 if current_exercise: workout["assigned_exercises"].append(current_exercise)
-                ex_id = exercise_map[stripped_line.lower()]
                 current_exercise = {"exercise_id": ex_id, "priority": len(workout["assigned_exercises"]), "assigned_sets": []}
                 continue
 
@@ -139,7 +253,13 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
             elif parsed_set:
                  console.print(f"[yellow]Warning: Found a set with no preceding exercise: '{stripped_line}'[/yellow]")
             else:
-                similar_exercises = get_similar_exercises(stripped_line.lower(), exercise_names)
+                # Filter exercise names by type for fuzzy matching
+                if workout_type_value == "nutrition":
+                    filtered_names = [name for name in exercise_names if exercise_map.get(name, {}).get('type') == 'nutrition']
+                else:
+                    filtered_names = [name for name in exercise_names if exercise_map.get(name, {}).get('type') != 'nutrition']
+
+                similar_exercises = get_similar_exercises(stripped_line.lower(), filtered_names)
                 if similar_exercises:
                     console.print(f"\nExercise [yellow]'{stripped_line}'[/yellow] not found. Did you mean one of these?")
                     for i, name in enumerate(similar_exercises, 1): console.print(f"  [[bold]{i}[/bold]] {name.title()}")
@@ -159,7 +279,8 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
                     
                     if chosen_exercise_name:
                         if current_exercise: workout["assigned_exercises"].append(current_exercise)
-                        ex_id = exercise_map[chosen_exercise_name]
+                        exercise_info = exercise_map[chosen_exercise_name]
+                        ex_id = exercise_info['id'] if isinstance(exercise_info, dict) else exercise_info
                         current_exercise = {"exercise_id": ex_id, "priority": len(workout["assigned_exercises"]), "assigned_sets": []}
                 else:
                     console.print(f"[yellow]Warning: Could not parse or find match for line: '{stripped_line}'[/yellow]")
@@ -171,18 +292,19 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
                 workout["weight_type"] = "kgs"
                 console.print(f"[green]Detected kg units—setting workout weight_type to 'kgs' for API compatibility.[/green]")
             workouts.append(workout)
-            
-    return workouts
+
+    return workouts, metrics
 
 def upload_workout(token, workout_data):
-    """Uploads a single workout to the API."""
+    """Uploads a single workout or nutrition assignment to the API."""
     url = f"{API_BASE_URL}/api/v1/workouts"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     try:
-        console.print(f"Uploading workout for [cyan]{workout_data['workout_date']}[/cyan]...")
+        assignment_type = "nutrition assignment" if workout_data.get('workout_type') == "nutrition" else "workout"
+        console.print(f"Uploading {assignment_type} for [cyan]{workout_data['workout_date']}[/cyan]...")
         response = requests.post(url, headers=headers, json=workout_data)
         response.raise_for_status()
-        console.print(f"✅ [bold green]Successfully uploaded workout![/bold green]")
+        console.print(f"✅ [bold green]Successfully uploaded {assignment_type}![/bold green]")
     except requests.exceptions.HTTPError as e:
         console.print(f"❌ [bold red]Upload failed.[/bold red] HTTP Error: {e.response.status_code}")
         console.print(f"[dim]API Response: {e.response.text}[/dim]")
