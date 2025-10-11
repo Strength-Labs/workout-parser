@@ -3,6 +3,7 @@ import re
 import os
 import requests
 from api_client import API_BASE_URL, console
+from encoding_utils import read_text_file
 
 try:
     from rapidfuzz import process
@@ -82,7 +83,7 @@ def parse_line_as_set(line: str):
 
 def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: dict):
     """Parses a text file into a list of workout dictionaries, with interactive fuzzy matching."""
-    with open(plain_text_path, 'r') as f: content = f.read()
+    content = read_text_file(plain_text_path)
     workouts = []
     workout_sections = [s for s in re.split(r'Workout Date:\s*', content) if s.strip()]
     exercise_names = list(exercise_map.keys())

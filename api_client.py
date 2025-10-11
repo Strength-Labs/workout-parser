@@ -7,13 +7,20 @@ import html
 from datetime import datetime, timedelta
 from rich.console import Console
 from settings import get_stored_credentials # for login ease
+from directory_migration import get_client_dir, get_shared_dir, perform_migration, needs_migration
+from encoding_utils import safe_open, safe_json_dump, safe_json_load
 
 
 # --- Configuration ---
 API_BASE_URL = "https://app.turnkey.coach"
-TOKEN_CACHE_FILE = ".tokencache"
-CLIENT_DATA_DIR = os.path.expanduser("~/TurnkeyClients")
 console = Console()
+
+# Directory paths (now managed by migration module)
+def get_token_cache_file():
+    return os.path.join(get_shared_dir(), '.tokencache')
+
+def get_exercise_list_file():
+    return os.path.join(get_shared_dir(), 'exerciselist.json')
 
 # --- Shared Helper Functions ---
 def clear_screen():
@@ -33,9 +40,10 @@ def clean_text(raw_html):
 def load_exercise_map():
     """Loads exerciselist.json and creates a name-to-ID mapping."""
     try:
-        filepath = os.path.join(os.path.dirname(__file__), 'exerciselist.json')
-        with open(filepath, 'r') as f:
-            exercises = json.load(f)
+        filepath = get_exercise_list_file()
+        exercises = safe_json_load(filepath)
+        if exercises is None:
+            raise FileNotFoundError()
         return {ex['name'].lower(): ex['id'] for ex in exercises}
     except FileNotFoundError:
         console.print("[bold red]Error: `exerciselist.json` not found.[/bold red]")
@@ -48,15 +56,14 @@ def update_exercise_list(token):
     """Fetches the latest exercise list from the API and saves it to exerciselist.json."""
     url = f"{API_BASE_URL}/api/v1/exercises"
     headers = {"Authorization": f"Bearer {token}"}
-    filepath = os.path.join(os.path.dirname(__file__), 'exerciselist.json')
+    filepath = get_exercise_list_file()
 
     with console.status("[bold green]Downloading latest exercise list...[/bold green]"):
         try:
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             exercises = response.json()
-            with open(filepath, 'w') as f:
-                json.dump(exercises, f, indent=2)
+            safe_json_dump(exercises, filepath)
             console.print(f"✅ [green]Successfully saved {len(exercises)} exercises to {filepath}[/green]")
             return True
         except requests.exceptions.RequestException as e:
@@ -88,30 +95,31 @@ def _download_workouts_from_api(token, client_id, start_date=None):
             return []
 
 def get_workout_history(token, client, force_refresh=False):
-    # ... (This function remains the same)
+    """Get workout history with intelligent caching and incremental updates."""
     client_id = client["id"]
-    client_dir = os.path.join(CLIENT_DATA_DIR, str(client_id))
+    client_dir = get_client_dir(client_id)
     workout_cache_path = os.path.join(client_dir, f"workouts_user_{client_id}.json")
     os.makedirs(client_dir, exist_ok=True)
     if force_refresh:
         workouts = _download_workouts_from_api(token, client_id)
-        with open(workout_cache_path, 'w', encoding='utf-8') as f: json.dump(workouts, f, indent=4)
+        safe_json_dump(workouts, workout_cache_path, indent=4)
         return workouts
     if os.path.exists(workout_cache_path):
-        with open(workout_cache_path, 'r', encoding='utf-8') as f:
-            existing_workouts = json.load(f)
+        existing_workouts = safe_json_load(workout_cache_path, default=[])
         if not existing_workouts:
+            console.print("[yellow]Cached workout file is empty, downloading fresh data...[/yellow]")
             return get_workout_history(token, client, force_refresh=True)
         valid_workouts = [w for w in existing_workouts if w.get('workout_date')]
         if not valid_workouts:
-             return get_workout_history(token, client, force_refresh=True)
+            console.print("[yellow]No valid workouts in cache, downloading fresh data...[/yellow]")
+            return get_workout_history(token, client, force_refresh=True)
         latest_date_str = max(w['workout_date'] for w in valid_workouts)
         start_date = datetime.fromisoformat(latest_date_str).date() + timedelta(days=1)
         new_workouts = _download_workouts_from_api(token, client_id, start_date=start_date.isoformat())
         if new_workouts:
             console.print(f"[green]Found {len(new_workouts)} new workouts. Updating cache...[/green]")
             all_workouts = existing_workouts + new_workouts
-            with open(workout_cache_path, 'w', encoding='utf-8') as f: json.dump(all_workouts, f, indent=4)
+            safe_json_dump(all_workouts, workout_cache_path, indent=4)
             return all_workouts
         else:
             console.print("[dim]Workout history is up to date.[/dim]")
@@ -123,41 +131,20 @@ def get_workout_history(token, client, force_refresh=False):
 def save_auth_data(token, user_id):
     expires_at = datetime.now() + timedelta(hours=1)
     auth_data = {"token": token, "user_id": user_id, "expires_at": expires_at.isoformat()}
-    with open(TOKEN_CACHE_FILE, 'w') as f: json.dump(auth_data, f)
+    token_cache_file = get_token_cache_file()
+    safe_json_dump(auth_data, token_cache_file)
 
 def load_auth_data():
-    if not os.path.exists(TOKEN_CACHE_FILE): return None, None
-    with open(TOKEN_CACHE_FILE, 'r') as f:
+    token_cache_file = get_token_cache_file()
+    if not os.path.exists(token_cache_file): return None, None
+    data = safe_json_load(token_cache_file)
+    if data:
         try:
-            data = json.load(f)
             if datetime.fromisoformat(data.get("expires_at")) > datetime.now():
                 return data.get("token"), data.get("user_id")
-        except (json.JSONDecodeError, KeyError, TypeError): pass
+        except (KeyError, TypeError, ValueError): pass
     return None, None
 
-def get_access_token():
-    token, user_id = load_auth_data()
-    if token and user_id:
-        console.print("Using cached access token. 👍", style="green")
-        return token, user_id
-    email = console.input("[bold]Enter your email:[/bold] ")
-    password = getpass.getpass("Enter your password: ")
-    url = f"{API_BASE_URL}/users/tokens/sign_in"
-    headers = {"Content-Type": "application/json"}
-    payload = {"email": email, "password": password}
-    with console.status("Authenticating..."):
-        try:
-            response = requests.post(url, headers=headers, json=payload)
-            response.raise_for_status()
-            data = response.json()
-            token, user_id = data.get("token"), data.get("resource_owner", {}).get("id")
-            if token and user_id:
-                console.print("Successfully obtained new access token. 🎉", style="green")
-                save_auth_data(token, user_id)
-                return token, user_id
-        except requests.exceptions.RequestException as e:
-            console.print(f"\n[bold red]Login failed:[/bold red] {e}")
-            return None, None
 
 def get_clients(token, user_id):
     headers = {"Authorization": f"Bearer {token}"}
@@ -187,12 +174,12 @@ def get_access_token():
         console.print("Using cached access token. 👍", style="green")
         return token, user_id
     
-    # New: Try stored credentials for auto-login
+    # Try stored credentials for auto-login
     email, password = get_stored_credentials()
     if email and password:
         console.print("[dim]Auto-logging in with stored credentials...[/dim]")
     else:
-        # Fallback to manual prompt (and store them)
+        # Fallback to manual prompt
         email = console.input("[bold]Enter your email:[/bold] ")
         password = getpass.getpass("Enter your password: ")
     
@@ -208,9 +195,6 @@ def get_access_token():
             if token and user_id:
                 console.print("Successfully obtained access token. 🎉", style="green")
                 save_auth_data(token, user_id)
-                # If we used manual prompt, store creds now (via load_or_init_settings call)
-                if not get_stored_credentials()[0]:
-                    load_or_init_settings()  # Triggers storage if missing
                 return token, user_id
         except requests.exceptions.RequestException as e:
             console.print(f"\n[bold red]Login failed:[/bold red] {e}")

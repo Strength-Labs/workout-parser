@@ -16,7 +16,9 @@ from rich.text import Text
 from settings import get_default_editor # added to make editor defaults more sensible
 
 # Import shared functions from the api_client.py file
-from api_client import API_BASE_URL, CLIENT_DATA_DIR, clean_text, clear_screen
+from api_client import API_BASE_URL, clean_text, clear_screen
+from directory_migration import get_client_dir
+from encoding_utils import safe_open, safe_json_dump, safe_json_load
 
 console = Console()
 
@@ -34,16 +36,11 @@ def _parse_ts(ts_str):
             return None
 
 def _load_json(path, default):
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except Exception:
-        return default
+    return safe_json_load(path, default)
 
 def _save_json(path, data):
     try:
-        with open(path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
+        safe_json_dump(data, path)
     except Exception:
         pass
 
@@ -182,8 +179,7 @@ def _update_workouts_cache_incremental(token, client, client_dir):
         except Exception:
             pass
         try:
-            with open(workouts_path, 'w', encoding='utf-8') as f:
-                json.dump(merged, f, indent=4, ensure_ascii=False)
+            safe_json_dump(merged, workouts_path, indent=4)
         except Exception:
             pass
     index['workouts'] = updated_index
@@ -252,8 +248,7 @@ def download_workouts(token, client_id, client_dir):
             if detail_response.status_code == 200:
                 detailed_workouts.append(detail_response.json())
         cache_file = os.path.join(client_dir, f"workouts_user_{client_id}.json")
-        with open(cache_file, 'w') as f:
-            json.dump(detailed_workouts, f, indent=4)
+        safe_json_dump(detailed_workouts, cache_file, indent=4)
         return detailed_workouts
     except requests.exceptions.RequestException:
         return []
@@ -311,7 +306,7 @@ def fetch_and_aggregate_data(token, client, feed_data_lock, feed_data):
     try:
         client_id = client["id"]
         client_full_name = client["full_name"]
-        client_dir = os.path.join(CLIENT_DATA_DIR, str(client_id))
+        client_dir = get_client_dir(client_id)
         messages_cache = _refresh_messages_cache(token, client_full_name, client_dir)
         conversation_id = messages_cache.get('conversation_id')
         workouts, _changed = _update_workouts_cache_incremental(token, client, client_dir)
@@ -347,8 +342,7 @@ def fetch_and_aggregate_data(token, client, feed_data_lock, feed_data):
             if isinstance(event.get('timestamp'), datetime):
                 event['timestamp'] = event['timestamp'].isoformat()
         try:
-            with open(cache_path, 'w', encoding='utf-8') as f:
-                json.dump({"events": events_to_cache, "conversation_id": conversation_id, "alias_map": comment_alias_map}, f, ensure_ascii=False)
+            safe_json_dump({"events": events_to_cache, "conversation_id": conversation_id, "alias_map": comment_alias_map}, cache_path)
         except Exception:
             console.print("[red]Failed to save feed cache.[/red]")
     except Exception as e:
@@ -446,7 +440,7 @@ def _export_unified_feed_text(client, events, client_dir, filename=None):
         else:
             lines.append(" (no text)")
         lines.append("")
-    with open(export_path, 'w', encoding='utf-8') as f:
+    with safe_open(export_path, 'w') as f:
         f.write('\n'.join(lines))
     console.print(f"\n[green]Exported feed to:[/green] {export_path}")
     return export_path
@@ -522,7 +516,7 @@ def display_feed(feed, coach_user_id, search_term=None, is_refreshing=False, off
     console.print(status)
 
 def run_feed(token, coach_user_id, client):
-    client_dir = os.path.join(CLIENT_DATA_DIR, str(client['id']))
+    client_dir = get_client_dir(client['id'])
     os.makedirs(client_dir, exist_ok=True)
     cache_path = os.path.join(client_dir, "feed_cache.json")
     feed_data = {"events": [], "conversation_id": None, "alias_map": {}, "is_refreshing": True}

@@ -6,6 +6,7 @@ from rich.console import Console
 from cryptography.fernet import Fernet
 import base64
 import getpass  # Added for secure password input
+from encoding_utils import safe_open, safe_json_dump, safe_json_load
 
 console = Console()
 
@@ -13,29 +14,51 @@ SETTINGS_FILE = os.path.expanduser("~/.turnkey_coach_settings.json")
 
 def load_or_init_settings():
     """Load settings or prompt for editor prefs and credentials like a nosy therapist."""
-    if os.path.exists(SETTINGS_FILE):
-        with open(SETTINGS_FILE, 'r') as f:
-            return json.load(f)
+    existing_settings = safe_json_load(SETTINGS_FILE)
+    if existing_settings:
+        return existing_settings
     
-    # First-time setup: Editor configuration (original code, unchanged)
+    # First-time setup: Editor configuration
     os_name = platform.system().lower()
     defaults = {
-        'windows': ['notepad.exe'],  # Boring but reliable
-        'darwin': ['open', '-a', 'TextEdit', '-W'],  # Mac's guilty pleasure
+        'windows': ['notepad.exe'],  # Simple and reliable
+        'darwin': ['open', '-e'],  # Forces TextEdit into plain text mode
         'linux': ['nvim']  # For the real heroes (you)
     }
     
     default_cmd = defaults.get(os_name, ['nvim'])  # Fallback to nvim for weird OSes
     console.print(f"\n[bold yellow]First-time setup detected on {platform.system()}.[/bold yellow]")
-    console.print(f"[dim]Default editor for you: {' '.join(default_cmd)}[/dim]")
-    choice = console.input("Want to change it? (y/n) > ").lower().strip()
     
-    if choice == 'y':
-        console.print("\n[bold]Enter your preferred editor command (e.g., 'code -w' for VS Code, or 'nvim' for masochists):[/bold]")
-        custom_cmd = console.input("> ").strip().split()  # Split on spaces for multi-arg commands
+    # Show what the default is and encourage keeping it
+    if os_name == 'windows':
+        editor_desc = "Notepad (simple text editor)"
+    elif os_name == 'darwin':
+        editor_desc = "TextEdit (in plain text mode)"
+    else:
+        editor_desc = "nvim (terminal text editor)"
+    
+    console.print(f"[bold green]Default text editor:[/bold green] {editor_desc}")
+    choice = console.input("Keep the default? Press y or Enter to continue, or 'n' to choose different > ").lower().strip()
+    
+    if choice == 'n':
+        console.print("\n[bold]Enter your preferred text editor:[/bold]")
+        console.print("[dim]Popular options:[/dim]")
+        if os_name == 'windows':
+            console.print("[dim]  • 'code -w' (VS Code, waits for close)[/dim]")
+            console.print("[dim]  • 'subl -w' (Sublime Text, waits for close)[/dim]")
+        elif os_name == 'darwin':
+            console.print("[dim]  • 'code -w' (VS Code, waits for close)[/dim]")
+            console.print("[dim]  • 'subl -w' (Sublime Text, waits for close)[/dim]")
+            console.print("[dim]  • 'open -a TextEdit -W' (TextEdit default mode)[/dim]")
+        else:
+            console.print("[dim]  • 'nano' (simple terminal editor)[/dim]")
+            console.print("[dim]  • 'code -w' (VS Code, waits for close)[/dim]")
+        custom_cmd = console.input("> ").strip().split()
         if custom_cmd:
             default_cmd = custom_cmd
-            console.print(f"[green]Got it—editor set to {' '.join(default_cmd)}.[/green]")
+            console.print(f"[green]Text editor set to {' '.join(default_cmd)}.[/green]")
+    else:
+        console.print(f"[green]Using {editor_desc}.[/green]")
     
     # New: Prompt for email and password (added HERE, after editor setup)
     console.print("\n[bold]Enter your Turnkey Coach credentials (stored securely for auto-login):[/bold]")
@@ -57,8 +80,7 @@ def load_or_init_settings():
         'encrypted_password': encrypted_password,
         'encryption_key': encoded_key  # Store key (tradeoff for simplicity)
     }
-    with open(SETTINGS_FILE, 'w') as f:
-        json.dump(settings, f, indent=2)
+    safe_json_dump(settings, SETTINGS_FILE)
     console.print(f"[green]Settings saved to {SETTINGS_FILE}. You're welcome.[/green]")
     return settings
 
@@ -95,8 +117,7 @@ def clear_stored_credentials():
     settings.pop('email', None)
     settings.pop('encrypted_password', None)
     settings.pop('encryption_key', None)
-    with open(SETTINGS_FILE, 'w') as f:
-        json.dump(settings, f, indent=2)
+    safe_json_dump(settings, SETTINGS_FILE)
     console.print("[green]Credentials cleared. You'll need to re-enter on next login.[/green]")
 
 # New: Helper to retrieve and decrypt LLM credentials

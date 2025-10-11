@@ -12,20 +12,34 @@ from api_client import get_workout_history
 from format_tool import format_workouts_to_markup
 from upload_tool import parse_workouts_from_file, upload_workout
 from settings import get_default_editor, get_llm_credentials
+from directory_migration import get_client_dir, get_coaching_context_dir
+from encoding_utils import safe_open, safe_temp_file, read_text_file, write_text_file
 
 console = Console()
 
+def estimate_token_count(text: str) -> int:
+    """Rough estimate of token count (approximately 4 characters per token for English text)."""
+    return len(text) // 4
+
+def input_with_completion(prompt: str) -> str:
+    """Input with path hints (tab completion attempted but may not work on all systems)."""
+    console.print(f"[dim]{prompt}[/dim]")
+    console.print(f"[dim]Examples: ~/Documents/file.txt, ./local/file.md, /absolute/path.txt[/dim]")
+    try:
+        return input("> ").strip()
+    except (EOFError, KeyboardInterrupt):
+        return ""
+
 def run_ai_chat(token, user_id, client, exercise_map):
     """AI chat for workout assistance."""
-    print("Debug: AI chat started")
     try:
         workouts = get_workout_history(token, client)
     except Exception as e:
-        print(f"Error loading workout history: {e}")
+        console.print(f"[red]Error loading workout history: {e}[/red]")
         input("Press Enter to continue.")
         return
     valid_workouts = [w for w in workouts if w.get('workout_date')]
-    print(f"Debug: Loaded {len(workouts)} workouts, {len(valid_workouts)} valid")
+    console.print(f"[green]Loaded {len(workouts)} workouts ({len(valid_workouts)} with dates)[/green]")
     if not valid_workouts:
         console.print("[red]No workout history found.[/red]")
         input("Press Enter to continue.")
@@ -35,52 +49,62 @@ def run_ai_chat(token, user_id, client, exercise_map):
 
     # Load markup guide
     try:
-        with open("markup.md", "r", encoding='utf-8') as f:
-            markup_guide = f.read()
+        markup_guide = read_text_file("markup.md")
     except FileNotFoundError:
         markup_guide = "Markup guide not found. Use standard workout formatting."
 
     system_prompt = f"You are an AI assistant for strength coaching. Use the following markup guide for workouts: {markup_guide}. The client's workout history is: {markup_content}"
+    
+    # Display token count estimate for context
+    estimated_tokens = estimate_token_count(system_prompt)
+    console.print(f"[dim]Context loaded: ~{estimated_tokens:,} tokens[/dim]")
 
     # Custom context
     custom_context = ""
     if input("Upload custom context file? (y/n): ").lower() == 'y':
-        CLIENT_DATA_DIR = os.path.expanduser("~/TurnkeyClients")
-        context_dir = os.path.join(CLIENT_DATA_DIR, "coaching_context")
+        context_dir = get_coaching_context_dir()
         os.makedirs(context_dir, exist_ok=True)
         files = [f for f in os.listdir(context_dir) if f.endswith(('.md', '.txt'))]
         console.print(f"[dim]Coaching context directory: {context_dir}[/dim]")
         console.print("[dim]Add .md or .txt files here for AI chat context.[/dim]")
         if not files:
-            console.print("[yellow]No context files found.[/yellow]")
-            path = input("File path: ").strip()
+            console.print("[yellow]No context files found in coaching_context directory.[/yellow]")
+            path = input_with_completion("File path")
         else:
             console.print("Available context files:")
             for i, f in enumerate(files):
                 console.print(f"  {i+1}. {f}")
             choice = input("Select file number(s) (e.g., 1 or 1,3) or 'm' for manual path: ").strip()
             if choice.lower() == 'm':
-                try:
-                    import readline
-                    import glob
-                    def complete(text, state):
-                        return (glob.glob(text+"*")+[None])[state]
-                    readline.set_completer(complete)
-                    readline.parse_and_bind("tab: complete")
-                except ImportError:
-                    pass
-                path = input("File path: ").strip()
+                path = input_with_completion("File path")
             else:
                 try:
                     indices = [int(x.strip()) - 1 for x in choice.split(',')]
                     for idx in indices:
                         if 0 <= idx < len(files):
                             filepath = os.path.join(context_dir, files[idx])
-                            with open(filepath, 'r', encoding='utf-8') as f:
-                                custom_context += f.read() + "\n\n"
+                            custom_context += read_text_file(filepath) + "\n\n"
                     console.print(f"[green]Loaded context from {len(indices)} file(s)[/green]")
+                    path = None  # Don't process path if we used numbered selection
                 except ValueError:
-                    path = input("Invalid selection. Enter file path: ").strip()
+                    console.print("[yellow]Invalid selection, switching to manual path entry.[/yellow]")
+                    path = input_with_completion("File path")
+        # Handle manual file path if provided
+        if 'path' in locals() and path and path.strip():
+            try:
+                # Expand user path (~) and resolve relative paths
+                expanded_path = os.path.expanduser(path)
+                if not os.path.isabs(expanded_path):
+                    expanded_path = os.path.abspath(expanded_path)
+                
+                if os.path.exists(expanded_path) and os.path.isfile(expanded_path):
+                    custom_context += read_text_file(expanded_path) + "\n\n"
+                    console.print(f"[green]Loaded context from {os.path.basename(expanded_path)}[/green]")
+                else:
+                    console.print(f"[red]File not found: {expanded_path}[/red]")
+            except Exception as e:
+                console.print(f"[red]Error loading file: {e}[/red]")
+        
         if custom_context:
             system_prompt += f"\nAdditional context: {custom_context}"
 
@@ -100,8 +124,8 @@ def run_ai_chat(token, user_id, client, exercise_map):
                 encrypted_key = fernet.encrypt(api_key.encode()).decode('utf-8')
                 settings['llm_provider'] = provider
                 settings['llm_encrypted_key'] = encrypted_key
-                with open(SETTINGS_FILE, 'w', encoding='utf-8') as f:
-                    json.dump(settings, f, indent=2)
+                with safe_open(SETTINGS_FILE, 'w') as f:
+                    json.dump(settings, f, indent=2, ensure_ascii=False)
                 console.print("[green]Saved.[/green]")
 
     # Set up the client based on provider
@@ -142,24 +166,61 @@ def run_ai_chat(token, user_id, client, exercise_map):
                 continue
             last_response = messages[-1]["content"]
             client_id = client['id']
-            client_dir = os.path.join(os.path.expanduser("~/TurnkeyClients"), str(client_id))
+            client_dir = get_client_dir(client_id)
             os.makedirs(client_dir, exist_ok=True)
-            with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.txt', dir=client_dir, encoding='utf-8') as temp_file:
-                temp_file.write(last_response)
-                temp_path = temp_file.name
+            # Create temp file manually for editor workflow
+            import tempfile
+            try:
+                with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.txt', dir=client_dir, encoding='utf-8') as temp_file:
+                    temp_file.write(last_response)
+                    temp_path = temp_file.name
+            except (OSError, IOError) as e:
+                console.print(f"[red]Error creating temp file: {e}[/red]")
+                continue
+            
             editor_cmd = get_default_editor()
-            subprocess.run(editor_cmd + [temp_path], check=False)
-            with open(temp_path, 'r', encoding='utf-8') as f:
-                edited_content = f.read().strip()
+            editor_name = editor_cmd[0] if editor_cmd else 'editor'
+            
+            # Give editor-specific instructions
+            editor_full_cmd = ' '.join(editor_cmd)
+            
+            # Editors that auto-save when closing (no manual save needed)
+            if ('notepad' in editor_name.lower() or 
+                ('open' in editor_name.lower() and '-e' in editor_full_cmd)):
+                console.print(f"[dim]Opening editor. Make your edits and close the window - it will save automatically.[/dim]")
+            
+            # Vim-like editors need special instructions
+            elif any(vim_editor in editor_name.lower() for vim_editor in ['vim', 'nvim', 'vi']):
+                console.print(f"[yellow]Opening in {editor_name}. Use :wq to save and exit, or :q! to exit without saving.[/yellow]")
+            
+            # All other editors (VS Code, Sublime, nano, etc.) need manual save reminder
+            else:
+                console.print(f"[yellow]Opening in {editor_full_cmd}. Remember to SAVE your changes before closing![/yellow]")
+            
+            try:
+                subprocess.run(editor_cmd + [temp_path], check=False)
+                edited_content = read_text_file(temp_path).strip()
+            except (subprocess.SubprocessError, FileNotFoundError, UnicodeDecodeError) as e:
+                console.print(f"[red]Error with editor or reading file: {e}[/red]")
+                # Clean up temp file and continue
+                try:
+                    os.remove(temp_path)
+                except OSError:
+                    pass
+                continue
             messages[-1]["content"] = edited_content
             console.print("[green]Updated last response with edited content.[/green]")
             save_name = input("Save edited plan to client directory? Enter filename (or blank to skip): ").strip()
             if save_name:
                 save_path = os.path.join(client_dir, save_name)
-                with open(save_path, 'w', encoding='utf-8') as f:
-                    f.write(edited_content)
+                write_text_file(save_path, edited_content)
                 console.print(f"[green]Saved to {save_path}[/green]")
-            os.remove(temp_path)
+            
+            # Clean up temp file
+            try:
+                os.remove(temp_path)
+            except OSError:
+                pass
             continue
         elif user_input.lower() == 'upload':
             console.print("Upload options:")
@@ -171,17 +232,26 @@ def run_ai_chat(token, user_id, client, exercise_map):
                     console.print("No previous response.")
                     continue
                 content = messages[-1]["content"]
+                # Create temp file for upload workflow
+                import tempfile
                 with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.txt', encoding='utf-8') as temp_file:
                     temp_file.write(content)
                     temp_path = temp_file.name
-                workouts_parsed = parse_workouts_from_file(temp_path, client['id'], exercise_map)
-                for workout in workouts_parsed:
-                    upload_workout(token, workout)
-                os.remove(temp_path)
+                
+                try:
+                    workouts_parsed = parse_workouts_from_file(temp_path, client['id'], exercise_map)
+                    for workout in workouts_parsed:
+                        upload_workout(token, workout)
+                finally:
+                    # Clean up temp file
+                    try:
+                        os.remove(temp_path)
+                    except OSError:
+                        pass
                 console.print("[green]Uploaded previous response.[/green]")
             elif choice == '2':
                 client_id = client['id']
-                client_dir = os.path.join(os.path.expanduser("~/TurnkeyClients"), str(client_id))
+                client_dir = get_client_dir(client_id)
                 if not os.path.exists(client_dir):
                     console.print("[yellow]Client directory not found.[/yellow]")
                     continue

@@ -12,7 +12,8 @@ from rich.text import Text  # Added for explicit text rendering
 from settings import get_default_editor, get_stored_credentials, clear_stored_credentials
 
 # Import our shared functions
-from api_client import get_access_token, get_clients, clear_screen, get_workout_history, load_exercise_map, update_exercise_list, CLIENT_DATA_DIR
+from api_client import get_access_token, get_clients, clear_screen, get_workout_history, load_exercise_map, update_exercise_list
+from directory_migration import get_client_dir, get_shared_dir
 # Import our tools
 from feed_tool import run_feed
 from pr_tool import run_pr_analyzer
@@ -71,7 +72,7 @@ def select_client(token, user_id):
 def browse_history(token, client, coach_user_id):
     """Generates a markup file and opens it in an editor inside the client's directory."""
     client_name = client['full_name']
-    client_dir = os.path.join(CLIENT_DATA_DIR, str(client['id']))
+    client_dir = get_client_dir(client['id'])
     workouts = get_workout_history(token, client)
     valid_workouts = [w for w in workouts if w.get('workout_date')]
     if not valid_workouts:
@@ -102,7 +103,7 @@ def browse_history(token, client, coach_user_id):
 def run_uploader_tool(token, client, exercise_map):
     """UI flow for the workout uploader tool."""
     client_id = client['id']
-    client_dir = os.path.join(CLIENT_DATA_DIR, str(client_id))
+    client_dir = get_client_dir(client_id)
     if not os.path.exists(client_dir) or not any(f.endswith('.txt') for f in os.listdir(client_dir)):
         console.print(f"[yellow]No workout .txt files found in {client_dir}[/yellow]")
         console.input("Press Enter to continue.")
@@ -134,7 +135,7 @@ def run_uploader_tool(token, client, exercise_map):
 def clean_client_directory(client):
     """Cleans up a client directory by deleting all files except cached workouts and messages."""
     client_id = client['id']
-    client_dir = os.path.join(CLIENT_DATA_DIR, str(client_id))
+    client_dir = get_client_dir(client_id)
     if not os.path.exists(client_dir):
         console.print(f"[yellow]No directory found for client {client['full_name']}.[/yellow]")
         console.input("Press Enter to continue.")
@@ -172,9 +173,8 @@ def clean_client_directory(client):
 
 def add_note(client):
     """Add a quick note to the client directory."""
-    from api_client import CLIENT_DATA_DIR
     client_id = client['id']
-    client_dir = os.path.join(CLIENT_DATA_DIR, str(client_id))
+    client_dir = get_client_dir(client_id)
     os.makedirs(client_dir, exist_ok=True)
     date_str = datetime.now().strftime("%Y-%m-%d")
     note_filename = f"note-{date_str}.txt"
