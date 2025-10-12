@@ -1,0 +1,117 @@
+name: Build Windows Release
+
+on:
+  workflow_dispatch:  # Manual trigger from GitHub web interface
+  push:
+    tags:
+      - 'v*'  # Automatically trigger when you create version tags
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.13'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+    
+    - name: Build Windows executable
+      run: |
+        pyinstaller --onefile --console --name "turnkey-coach" --icon=app-icon.ico coach_cli.py
+      shell: cmd
+    
+    - name: Create Inno Setup installer script
+      run: |
+        $setupScript = @"
+        #define MyAppName "Turnkey Coach Tools"
+        #define MyAppVersion "1.0.0"
+        #define MyAppPublisher "Barbell Logic"
+        #define MyAppURL "https://github.com/Strength-Labs/workout-parser"
+        #define MyAppExeName "turnkey-coach.exe"
+        
+        [Setup]
+        AppId={{12345678-1234-5678-9ABC-DEF123456789}
+        AppName={#MyAppName}
+        AppVersion={#MyAppVersion}
+        AppVerName={#MyAppName} {#MyAppVersion}
+        AppPublisher={#MyAppPublisher}
+        AppPublisherURL={#MyAppURL}
+        AppSupportURL={#MyAppURL}
+        AppUpdatesURL={#MyAppURL}
+        DefaultDirName={autopf}\{#MyAppName}
+        DefaultGroupName={#MyAppName}
+        AllowNoIcons=yes
+        LicenseFile=
+        OutputDir=dist\windows-installer
+        OutputBaseFilename=TurnkeyCoachTools-1.0.0-Setup
+        SetupIconFile=app-icon.ico
+        Compression=lzma
+        SolidCompression=yes
+        WizardStyle=modern
+        ArchitecturesAllowed=x64
+        ArchitecturesInstallIn64BitMode=x64
+        
+        [Languages]
+        Name: "english"; MessagesFile: "compiler:Default.isl"
+        
+        [Tasks]
+        Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+        Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 6.1
+        
+        [Files]
+        Source: "dist\turnkey-coach.exe"; DestDir: "{app}"; Flags: ignoreversion
+        Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
+        
+        [Icons]
+        Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
+        Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
+        Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
+        Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+        Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: quicklaunchicon
+        
+        [Run]
+        Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#SetupSetting('AppName')}}"; Flags: nowait postinstall skipifsilent
+        
+        [Code]
+        const
+          BeveledLabel = 'Barbell Logic - Turnkey Coach Tools';
+        "@
+        
+        New-Item -ItemType Directory -Force -Path "dist\windows-installer"
+        $setupScript | Out-File -FilePath "setup.iss" -Encoding UTF8
+      shell: powershell
+    
+    - name: Download and setup Inno Setup
+      run: |
+        Invoke-WebRequest -Uri "https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe" -OutFile "innosetup-installer.exe"
+        Start-Process -FilePath "innosetup-installer.exe" -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
+      shell: powershell
+    
+    - name: Build Windows installer
+      run: |
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+      shell: powershell
+    
+    - name: Create ZIP archive
+      run: |
+        Compress-Archive -Path "dist\turnkey-coach.exe" -DestinationPath "dist\TurnkeyCoachTools-1.0.0-Windows.zip"
+      shell: powershell
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-release
+        path: |
+          dist/turnkey-coach.exe
+          dist/windows-installer/TurnkeyCoachTools-1.0.0-Setup.exe
+          dist/TurnkeyCoachTools-1.0.0-Windows.zip
