@@ -117,34 +117,109 @@ dist/onefile/turnkey-coach
 
 ---
 
-## 🚀 **Release Process**
+## 🚀 **Complete Cross-Platform Release Process**
 
-### **1. Update and Build**
+### **Step 1: Development & Testing**
 ```bash
+# Work in develop branch
+git checkout develop
+
 # Make your changes
-# Update version numbers if needed
+vim coach_cli.py feed_tool.py etc.
+
+# Test locally
+python coach_cli.py
+
+# Quick test build (optional)
+./build-simple-launcher.sh
+```
+
+### **Step 2: Build macOS Version**
+```bash
+# Build macOS executables
 ./build-onefile.sh && ./build-app-with-icon.sh
-```
 
-### **2. Test Everything**
-```bash
-# Test the final DMG
+# Test the DMG
 open dist/app-with-icon/TurnkeyCoachTools-1.0.0-WithIcon.dmg
-# Install and run the app
+# Install and verify it works
 ```
 
-### **3. Commit Changes**
+### **Step 3: Update Version Numbers** 
 ```bash
-git add .  # Add your source changes only
-git commit -m "Add new feature X"
+# Update version in build scripts if needed
+# Search for "VERSION=" in:
+# - build-onefile.sh
+# - build-app-with-icon.sh  
+# - build-windows.ps1
+# - .github/workflows/build-windows.yml
+```
+
+### **Step 4: Commit & Merge to Main**
+```bash
+# Commit your changes
+git add .  # Add source changes (NOT dist/ folder)
+git commit -m "Add new feature X for v1.4.0"
 git push origin develop
+
+# Merge develop to main for stable release
+git checkout main
+git merge develop  
+git push origin main
+git checkout develop
 ```
 
-### **4. Create GitHub Release**
+### **Step 5: Create GitHub Release**
 ```bash
-gh release create v1.4.0 --title "Version 1.4.0 - New Features" --notes "Description of changes"
+# Create the release
+gh release create v1.4.0 --title "Turnkey Coach Tools v1.4.0" --notes "New features: X, Y, Z"
+
+# Upload macOS files
 gh release upload v1.4.0 dist/app-with-icon/TurnkeyCoachTools-1.0.0-WithIcon.dmg
 gh release upload v1.4.0 dist/app-with-icon/TurnkeyCoachTools-1.0.0-WithIcon.zip
+gh release upload v1.4.0 dist/onefile/TurnkeyCoachTools-1.0.0-OneFile.zip
+```
+
+### **Step 6: Trigger Windows Build**
+```bash
+# Windows build happens automatically via GitHub Actions
+# Or trigger manually:
+gh workflow run "Build Windows Release"
+
+# Wait for build to complete (check with):
+gh run list --workflow="build-windows.yml" --limit 1
+
+# When complete (✓ status), download and upload:
+gh run download [RUN_ID]  # Get RUN_ID from above command
+gh release upload v1.4.0 windows-release/windows-installer/TurnkeyCoachTools-1.0.0-Setup.exe
+gh release upload v1.4.0 windows-release/TurnkeyCoachTools-1.0.0-Windows.zip
+rm -rf windows-release  # Clean up
+```
+
+### **Step 7: Update Release Notes**
+```bash
+# Create comprehensive release notes
+cat > /tmp/release-notes.md << 'EOF'
+# 🎉 Turnkey Coach Tools v1.4.0 - [Your Title]
+
+## New Features
+- ✅ **Feature 1** - Description
+- ✅ **Feature 2** - Description  
+
+## Download Options
+
+### 🍎 **macOS (Apple Silicon)**
+- **Recommended**: TurnkeyCoachTools-1.0.0-WithIcon.dmg
+- **Alternative**: TurnkeyCoachTools-1.0.0-OneFile.zip
+
+### 🪟 **Windows (64-bit)**  
+- **Recommended**: TurnkeyCoachTools-1.0.0-Setup.exe
+- **Alternative**: TurnkeyCoachTools-1.0.0-Windows.zip
+
+[Include installation instructions, requirements, etc.]
+EOF
+
+# Update the release
+gh release edit v1.4.0 --notes-file /tmp/release-notes.md
 ```
 
 ---
@@ -242,16 +317,41 @@ codesign --force --options runtime --sign "Developer ID Application: Barbell Log
 
 ---
 
-## 📝 **Quick Checklist for Releases**
+## 📝 **Quick Cross-Platform Release Checklist**
 
-- [ ] Code changes tested locally
+### **Pre-Release:**
+- [ ] Code changes tested locally (`python coach_cli.py`)
 - [ ] Requirements.txt updated if needed  
-- [ ] Version numbers updated in build scripts
-- [ ] Built and tested: `./build-onefile.sh && ./build-app-with-icon.sh`
-- [ ] App launches and shows client list
-- [ ] DMG created successfully
-- [ ] Code committed to git
-- [ ] GitHub release created
-- [ ] DMG uploaded to release
+- [ ] Version numbers updated in build scripts (search "VERSION=")
+- [ ] Built and tested macOS: `./build-onefile.sh && ./build-app-with-icon.sh`
+- [ ] macOS app launches and shows client list
+- [ ] Changes committed to develop branch
+- [ ] Develop merged to main branch
 
-**That's it! Your build system is solid.** 🎉
+### **Release Creation:**
+- [ ] GitHub release created: `gh release create v1.X.X`
+- [ ] macOS files uploaded (DMG, ZIP)
+- [ ] Windows build triggered: `gh workflow run "Build Windows Release"`
+- [ ] Windows build completed (✓ status)
+- [ ] Windows files downloaded and uploaded
+- [ ] Release notes updated with cross-platform instructions
+
+### **Post-Release:**
+- [ ] Both platform installers tested
+- [ ] Release announcement ready for coaches
+- [ ] Back to develop branch for next features
+
+## 🚀 **One-Command Release (After Development)**
+
+```bash
+# The full release pipeline:
+./build-onefile.sh && ./build-app-with-icon.sh  # Build macOS
+git add . && git commit -m "Release v1.X.X"        # Commit
+git checkout main && git merge develop && git push origin main && git checkout develop  # Merge
+gh release create v1.X.X --title "Title" --notes "Notes"  # Create release
+gh release upload v1.X.X dist/app-with-icon/*.dmg dist/app-with-icon/*.zip  # Upload macOS
+gh workflow run "Build Windows Release"              # Trigger Windows build
+# Then wait, download, and upload Windows files when ready
+```
+
+**Your cross-platform build system is ready!** 🎉
