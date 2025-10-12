@@ -38,19 +38,42 @@ def clean_text(raw_html):
 
 # --- Data Loading and Updating ---
 def load_exercise_map():
-    """Loads exerciselist.json and creates a name-to-ID mapping."""
+    """Loads exerciselist.json and creates a name-to-ID mapping with exercise types.
+
+    Returns dict with structure: {exercise_name_lower: {'id': id, 'type': exercise_type}}
+    """
     try:
         filepath = get_exercise_list_file()
         exercises = safe_json_load(filepath)
         if exercises is None:
             raise FileNotFoundError()
-        return {ex['name'].lower(): ex['id'] for ex in exercises}
+        return {ex['name'].lower(): {'id': ex['id'], 'type': ex.get('exercise_type', 'resistance')} for ex in exercises}
     except FileNotFoundError:
         console.print("[bold red]Error: `exerciselist.json` not found.[/bold red]")
         return None
     except Exception as e:
         console.print(f"[bold red]Error loading exercise list: {e}[/bold red]")
         return None
+
+def get_exercise_id(exercise_map, exercise_name):
+    """Safely retrieve an exercise ID from the cached exercise map."""
+    if not exercise_map or not exercise_name:
+        return None
+    entry = exercise_map.get(exercise_name.strip().lower())
+    if entry is None:
+        return None
+    if isinstance(entry, dict):
+        return entry.get("id")
+    return entry
+
+def get_exercise_type(exercise_map, exercise_name, default="resistance"):
+    """Safely retrieve the exercise_type for an exercise name."""
+    if not exercise_map or not exercise_name:
+        return default
+    entry = exercise_map.get(exercise_name.strip().lower())
+    if isinstance(entry, dict):
+        return entry.get("type", default)
+    return default
 
 def update_exercise_list(token):
     """Fetches the latest exercise list from the API and saves it to exerciselist.json."""
@@ -69,6 +92,19 @@ def update_exercise_list(token):
         except requests.exceptions.RequestException as e:
             console.print(f"❌ [red]Error fetching exercises: {e}[/red]")
             return False
+
+
+def fetch_metric_catalog(token):
+    """Retrieve the global list of available metric definitions."""
+    url = f"{API_BASE_URL}/api/v1/metrics"
+    headers = {"Authorization": f"Bearer {token}"}
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as err:
+        console.print(f"[bold red]Error fetching metric catalog:[/bold red] {err}")
+        return []
 
 def _download_workouts_from_api(token, client_id, start_date=None):
     # ... (This function remains the same)

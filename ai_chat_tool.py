@@ -10,7 +10,7 @@ from rich.console import Console
 # Import shared functions
 from api_client import get_workout_history
 from format_tool import format_workouts_to_markup
-from upload_tool import parse_workouts_from_file, upload_workout
+from upload_tool import parse_workouts_from_file, upload_workout, prepare_assigned_metrics_for_workout, get_metric_lookup_structures
 from settings import get_default_editor, get_llm_credentials
 from directory_migration import get_client_dir, get_coaching_context_dir
 from encoding_utils import safe_open, safe_temp_file, read_text_file, write_text_file
@@ -239,9 +239,27 @@ def run_ai_chat(token, user_id, client, exercise_map):
                     temp_path = temp_file.name
                 
                 try:
-                    workouts_parsed = parse_workouts_from_file(temp_path, client['id'], exercise_map)
-                    for workout in workouts_parsed:
-                        upload_workout(token, workout)
+                    assignments = parse_workouts_from_file(temp_path, client['id'], exercise_map)
+                    pending_total = sum(len(a.get("pending_metrics", [])) for a in assignments)
+                    metric_index = {}
+                    metric_slugs = []
+                    if pending_total:
+                        console.print(f"[dim]Resolving {pending_total} metric placeholder(s) before upload...[/dim]")
+                        metric_index, metric_slugs = get_metric_lookup_structures(token)
+                        if not metric_index:
+                            console.print("[yellow]Warning: Could not load metric catalog. Metrics will be skipped.[/yellow]")
+                    for assignment in assignments:
+                        if metric_index and assignment.get("pending_metrics"):
+                            _, skipped = prepare_assigned_metrics_for_workout(assignment, metric_index, metric_slugs)
+                            for metric in skipped:
+                                console.print(
+                                    f"[yellow]Warning: Unknown metric '{metric.get('metric_type')}' "
+                                    f"on {assignment.get('workout_date')} – skipping.[/yellow]"
+                                )
+                        else:
+                            assignment.pop("pending_metrics", None)
+                            assignment.setdefault("assigned_metrics", [])
+                        upload_workout(token, assignment)
                 finally:
                     # Clean up temp file
                     try:
@@ -266,9 +284,27 @@ def run_ai_chat(token, user_id, client, exercise_map):
                     idx = int(input("Select file number: ")) - 1
                     if 0 <= idx < len(files):
                         file_path = os.path.join(client_dir, files[idx])
-                        workouts_parsed = parse_workouts_from_file(file_path, client['id'], exercise_map)
-                        for workout in workouts_parsed:
-                            upload_workout(token, workout)
+                        assignments = parse_workouts_from_file(file_path, client['id'], exercise_map)
+                        pending_total = sum(len(a.get("pending_metrics", [])) for a in assignments)
+                        metric_index = {}
+                        metric_slugs = []
+                        if pending_total:
+                            console.print(f"[dim]Resolving {pending_total} metric placeholder(s) before upload...[/dim]")
+                            metric_index, metric_slugs = get_metric_lookup_structures(token)
+                            if not metric_index:
+                                console.print("[yellow]Warning: Could not load metric catalog. Metrics will be skipped.[/yellow]")
+                        for assignment in assignments:
+                            if metric_index and assignment.get("pending_metrics"):
+                                _, skipped = prepare_assigned_metrics_for_workout(assignment, metric_index, metric_slugs)
+                                for metric in skipped:
+                                    console.print(
+                                        f"[yellow]Warning: Unknown metric '{metric.get('metric_type')}' "
+                                        f"on {assignment.get('workout_date')} – skipping.[/yellow]"
+                                    )
+                            else:
+                                assignment.pop("pending_metrics", None)
+                                assignment.setdefault("assigned_metrics", [])
+                            upload_workout(token, assignment)
                         console.print(f"[green]Uploaded {files[idx]}.[/green]")
                     else:
                         console.print("[red]Invalid selection.[/red]")
