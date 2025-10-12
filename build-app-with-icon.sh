@@ -186,24 +186,6 @@ EOF
 
 echo "✅ App bundle created with custom icon"
 
-# Code sign the app bundle
-echo ""
-echo "🔐 Signing the app bundle..."
-if security find-certificate -c "Turnkey Coach Tools" >/dev/null 2>&1; then
-    codesign --force --sign "Turnkey Coach Tools" "$APP_BUNDLE"
-    if [ $? -eq 0 ]; then
-        echo "✅ App bundle signed successfully"
-        # Verify the signature
-        codesign --verify --verbose "$APP_BUNDLE"
-        echo "✅ Signature verified"
-    else
-        echo "⚠️  Code signing failed, but continuing..."
-    fi
-else
-    echo "⚠️  No 'Turnkey Coach Tools' certificate found - app will be unsigned"
-    echo "   To create a certificate: Keychain Access → Certificate Assistant → Create Certificate"
-fi
-
 # Fix permissions and remove quarantine attributes
 chmod -R 755 "$APP_BUNDLE"
 chmod +x "$MACOS_DIR/TurnkeyCoachTools"
