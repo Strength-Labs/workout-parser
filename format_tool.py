@@ -51,16 +51,22 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
         if workout_date_str in metrics_by_date:
             for metric in metrics_by_date[workout_date_str]:
                 metric_type = metric.get('metric_type', '')
-                value = metric.get('value', '')
-                unit = metric.get('unit', '')
-                notes = metric.get('notes', '')
+                value = metric.get('value')
+                unit = metric.get('unit') or ''
+                notes = metric.get('notes') or ''
 
-                # Format: @metric_type: value unit notes
-                metric_line = f"@{metric_type}: {value}"
+                # Build components while allowing placeholder metrics (no numeric value)
+                components = []
+                if value not in [None, '']:
+                    components.append(str(value))
                 if unit:
-                    metric_line += f" {unit}"
+                    components.append(unit)
                 if notes:
-                    metric_line += f" {notes}"
+                    components.append(notes)
+
+                metric_line = f"@{metric_type}:"
+                if components:
+                    metric_line += f" {' '.join(components)}"
 
                 output_lines.append(metric_line)
             output_lines.append("")

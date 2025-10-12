@@ -12,15 +12,15 @@ from rich.text import Text  # Added for explicit text rendering
 from settings import get_default_editor, get_stored_credentials, clear_stored_credentials
 
 # Import our shared functions
-from api_client import get_access_token, get_clients, clear_screen, get_workout_history, load_exercise_map, update_exercise_list
+from api_client import get_access_token, get_clients, clear_screen, get_workout_history, load_exercise_map, update_exercise_list, fetch_metric_catalog
 from directory_migration import get_client_dir, get_shared_dir
 # Import our tools
 from feed_tool import run_feed
 from pr_tool import run_pr_analyzer
 from format_tool import format_workouts_to_markup
 from actual_prs_tool import run_actual_prs_viewer
-from upload_tool import parse_workouts_from_file, upload_workout
-from metrics_tool import upload_metric, get_client_metrics
+from upload_tool import parse_workouts_from_file, upload_workout, build_metric_catalog_index, prepare_assigned_metrics_for_workout
+from metrics_tool import get_client_metrics
 from ai_chat_tool import run_ai_chat
 from metrics_tool import run_metrics_tool
 
@@ -130,22 +130,36 @@ def run_uploader_tool(token, client, exercise_map):
         index = int(choice) - 1
         if 0 <= index < len(txt_files):
             filepath = os.path.join(client_dir, txt_files[index])
-            assignments, metrics = parse_workouts_from_file(filepath, client_id, exercise_map)
+            assignments, _ = parse_workouts_from_file(filepath, client_id, exercise_map)
 
             # Separate workouts and nutrition assignments for summary
             workouts = [a for a in assignments if a.get('workout_type') == 'default']
             nutrition = [a for a in assignments if a.get('workout_type') == 'nutrition']
 
+            total_pending_metrics = sum(len(a.get("pending_metrics", [])) for a in assignments)
+            metric_catalog_index = {}
+            if total_pending_metrics:
+                console.print(f"\n[dim]Resolving {total_pending_metrics} metric placeholder(s) against catalog...[/dim]")
+                metric_catalog = fetch_metric_catalog(token)
+                metric_catalog_index = build_metric_catalog_index(metric_catalog)
+                if not metric_catalog_index:
+                    console.print("[yellow]Warning: Could not load metric catalog. Metrics will be skipped.[/yellow]")
+
             # Upload all assignments (both types use same API endpoint)
             console.print(f"\n[cyan]Uploading {len(workouts)} workout(s) and {len(nutrition)} nutrition assignment(s)...[/cyan]")
             for assignment in assignments:
+                if metric_catalog_index and assignment.get("pending_metrics"):
+                    assigned_metrics, skipped = prepare_assigned_metrics_for_workout(assignment, metric_catalog_index)
+                    if skipped:
+                        for metric in skipped:
+                            console.print(
+                                f"[yellow]Warning: Unknown metric '{metric.get('metric_type')}' "
+                                f"on {assignment.get('workout_date')} – skipping.[/yellow]"
+                            )
+                else:
+                    assignment.pop("pending_metrics", None)
+                    assignment.setdefault("assigned_metrics", [])
                 upload_workout(token, assignment)
-
-            # Upload metrics
-            if metrics:
-                console.print(f"\n[cyan]Uploading {len(metrics)} metric(s)...[/cyan]")
-                for metric in metrics:
-                    upload_metric(token, metric)
 
             console.print("[green]Upload complete.[/green]")
         else:
@@ -340,5 +354,3 @@ def main():
 if __name__ == "__main__":
     main()
     console.print("\nExiting. Goodbye!", style="dim")
-
-

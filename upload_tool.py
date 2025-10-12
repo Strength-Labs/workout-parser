@@ -1,6 +1,7 @@
-import json
 import re
 import os
+import json
+from typing import Dict, List, Tuple
 import requests
 from api_client import API_BASE_URL, console
 from encoding_utils import read_text_file
@@ -9,6 +10,105 @@ try:
     from rapidfuzz import process
 except ImportError:
     pass
+
+METRIC_NAME_OVERRIDES = {
+    "weight": ["body_weight", "weight"],
+    "body_weight": ["body_weight"],
+    "body_fat": ["body_fat", "body_fat_percentage"],
+    "waist": ["waist"],
+    "chest": ["chest"],
+    "arms": ["arm", "arms"],
+    "thighs": ["thighs"],
+    "sleep": ["sleep", "sleep_hours"],
+    "stress": ["stress"],
+    "recovery": ["recovery"],
+    "energy": ["energy"],
+    "fatigue": ["fatigue"],
+    "difficulty": ["difficulty", "session_difficulty"],
+    "enjoyment": ["enjoyment"],
+    "motivation": ["motivation"],
+    "duration": ["duration", "session_duration"],
+}
+
+
+def normalise_metric_key(raw_value: str) -> str:
+    """Create a slug-like identifier for matching metric names."""
+    if not raw_value:
+        return ""
+    return re.sub(r'[^a-z0-9]+', '_', raw_value.strip().lower()).strip('_')
+
+
+def build_metric_catalog_index(metric_catalog: List[dict]) -> Dict[str, dict]:
+    """Build a lookup map of normalised metric names to metric definitions."""
+    index: Dict[str, dict] = {}
+    for entry in metric_catalog or []:
+        name = entry.get("name")
+        if not name:
+            continue
+        slug = normalise_metric_key(name)
+        if slug and slug not in index:
+            index[slug] = entry
+    return index
+
+
+def _cast_metric_answer_value(value, metric_type: str):
+    """Cast value to appropriate type based on metric definition."""
+    if value is None:
+        return None
+    if metric_type in {"integer", "scale"}:
+        try:
+            return int(round(float(value)))
+        except (ValueError, TypeError):
+            return value
+    if metric_type == "decimal":
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return value
+    return str(value)
+
+
+def prepare_assigned_metrics_for_workout(workout: dict, metric_catalog_index: Dict[str, dict]) -> Tuple[List[dict], List[dict]]:
+    """Convert parsed metrics into API-ready assigned metric payloads for a workout."""
+    pending_metrics = workout.pop("pending_metrics", [])
+    assigned_metrics = []
+    skipped_metrics = []
+
+    for metric in pending_metrics:
+        metric_slug = normalise_metric_key(metric.get("metric_type"))
+        candidate_slugs = []
+        override_candidates = METRIC_NAME_OVERRIDES.get(metric_slug, [])
+        candidate_slugs.extend(normalise_metric_key(c) for c in override_candidates if c)
+        candidate_slugs.append(metric_slug)
+
+        definition = None
+        for candidate in candidate_slugs:
+            if candidate and candidate in metric_catalog_index:
+                definition = metric_catalog_index[candidate]
+                break
+
+        if not definition:
+            skipped_metrics.append(metric)
+            continue
+
+        assigned_entry = {
+            "metric_id": definition["id"],
+            "priority": len(assigned_metrics),
+        }
+
+        notes = (metric.get("notes") or "").strip()
+        if notes:
+            assigned_entry["description"] = notes
+
+        value = metric.get("value")
+        cast_value = _cast_metric_answer_value(value, definition.get("metric_type"))
+        if cast_value not in (None, ""):
+            assigned_entry["metric_answer"] = {"value": cast_value}
+
+        assigned_metrics.append(assigned_entry)
+
+    workout["assigned_metrics"] = assigned_metrics
+    return assigned_metrics, skipped_metrics
 
 def parse_line_as_metric(line: str):
     """
@@ -35,37 +135,53 @@ def parse_line_as_metric(line: str):
     metric_type = metric_part.strip().lower()
     value_part = value_part.strip()
 
+    if not value_part:
+        # Allow blank metrics so coaches can assign placeholders
+        return {
+            'metric_type': metric_type,
+            'value': None,
+            'unit': '',
+            'notes': ''
+        }
+
     # Parse value part: "value unit optional notes"
     # Try to extract numeric value first
     value_match = re.match(r'([\d.]+)\s*(%|lbs|kg|inches|cm|hours|bpm|ms|/10)?(.*)$', value_part, re.IGNORECASE)
 
-    if not value_match:
-        return None
+    if value_match:
+        value_str, unit, notes = value_match.groups()
 
-    value_str, unit, notes = value_match.groups()
+        try:
+            value = float(value_str)
+        except ValueError:
+            value = None
 
-    try:
-        value = float(value_str)
-    except ValueError:
-        return None
+        if value is not None:
+            # Clean up unit
+            if unit:
+                unit = unit.strip()
+                # Normalize units
+                if unit == '/10':
+                    unit = '1-10'
+            else:
+                unit = ''
 
-    # Clean up unit
-    if unit:
-        unit = unit.strip()
-        # Normalize units
-        if unit == '/10':
-            unit = '1-10'
-    else:
-        unit = ''
+            # Clean up notes
+            notes = notes.strip() if notes else ''
 
-    # Clean up notes
-    notes = notes.strip() if notes else ''
+            return {
+                'metric_type': metric_type,
+                'value': value,
+                'unit': unit,
+                'notes': notes
+            }
 
+    # Fallback for non-numeric values: treat as placeholder with optional notes
     return {
         'metric_type': metric_type,
-        'value': value,
-        'unit': unit,
-        'notes': notes
+        'value': None,
+        'unit': '',
+        'notes': value_part.strip()
     }
 
 def get_similar_exercises(exercise_name: str, exercise_names: list[str], limit: int = 5):
@@ -203,14 +319,27 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
             # Check if line is a metric
             parsed_metric = parse_line_as_metric(stripped_line)
             if parsed_metric:
-                # Add workout date and user_id to metric
-                metric_data = {
+                metric_payload = {
                     "user_id": user_id,
                     "metric_date": workout_date,
-                    **parsed_metric
+                    **parsed_metric,
                 }
-                metrics.append(metric_data)
-                console.print(f"[cyan]Found metric:[/cyan] {parsed_metric['metric_type']} = {parsed_metric['value']} {parsed_metric['unit']}")
+                metrics.append(metric_payload)
+
+                workout_metric = {
+                    "metric_type": parsed_metric["metric_type"],
+                    "value": parsed_metric.get("value"),
+                    "unit": parsed_metric.get("unit"),
+                    "notes": parsed_metric.get("notes"),
+                    "metric_date": workout_date,
+                }
+                workout.setdefault("pending_metrics", []).append(workout_metric)
+
+                if parsed_metric.get('value') is None:
+                    note_display = f" (notes: {parsed_metric.get('notes')})" if parsed_metric.get('notes') else ""
+                    console.print(f"[cyan]Found metric placeholder:[/cyan] {parsed_metric['metric_type']}{note_display}")
+                else:
+                    console.print(f"[cyan]Found metric:[/cyan] {parsed_metric['metric_type']} = {parsed_metric['value']} {parsed_metric['unit']}")
                 continue
             
             is_indented = len(line) > len(line.lstrip())

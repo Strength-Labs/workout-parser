@@ -73,6 +73,19 @@ def update_exercise_list(token):
             console.print(f"❌ [red]Error fetching exercises: {e}[/red]")
             return False
 
+
+def fetch_metric_catalog(token):
+    """Retrieve the global list of available metric definitions."""
+    url = f"{API_BASE_URL}/api/v1/metrics"
+    headers = {"Authorization": f"Bearer {token}"}
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as err:
+        console.print(f"[bold red]Error fetching metric catalog:[/bold red] {err}")
+        return []
+
 def _download_workouts_from_api(token, client_id, start_date=None):
     # ... (This function remains the same)
     status_message = "Downloading full workout history" if not start_date else "Downloading new workouts"

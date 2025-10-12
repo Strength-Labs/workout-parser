@@ -1,0 +1,40 @@
+Workout Date: 2025-10-11
+Test Day with Metrics
+
+@weight: 185.5 lbs
+@body_fat: 15.2%
+@sleep: 7.5 hours feeling well-rested
+@recovery: 8 1-10
+
+Squat
+3x5 @ 315
+	Focus on depth and bar speed
+
+Bench Press
+3x8 @ 225
+
+---
+
+Workout Date: 2025-10-12
+Active Recovery
+
+@weight: 185.0 lbs
+@stress: 3 1-10
+@energy: 9 1-10
+
+Walk
+1x30:00
+
+---
+
+Workout Date: 2025-10-13
+Heavy Day
+
+@weight: 186.0 lbs post-cheat meal
+@waist: 34 inches
+
+Deadlift
+5x3 @ 405
+
+Press
+3x5 @ 155
