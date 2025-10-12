@@ -1,9 +1,9 @@
 import re
 import os
 import json
-from typing import Dict, List, Tuple
+from typing import Dict, Iterable, List, Tuple
 import requests
-from api_client import API_BASE_URL, console
+from api_client import API_BASE_URL, console, get_exercise_id, get_exercise_type, fetch_metric_catalog
 from encoding_utils import read_text_file
 
 try:
@@ -37,10 +37,25 @@ def normalise_metric_key(raw_value: str) -> str:
         return ""
     return re.sub(r'[^a-z0-9]+', '_', raw_value.strip().lower()).strip('_')
 
+_METRIC_LOOKUP_CACHE: dict = {"loaded": False, "index": {}, "slugs": []}
 
-def build_metric_catalog_index(metric_catalog: List[dict]) -> Dict[str, dict]:
-    """Build a lookup map of normalised metric names to metric definitions."""
+def get_metric_lookup_structures(token: str, force_refresh: bool = False) -> Tuple[Dict[str, dict], List[Tuple[str, dict]]]:
+    """Return cached metric lookup tables, fetching and indexing once per session."""
+    global _METRIC_LOOKUP_CACHE
+    if not force_refresh and _METRIC_LOOKUP_CACHE.get("loaded"):
+        console.print("[dim]Using cached metric catalog index.[/dim]")
+        return _METRIC_LOOKUP_CACHE["index"], _METRIC_LOOKUP_CACHE["slugs"]
+
+    metric_catalog = fetch_metric_catalog(token)
+    index, slugs = build_metric_catalog_index(metric_catalog)
+    _METRIC_LOOKUP_CACHE = {"loaded": True, "index": index, "slugs": slugs}
+    return index, slugs
+
+
+def build_metric_catalog_index(metric_catalog: List[dict]) -> Tuple[Dict[str, dict], List[Tuple[str, dict]]]:
+    """Build lookup structures for metric definition matching."""
     index: Dict[str, dict] = {}
+    slug_entries: List[Tuple[str, dict]] = []
     for entry in metric_catalog or []:
         name = entry.get("name")
         if not name:
@@ -48,7 +63,9 @@ def build_metric_catalog_index(metric_catalog: List[dict]) -> Dict[str, dict]:
         slug = normalise_metric_key(name)
         if slug and slug not in index:
             index[slug] = entry
-    return index
+        if slug:
+            slug_entries.append((slug, entry))
+    return index, slug_entries
 
 
 def _cast_metric_answer_value(value, metric_type: str):
@@ -68,7 +85,29 @@ def _cast_metric_answer_value(value, metric_type: str):
     return str(value)
 
 
-def prepare_assigned_metrics_for_workout(workout: dict, metric_catalog_index: Dict[str, dict]) -> Tuple[List[dict], List[dict]]:
+def _find_metric_definition(metric_slug: str, candidate_slugs: Iterable[str], index: Dict[str, dict], slug_entries: List[Tuple[str, dict]]):
+    """Locate a metric definition matching any of the candidate slugs."""
+    for candidate in candidate_slugs:
+        if candidate in index:
+            return index[candidate]
+
+    # Fallback: match by slug tokens (e.g., waist -> waist_in) while avoiding substring collisions
+    best_match = None
+    best_slug_length = None
+    for candidate in candidate_slugs:
+        for slug, entry in slug_entries:
+            if slug == candidate:
+                return entry
+            tokens = [token for token in slug.split('_') if token]
+            if candidate in tokens:
+                slug_length = len(slug)
+                if best_match is None or slug_length < best_slug_length:
+                    best_match = entry
+                    best_slug_length = slug_length
+    return best_match
+
+
+def prepare_assigned_metrics_for_workout(workout: dict, metric_catalog_index: Dict[str, dict], slug_entries: List[Tuple[str, dict]]) -> Tuple[List[dict], List[dict]]:
     """Convert parsed metrics into API-ready assigned metric payloads for a workout."""
     pending_metrics = workout.pop("pending_metrics", [])
     assigned_metrics = []
@@ -80,12 +119,9 @@ def prepare_assigned_metrics_for_workout(workout: dict, metric_catalog_index: Di
         override_candidates = METRIC_NAME_OVERRIDES.get(metric_slug, [])
         candidate_slugs.extend(normalise_metric_key(c) for c in override_candidates if c)
         candidate_slugs.append(metric_slug)
+        candidate_slugs = [slug for slug in candidate_slugs if slug]
 
-        definition = None
-        for candidate in candidate_slugs:
-            if candidate and candidate in metric_catalog_index:
-                definition = metric_catalog_index[candidate]
-                break
+        definition = _find_metric_definition(metric_slug, candidate_slugs, metric_catalog_index, slug_entries)
 
         if not definition:
             skipped_metrics.append(metric)
@@ -256,17 +292,16 @@ def parse_line_as_set(line: str):
     return None
 
 def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: dict):
-    """Parses a text file into a list of workout/nutrition dictionaries and metrics, with interactive fuzzy matching.
+    """Parses a text file into a list of workout/nutrition dictionaries with interactive fuzzy matching.
 
     Supports both "Workout Date:" (training calendar) and "Nutrition Date:" (nutrition calendar) entries.
     Both types can be mixed in the same file.
 
     Returns:
-        tuple: (workouts, metrics) - lists of workout/nutrition and metric dictionaries
+        list: Workout/nutrition assignments ready for upload
     """
     content = read_text_file(plain_text_path)
     workouts = []
-    metrics = []
 
     # Split by both "Workout Date:" and "Nutrition Date:"
     # Use a regex that captures the header type and preserves it
@@ -305,7 +340,7 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
         start_line_index = 1
         if len(lines) > 1:
             potential_title = lines[1].strip()
-            if potential_title and potential_title.lower() not in exercise_map and not re.match(r"^\d+\s*x", potential_title) and not potential_title.startswith('@'):
+            if potential_title and get_exercise_id(exercise_map, potential_title) is None and not re.match(r"^\d+\s*x", potential_title) and not potential_title.startswith('@'):
                 workout["title"] = potential_title
                 start_line_index = 2
 
@@ -319,12 +354,6 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
             # Check if line is a metric
             parsed_metric = parse_line_as_metric(stripped_line)
             if parsed_metric:
-                metric_payload = {
-                    "user_id": user_id,
-                    "metric_date": workout_date,
-                    **parsed_metric,
-                }
-                metrics.append(metric_payload)
 
                 workout_metric = {
                     "metric_type": parsed_metric["metric_type"],
@@ -356,10 +385,9 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
                     console.print(f"[yellow]Warning: Found indented note with no preceding exercise: '{stripped_line}'[/yellow]")
                 continue
 
-            if stripped_line.lower() in exercise_map:
-                exercise_info = exercise_map[stripped_line.lower()]
-                ex_id = exercise_info['id'] if isinstance(exercise_info, dict) else exercise_info
-                ex_type = exercise_info.get('type', 'resistance') if isinstance(exercise_info, dict) else 'resistance'
+            exercise_id = get_exercise_id(exercise_map, stripped_line)
+            if exercise_id is not None:
+                ex_type = get_exercise_type(exercise_map, stripped_line)
 
                 # Validate exercise type matches workout type
                 if workout_type_value == "nutrition" and ex_type != "nutrition":
@@ -370,7 +398,7 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
                     continue
 
                 if current_exercise: workout["assigned_exercises"].append(current_exercise)
-                current_exercise = {"exercise_id": ex_id, "priority": len(workout["assigned_exercises"]), "assigned_sets": []}
+                current_exercise = {"exercise_id": exercise_id, "priority": len(workout["assigned_exercises"]), "assigned_sets": []}
                 continue
 
             parsed_set = parse_line_as_set(stripped_line)
@@ -384,9 +412,9 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
             else:
                 # Filter exercise names by type for fuzzy matching
                 if workout_type_value == "nutrition":
-                    filtered_names = [name for name in exercise_names if exercise_map.get(name, {}).get('type') == 'nutrition']
+                    filtered_names = [name for name in exercise_names if get_exercise_type(exercise_map, name) == 'nutrition']
                 else:
-                    filtered_names = [name for name in exercise_names if exercise_map.get(name, {}).get('type') != 'nutrition']
+                    filtered_names = [name for name in exercise_names if get_exercise_type(exercise_map, name) != 'nutrition']
 
                 similar_exercises = get_similar_exercises(stripped_line.lower(), filtered_names)
                 if similar_exercises:
@@ -408,21 +436,23 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
                     
                     if chosen_exercise_name:
                         if current_exercise: workout["assigned_exercises"].append(current_exercise)
-                        exercise_info = exercise_map[chosen_exercise_name]
-                        ex_id = exercise_info['id'] if isinstance(exercise_info, dict) else exercise_info
-                        current_exercise = {"exercise_id": ex_id, "priority": len(workout["assigned_exercises"]), "assigned_sets": []}
+                        chosen_exercise_id = get_exercise_id(exercise_map, chosen_exercise_name)
+                        if chosen_exercise_id is not None:
+                            current_exercise = {"exercise_id": chosen_exercise_id, "priority": len(workout["assigned_exercises"]), "assigned_sets": []}
+                        else:
+                            console.print(f"[yellow]Warning: Could not resolve exercise '{chosen_exercise_name}'.[/yellow]")
                 else:
                     console.print(f"[yellow]Warning: Could not parse or find match for line: '{stripped_line}'[/yellow]")
 
-        if current_exercise:
-            workout["assigned_exercises"].append(current_exercise)
+            if current_exercise:
+                workout["assigned_exercises"].append(current_exercise)
         if workout["assigned_exercises"]:
             if kg_detected:
                 workout["weight_type"] = "kgs"
                 console.print(f"[green]Detected kg units—setting workout weight_type to 'kgs' for API compatibility.[/green]")
             workouts.append(workout)
 
-    return workouts, metrics
+    return workouts
 
 def upload_workout(token, workout_data):
     """Uploads a single workout or nutrition assignment to the API."""

@@ -17,6 +17,11 @@ These guides serve multiple purposes:
 
 The guides are organized by topic, progressing from high-level architecture to specific implementation details:
 
+## Metric References
+
+- [METRICS_GUIDE.md](../METRICS_GUIDE.md) — canonical metric catalog, API payloads, and usage guidelines
+- [METRICS_IN_MARKUP.md](../METRICS_IN_MARKUP.md) — how metrics map into the markup language and uploader expectations
+
 ### [01-Architecture-Overview.md](./01-Architecture-Overview.md)
 
 **High-level system architecture, design patterns, and module organization**
@@ -25,6 +30,8 @@ The guides are organized by topic, progressing from high-level architecture to s
 - System architecture diagram and component overview
 - Module organization (core, tools, supporting)
 - Data flow patterns (authentication, workout history, feed aggregation)
+- Nutrition & metrics routing through dual calendars
+- Metric catalog integration and tooling
 - Design patterns (incremental caching, background refresh, shared utilities)
 - Directory structure (runtime and application directories)
 - Error handling strategy
@@ -43,6 +50,7 @@ The guides are organized by topic, progressing from high-level architecture to s
 - Authentication flow
 - Workout history flow
 - Feed aggregation flow
+- Nutrition & metrics flow
 - File system structure
 
 ---
@@ -156,7 +164,10 @@ The guides are organized by topic, progressing from high-level architecture to s
 - Set parsing patterns (time-based, RPE, percentage, weight, bodyweight)
 - Fuzzy exercise name matching
 - Unit detection (lbs/kg)
+- Nutrition calendar workflow and dual-calendar routing
+- Metric ingestion via `@metric` lines and catalog validation
 - Upload workflow
+- Dry-run validation flow for markup files
 - AI chat tool with context loading
 - LLM provider integration (OpenAI/xAI)
 - Editing AI responses in text editor
@@ -171,6 +182,7 @@ The guides are organized by topic, progressing from high-level architecture to s
 
 **Key Sections**:
 - Markup formatting rules
+- Nutrition workflow checklists
 - Set parsing regex patterns
 - Fuzzy matching implementation
 - AI chat context assembly

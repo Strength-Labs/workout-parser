@@ -55,6 +55,26 @@ def load_exercise_map():
         console.print(f"[bold red]Error loading exercise list: {e}[/bold red]")
         return None
 
+def get_exercise_id(exercise_map, exercise_name):
+    """Safely retrieve an exercise ID from the cached exercise map."""
+    if not exercise_map or not exercise_name:
+        return None
+    entry = exercise_map.get(exercise_name.strip().lower())
+    if entry is None:
+        return None
+    if isinstance(entry, dict):
+        return entry.get("id")
+    return entry
+
+def get_exercise_type(exercise_map, exercise_name, default="resistance"):
+    """Safely retrieve the exercise_type for an exercise name."""
+    if not exercise_map or not exercise_name:
+        return default
+    entry = exercise_map.get(exercise_name.strip().lower())
+    if isinstance(entry, dict):
+        return entry.get("type", default)
+    return default
+
 def update_exercise_list(token):
     """Fetches the latest exercise list from the API and saves it to exerciselist.json."""
     url = f"{API_BASE_URL}/api/v1/exercises"

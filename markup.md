@@ -9,6 +9,12 @@ The Strength Coaching Markup Language provides a human-readable plain text forma
 
 ### Key Formatting Rules
 
+#### Naming Requirements
+
+> **Critical:** Names must match the official catalog. Stick to the canonical nutrition item titles from `exerciselist.json` (e.g., `Visual Food Diary`, `Calorie Tracking`) and metric tags that resolve to the Turnkey Coach metric catalog (`@weight`, `@waist`, `@sleep`, etc.). Any variation, abbreviation, or creative renaming will be treated as unknown data and skipped during upload.
+
+Keep the reference lists from the Turnkey Coach app or internal guides nearby when drafting plans, and copy the entries verbatim—including spacing and capitalization.
+
 #### Assignment Types
 
 The markup language supports two types of assignments:
@@ -29,6 +35,8 @@ Each workout assignment begins with a `Workout Date:` line, followed by the date
 Each nutrition assignment begins with a `Nutrition Date:` line, followed by the date in YYYY-MM-DD format. This uploads to the **nutrition calendar**.
 
 * **Example**: `Nutrition Date: 2025-08-18`
+
+> **Important for template generators/LLMs:** Never use `Workout Date:` for a nutrition entry. If the header is `Workout Date:`, the uploader treats the block as training and every nutrition item will be skipped. Always start nutrition blocks with `Nutrition Date: YYYY-MM-DD`.
 
 #### Title
 
@@ -72,6 +80,8 @@ Metrics allow you to track client data such as body weight, body fat percentage,
 
 Metrics appear after the assignment title (if present) and before the exercises/nutrition items. They will be uploaded to the Turnkey Coach API along with the assignment data.
 
+> **Exact naming matters:** Metrics must map to the existing catalog entries in Turnkey Coach (e.g., `Body Weight`, `Waist (in)`, `Sleep Hours`). Stick to the canonical names listed in the app/metrics guide so the uploader can resolve them. Aliases like `@weight:` and `@waist:` are supported, but anything ambiguous may be skipped.
+
 #### Exercises (Training Calendar)
 
 For **Workout Date** assignments, exercises are training movements. The name of each exercise is on its own, unindented line. It must be a valid exercise name from `exerciselist.json` with `exercise_type: resistance` or `exercise_type: conditioning`.
@@ -82,7 +92,11 @@ For **Workout Date** assignments, exercises are training movements. The name of 
 
 #### Nutrition Items (Nutrition Calendar)
 
-For **Nutrition Date** assignments, nutrition items are meal/nutrition tracking tasks. The name of each item is on its own, unindented line. It must be a valid nutrition exercise name from `exerciselist.json` with `exercise_type: nutrition`.
+For **Nutrition Date** assignments, nutrition items are meal/nutrition tracking tasks. Each item:
+
+* **Must** be a valid entry from `exerciselist.json` whose `exercise_type` is `nutrition`. Training or conditioning exercises will be skipped automatically.
+* Appears on its own unindented line, just like workouts do.
+* Does **not** use prescribed sets, reps, load, distance, or time. Nutrition entries accept notes only.
 
 * **Examples**:
     * `Meal Pictures`
@@ -90,7 +104,21 @@ For **Nutrition Date** assignments, nutrition items are meal/nutrition tracking 
     * `Protein Intake`
     * `Calorie Tracking`
 
-Nutrition items typically have instructions rather than sets/reps. Use indented notes to provide guidance (see **Comments and Notes** section below).
+> **Tip:** If you need to create a new nutrition item, add it to the Turnkey Coach exercise catalog first (marking it as `exercise_type: nutrition`). Once the catalog is updated, the uploader will accept the name in your markup.
+
+> **Exact naming matters:** Use the nutrition item names verbatim (e.g., `Visual Food Diary`, `Instructions`, `Meal Pictures`). Changing singular/plural forms or capitalization (such as `Instruction`) creates an unknown exercise that the uploader will skip. Keep a reference list of approved nutrition items handy when generating templates.
+
+Nutrition items typically have instructions rather than sets/reps. Use indented notes to provide guidance (see **Comments and Notes** section below). Any line that looks like a traditional set prescription (`3x10 @ ...`, `5x00:30`, etc.) will be ignored for nutrition assignments, so keep coaching cues and expectations in note form.
+
+> **LLM Hint:** When generating nutrition plans, follow this pattern exactly:
+> ```
+> Nutrition Date: 2025-10-13
+> Title (optional)
+> @metric: ...
+> Nutrition Item Name
+>     Guidance/notes (indented)
+> ```
+> Using `Workout Date:` or adding set prescriptions will cause the uploader to drop the nutrition items.***
 
 #### Prescribed Sets
 

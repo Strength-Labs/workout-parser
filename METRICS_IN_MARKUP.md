@@ -181,7 +181,7 @@ See `markup.md` for complete markup language specification including metrics syn
 - Each metric is uploaded individually with full metadata
 
 ### Example Test File
-See `test_metrics_example.txt` for a complete example file with multiple workouts and metrics.
+See `tests/fixtures/metrics_example.txt` for a complete example file with multiple workouts and metrics.
 
 ## Troubleshooting
 

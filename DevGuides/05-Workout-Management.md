@@ -10,6 +10,31 @@ This guide covers workout-related functionality including browsing history, uplo
 3. **ai_chat_tool.py** - AI-powered workout planning
 4. **coach_cli.py** - Workout management UI functions
 
+## Calendar Workflows Overview
+
+Turnkey Coach maintains **two parallel calendars**—Training and Nutrition. Both are authored in the same markup language, but each block is routed by its header:
+
+- `Workout Date:` → Training calendar
+- `Nutrition Date:` → Nutrition calendar
+
+`format_tool.py` and `upload_tool.py` understand this dual-calendar model. When the formatter encounters a nutrition assignment in the API payload, it emits the `Nutrition Date:` header and only lists nutrition-type catalog items. Conversely, the uploader reads the header to determine which API endpoint to hit so nutrition tasks never end up in the training calendar (and vice versa).
+
+### Nutrition Calendar Workflow
+
+1. **Download** existing nutrition entries with `format_tool.py` or the CLI “Export to Markup” option. The formatter preserves metric lines and nutrition catalog items exactly as they were stored.
+2. **Author or revise** the plan in markup:
+   - Keep the `Nutrition Date:` header accurate; it anchors the block to the nutrition calendar.
+   - Use only nutrition items from `exerciselist.json` and keep names verbatim (e.g., `Visual Food Diary`, `Calorie Tracking`).
+   - Insert metrics with the standard `@metric_type:` syntax so they remain tied to the same date.
+3. **Upload** via `upload_tool.py` or `coach_cli.py`’s “Upload Markup” option. The tool batches nutrition and workout blocks separately so they post to the correct calendar endpoints.
+4. **Verify** in the Turnkey Coach UI that both calendars received the intended updates. Nutrition items appear alongside their notes; metrics appear on whichever calendar the block was routed to.
+
+> **Tip:** The CLI upload flow prints a summary of which blocks were interpreted as training versus nutrition. If an entire nutrition block is reported as “skipped,” double-check the header spelling and item names against the catalog.
+
+For more detail on the metric system, keep the dedicated references close:
+- [METRICS_GUIDE.md](../METRICS_GUIDE.md) – full catalog, unit rules, and API payload reference
+- [METRICS_IN_MARKUP.md](../METRICS_IN_MARKUP.md) – how metrics appear in the markup language and parser expectations
+
 ## Workout Formatting (`format_tool.py`)
 
 **File**: `format_tool.py` (87 lines)
@@ -296,7 +321,17 @@ Parse workout files written in custom markup format and upload to Turnkey Coach 
 
 **Function**: `parse_workouts_from_file(plain_text_path, user_id, exercise_map)`
 **Location**: upload_tool.py:142-296
-**Returns**: Tuple `(assignments, metrics)` where `assignments` contains workout/nutrition payloads and `metrics` captures both populated and placeholder metric entries
+**Returns**: List of workout/nutrition assignments with any `@metric` lines attached to each entry as `pending_metrics`
+
+> Metrics parsed from markup are resolved into `assigned_metrics` during upload so you only post them once. Avoid re-uploading the same values through `metrics_tool.py` unless you truly need standalone metric entries.
+
+Use the shared helpers `api_client.get_exercise_id()` and `api_client.get_exercise_type()` when working with the exercise map; they normalise names and prevent missing-key errors.
+
+Metric catalog lookups are memoised through `upload_tool.get_metric_lookup_structures()`, so bulk uploads only hit the API once per session while still allowing a manual refresh via `force_refresh=True` when needed.
+
+### Dry-Run Validation
+
+`coach_cli.py` now exposes **Validate Markup (Dry Run)** on the client menu. This path runs the full parser—including metric resolution and exercise validation—but skips the API call, printing a summary of each assignment plus any warnings. Use it before committing to an upload when you want to surface fuzzy-match prompts or unknown metrics without modifying the client's calendar.
 
 ### Parsing Logic
 
@@ -328,7 +363,7 @@ start_line_index = 1
 if len(lines) > 1:
     potential_title = lines[1].strip()
     # If line is not an exercise name and not a set prescription, it's the title
-    if potential_title and potential_title.lower() not in exercise_map and not re.match(r"^\d+\s*x", potential_title):
+    if potential_title and get_exercise_id(exercise_map, potential_title) is None and not re.match(r"^\d+\s*x", potential_title):
         workout["title"] = potential_title
         start_line_index = 2
 ```

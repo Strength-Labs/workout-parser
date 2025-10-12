@@ -22,9 +22,10 @@ This guide provides a high-level overview of the Turnkey Coach Tools codebase ar
 │         api_client.py                │    │    Tool Modules            │
 │  - Authentication & token caching    │    │  - feed_tool.py            │
 │  - Client list retrieval             │    │  - pr_tool.py              │
-│  - Workout history management        │    │  - actual_prs_tool.py      │
+│  - Workout & nutrition sync          │    │  - actual_prs_tool.py      │
 │  - Exercise list management          │    │  - upload_tool.py          │
-│  - Shared utilities                  │    │  - ai_chat_tool.py         │
+│  - Metric catalog access             │    │  - ai_chat_tool.py         │
+│  - Shared utilities                  │    │  - metrics_tool.py         │
 └──────────────────────────────────────┘    └────────────────────────────┘
                               │                              │
                               ├──────────────────────────────┘
@@ -64,6 +65,7 @@ This guide provides a high-level overview of the Turnkey Coach Tools codebase ar
   - `get_access_token()`: Authentication with caching
   - `get_clients()`: Fetch coach's client list
   - `get_workout_history()`: Workout data retrieval with incremental updates
+  - `fetch_metric_catalog()`: Canonical metric catalog lookup
   - `load_exercise_map()`: Exercise database management
 - **Dependencies**: requests, settings, directory_migration, encoding_utils
 
@@ -101,9 +103,18 @@ This guide provides a high-level overview of the Turnkey Coach Tools codebase ar
   - Fuzzy exercise matching (rapidfuzz)
   - Interactive exercise selection
   - Unit detection (lbs/kg)
+  - Nutrition calendar routing and metric line ingestion
 - **Dependencies**: api_client, encoding_utils, rapidfuzz
 
-#### 7. **ai_chat_tool.py** (302 lines)
+#### 7. **metrics_tool.py** (603 lines)
+- **Purpose**: Standalone CLI for programming and uploading client metrics
+- **Key Features**:
+  - Metric catalog lookup with friendly aliases
+  - Local caching of metric submissions per client
+  - Batch upload to Turnkey Coach metrics endpoint
+- **Dependencies**: api_client, directory_migration, encoding_utils, requests
+
+#### 8. **ai_chat_tool.py** (302 lines)
 - **Purpose**: AI-powered workout planning assistant
 - **Key Features**:
   - OpenAI/xAI integration
@@ -114,14 +125,15 @@ This guide provides a high-level overview of the Turnkey Coach Tools codebase ar
 
 ### Supporting Modules
 
-#### 8. **format_tool.py** (87 lines)
-- **Purpose**: Workout data formatting to custom markup
+#### 9. **format_tool.py** (87 lines)
+- **Purpose**: Workout and nutrition data formatting to custom markup
 - **Key Functions**:
   - `format_workouts_to_markup()`: JSON to text conversion
   - `format_time()`: Time formatting for sets
+- **Nutrition/Metrics Support**: Emits `Nutrition Date:` blocks, nutrition catalog items, and `@metric` lines directly from API payloads
 - **Dependencies**: api_client
 
-#### 9. **encoding_utils.py** (133 lines)
+#### 10. **encoding_utils.py** (133 lines)
 - **Purpose**: Cross-platform UTF-8 file handling
 - **Key Functions**:
   - `safe_open()`: UTF-8 file operations
@@ -129,7 +141,7 @@ This guide provides a high-level overview of the Turnkey Coach Tools codebase ar
   - `read_text_file()`/`write_text_file()`: Text file utilities
 - **Dependencies**: None (stdlib only)
 
-#### 10. **directory_migration.py** (189 lines)
+#### 11. **directory_migration.py** (189 lines)
 - **Purpose**: File system structure management
 - **Key Functions**:
   - `get_client_dir()`: Client-specific directories
@@ -137,7 +149,7 @@ This guide provides a high-level overview of the Turnkey Coach Tools codebase ar
   - `perform_migration()`: Legacy structure migration
 - **Dependencies**: rich
 
-#### 11. **settings.py** (142 lines)
+#### 12. **settings.py** (142 lines)
 - **Purpose**: Configuration and credentials management
 - **Key Functions**:
   - `load_or_init_settings()`: First-time setup
@@ -196,6 +208,26 @@ Background thread: fetch_and_aggregate_data()
     ↓
 Update display with new data
 ```
+
+### Nutrition & Metrics Flow
+```
+Coach edits markup block
+    ↓
+upload_tool.parse_markup()
+    ↓
+Split blocks by header → Workout vs Nutrition
+    ↓
+Resolve exercises + nutrition catalog names
+    ↓
+Collect @metric lines → map to metric catalog entries
+    ↓
+POST assignments to /api/v1/workouts (workout_type = default|nutrition)
+POST metrics to /api/v1/metrics
+    ↓
+Summaries logged in CLI + cached locally
+```
+
+[Further Reading: `METRICS_GUIDE.md`](../METRICS_GUIDE.md) describes the canonical metric catalog and API payloads, while [`METRICS_IN_MARKUP.md`](../METRICS_IN_MARKUP.md) documents how those metrics map to markup syntax.
 
 ## Design Patterns
 
