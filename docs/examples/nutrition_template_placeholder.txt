@@ -1,9 +1,0 @@
-Nutrition Date: 2025-10-13
-Nutrition - Weekly Check-In + Daily Visual Food Diary
-@weight:
-@waist:
-Visual Food Diary
-    note
-Instruction
-    macros
----

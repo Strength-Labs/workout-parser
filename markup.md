@@ -1,124 +1,31 @@
-### Strength Coaching Markup Language v1.2
+### Strength Coaching Markup Language v1.1
 
-The Strength Coaching Markup Language provides a human-readable plain text format for strength and conditioning workouts **and nutrition assignments**. It serves as an intermediate format for a two-way data conversion process:
+The Strength Coaching Markup Language provides a human-readable plain text format for strength and conditioning workouts. It serves as an intermediate format for a two-way data conversion process:
 
-1.  **JSON to Text (`format_tool.py`):** Converts workout and nutrition data downloaded from the Turnkey Coach API (JSON format) into this markup language. This generated text includes prescribed sets, accomplished sets, and conversational comments between coach and client.
-2.  **Text to JSON (`upload_tool.py`):** Converts workout programs and nutrition assignments written in this markup language back into the JSON format required by the Turnkey Coach API for uploading.
+1.  **JSON to Text (`json2markup.py`):** Converts workout data downloaded from the Turnkey Coach API (JSON format) into this markup language. This generated text includes prescribed sets, accomplished sets, and conversational comments between coach and client.
+2.  **Text to JSON (`workout_parser.py`):** Converts workout programs written in this markup language back into the JSON format required by the Turnkey Coach API for uploading.
 
 ---
 
 ### Key Formatting Rules
 
-#### Naming Requirements
-
-> **Critical:** Names must match the official catalog. Stick to the canonical nutrition item titles from `exerciselist.json` (e.g., `Visual Food Diary`, `Calorie Tracking`) and metric tags that resolve to the Turnkey Coach metric catalog (`@weight`, `@waist`, `@sleep`, etc.). Any variation, abbreviation, or creative renaming will be treated as unknown data and skipped during upload.
-
-Keep the reference lists from the Turnkey Coach app or internal guides nearby when drafting plans, and copy the entries verbatim—including spacing and capitalization.
-
-#### Assignment Types
-
-The markup language supports two types of assignments:
-
-1. **Training Calendar Assignments** - Use `Workout Date:` header
-2. **Nutrition Calendar Assignments** - Use `Nutrition Date:` header
-
-Both types can be mixed in the same file and follow the same structural rules.
-
 #### Workout Date
 
-Each workout assignment begins with a `Workout Date:` line, followed by the date in YYYY-MM-DD format. This uploads to the **training calendar**.
+Each workout begins with a `Workout Date:` line, followed by the date in YYYY-MM-DD format.
 
 * **Example**: `Workout Date: 2025-08-18`
 
-#### Nutrition Date
+  
+#### Workout Title
+The first line after the workout date, if it exists and is _not_ the name of an exercise, is the title of the workout. 
 
-Each nutrition assignment begins with a `Nutrition Date:` line, followed by the date in YYYY-MM-DD format. This uploads to the **nutrition calendar**.
+#### Exercises
 
-* **Example**: `Nutrition Date: 2025-08-18`
-
-> **Important for template generators/LLMs:** Never use `Workout Date:` for a nutrition entry. If the header is `Workout Date:`, the uploader treats the block as training and every nutrition item will be skipped. Always start nutrition blocks with `Nutrition Date: YYYY-MM-DD`.
-
-#### Title
-
-The first line after the date header (workout or nutrition), if it exists and is _not_ the name of an exercise, is the title of the assignment.
-
-* **Example for Workout**:
-  ```
-  Workout Date: 2025-08-18
-  Upper Body Strength
-  ```
-
-* **Example for Nutrition**:
-  ```
-  Nutrition Date: 2025-08-18
-  Weekly Meal Plan
-  ```
-
-#### Metrics
-
-Metrics allow you to track client data such as body weight, body fat percentage, measurements, sleep, recovery scores, and other health/performance indicators. Metrics are associated with the date they appear under (either Workout Date or Nutrition Date).
-
-**Metrics work with both workout and nutrition assignments.** They are specified using the `@` symbol followed by the metric type, a colon, the value, unit, and optional notes.
-
-* **Format**: `@metric_type: value unit [optional notes]`
-* **Examples**:
-    * `@weight: 185.5 lbs`
-    * `@body_fat: 15.2%`
-    * `@sleep: 7.5 hours feeling well-rested`
-    * `@waist: 34 inches`
-    * `@stress: 6 1-10 work deadline this week`
-
-**Common Metric Types:**
-* `weight` - Body weight (lbs or kg)
-* `body_fat` - Body fat percentage (%)
-* `waist`, `chest`, `arms`, `thighs` - Body measurements (inches or cm)
-* `sleep` - Sleep duration (hours)
-* `stress`, `recovery`, `energy` - Subjective scales (1-10)
-* `calories` - Caloric intake (cal)
-* `protein`, `carbs`, `fat` - Macronutrients (grams)
-* Custom types can be used (e.g., `resting_hr`, `hrv`, `vertical_jump`, `water_intake`)
-
-Metrics appear after the assignment title (if present) and before the exercises/nutrition items. They will be uploaded to the Turnkey Coach API along with the assignment data.
-
-> **Exact naming matters:** Metrics must map to the existing catalog entries in Turnkey Coach (e.g., `Body Weight`, `Waist (in)`, `Sleep Hours`). Stick to the canonical names listed in the app/metrics guide so the uploader can resolve them. Aliases like `@weight:` and `@waist:` are supported, but anything ambiguous may be skipped.
-
-#### Exercises (Training Calendar)
-
-For **Workout Date** assignments, exercises are training movements. The name of each exercise is on its own, unindented line. It must be a valid exercise name from `exerciselist.json` with `exercise_type: resistance` or `exercise_type: conditioning`.
+The name of each exercise is on its own, unindented line. It must be a valid exercise name from `exerciselist.json`.
 
 * **Standard Example**: `Squat`
 * **Failsafe by ID**: To avoid ambiguity with duplicate exercise names, you can specify the exercise by its numerical ID using the format `id: <exercise_id>`.
     * **Example**: `id: 7`
-
-#### Nutrition Items (Nutrition Calendar)
-
-For **Nutrition Date** assignments, nutrition items are meal/nutrition tracking tasks. Each item:
-
-* **Must** be a valid entry from `exerciselist.json` whose `exercise_type` is `nutrition`. Training or conditioning exercises will be skipped automatically.
-* Appears on its own unindented line, just like workouts do.
-* Does **not** use prescribed sets, reps, load, distance, or time. Nutrition entries accept notes only.
-
-* **Examples**:
-    * `Meal Pictures`
-    * `Visual Food Diary`
-    * `Protein Intake`
-    * `Calorie Tracking`
-
-> **Tip:** If you need to create a new nutrition item, add it to the Turnkey Coach exercise catalog first (marking it as `exercise_type: nutrition`). Once the catalog is updated, the uploader will accept the name in your markup.
-
-> **Exact naming matters:** Use the nutrition item names verbatim (e.g., `Visual Food Diary`, `Instructions`, `Meal Pictures`). Changing singular/plural forms or capitalization (such as `Instruction`) creates an unknown exercise that the uploader will skip. Keep a reference list of approved nutrition items handy when generating templates.
-
-Nutrition items typically have instructions rather than sets/reps. Use indented notes to provide guidance (see **Comments and Notes** section below). Any line that looks like a traditional set prescription (`3x10 @ ...`, `5x00:30`, etc.) will be ignored for nutrition assignments, so keep coaching cues and expectations in note form.
-
-> **LLM Hint:** When generating nutrition plans, follow this pattern exactly:
-> ```
-> Nutrition Date: 2025-10-13
-> Title (optional)
-> @metric: ...
-> Nutrition Item Name
->     Guidance/notes (indented)
-> ```
-> Using `Workout Date:` or adding set prescriptions will cause the uploader to drop the nutrition items.***
 
 #### Prescribed Sets
 
@@ -184,17 +91,11 @@ Each individual workout block (representing a single day) should be separated by
 
 ### Sample Markup
 
-This sample demonstrates various features of the markup language, including both training and nutrition calendar assignments.
-
-#### Example 1: Training Calendar Workout
+This sample demonstrates various features of the markup language.
 
 ```markdown
 Workout Date: 2025-10-01
 Intensity Day
-
-@weight: 185.5 lbs
-@sleep: 7.5 hours
-@recovery: 8 1-10
 
 Squat
 3x5 @ 405
@@ -225,79 +126,4 @@ Sled Push Intervals
 
 id: 7
 3x10
-```
-
-#### Example 2: Nutrition Calendar Assignment
-
-```markdown
-Nutrition Date: 2025-10-01
-Weekly Meal Plan - High Protein Focus
-
-@weight: 185.5 lbs
-@calories: 2800 cal daily target
-@protein: 180 g target
-
-Meal Pictures
-    Upload photos of all meals and snacks throughout the day.
-    Include timestamps for meal timing analysis.
-
-Protein Intake
-    Target: 180g protein daily
-    Aim for 40g per meal, 4-5 meals per day
-
-Visual Food Diary
-    Log all food items with approximate portions
-    Focus on hitting macros: 180g protein, 350g carbs, 85g fat
-```
-
-#### Example 3: Mixed File with Both Types
-
-```markdown
-Workout Date: 2025-10-01
-Lower Body Strength
-
-@weight: 185.5 lbs
-@sleep: 7.5 hours
-
-Squat
-3x5 @ 405
-
-Deadlift
-1x5 @ 495
-
----
-
-Nutrition Date: 2025-10-01
-Monday Nutrition Plan
-
-@calories: 2800 cal
-@protein: 180 g
-
-Meal Pictures
-    Focus on breakfast and post-workout meal
-
-Protein Intake
-    Target 40g per meal
-
----
-
-Workout Date: 2025-10-02
-Upper Body
-
-Bench Press
-3x5 @ 315
-
-Press
-3x8 @ 135
-
----
-
-Nutrition Date: 2025-10-02
-Tuesday Nutrition - Lower Carb Day
-
-@calories: 2400 cal
-@carbs: 200 g
-
-Visual Food Diary
-    Track all meals for carb intake monitoring
 ```

@@ -9,67 +9,21 @@ def format_time(seconds):
     secs = int(seconds % 60)
     return f"{minutes:02d}:{secs:02d}"
 
-def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
+def format_workouts_to_markup(workouts, coach_user_id):
     """
-    Parses a list of workout/nutrition objects and formats it into the custom markup,
-    correctly handling both training calendar (workout_type: default) and nutrition calendar
-    (workout_type: nutrition) assignments.
-
-    Args:
-        workouts: List of workout/nutrition assignment dictionaries
-        coach_user_id: User ID of the coach (for filtering comments)
-        metrics: Optional list of metric dictionaries to include in output
+    Parses a list of workout objects and formats it into the custom markup,
+    now correctly indenting "custom" set notes and formatting time-based sets as MM:SS.
     """
     output_lines = []
-
-    # Group metrics by date for easy lookup
-    metrics_by_date = {}
-    if metrics:
-        for metric in metrics:
-            date = metric.get('metric_date')
-            if date:
-                if date not in metrics_by_date:
-                    metrics_by_date[date] = []
-                metrics_by_date[date].append(metric)
-
+    
     for workout in workouts:
         workout_date = datetime.strptime(workout['workout_date'], "%Y-%m-%d")
-
-        # Determine date header based on workout_type
-        workout_type = workout.get('workout_type', 'default')
-        date_header = "Nutrition Date:" if workout_type == "nutrition" else "Workout Date:"
-
-        output_lines.append(f"{date_header} {workout_date.strftime('%Y-%m-%d')}")
-
+        output_lines.append(f"Workout Date: {workout_date.strftime('%Y-%m-%d')}")
+        
         if workout.get('title'):
             output_lines.append(f"{workout['title']}")
-
+        
         output_lines.append("")
-
-        # Add metrics for this workout date
-        workout_date_str = workout['workout_date']
-        if workout_date_str in metrics_by_date:
-            for metric in metrics_by_date[workout_date_str]:
-                metric_type = metric.get('metric_type', '')
-                value = metric.get('value')
-                unit = metric.get('unit') or ''
-                notes = metric.get('notes') or ''
-
-                # Build components while allowing placeholder metrics (no numeric value)
-                components = []
-                if value not in [None, '']:
-                    components.append(str(value))
-                if unit:
-                    components.append(unit)
-                if notes:
-                    components.append(notes)
-
-                metric_line = f"@{metric_type}:"
-                if components:
-                    metric_line += f" {' '.join(components)}"
-
-                output_lines.append(metric_line)
-            output_lines.append("")
 
         if 'comments' in workout and workout['comments']:
             for comment in workout['comments']:

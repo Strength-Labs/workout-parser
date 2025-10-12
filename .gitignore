@@ -1,36 +1,9 @@
-# Virtual environments
-.venv/
-venv/
-env/
-ENV/
-
-# Python caches and compiled artifacts
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-*.py[cod]
 *.log
-.mypy_cache/
-.pytest_cache/
-.cache/
-.coverage
-coverage.xml
-htmlcov/
-
-# Build artifacts
-build/
-dist/
-*.egg-info/
-pip-wheel-metadata/
-
-# IDE/workspace settings
-.vscode/
-.vs/
-.idea/
-
 .env
 .tokencache
 # Exclude JSON output files but keep exerciselist.json
 *.json
 !exerciselist.json
+venv/
