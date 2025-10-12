@@ -1,0 +1,101 @@
+Nutrition Date: 2025-10-11
+Weekly Meal Plan - High Protein Focus
+
+@weight: 185.5 lbs
+@calories: 2800 cal daily target
+@protein: 180 g
+
+Meal Pictures
+    Upload photos of all meals and snacks throughout the day.
+    Include timestamps for meal timing analysis.
+    Focus on breakfast and post-workout meal.
+
+Visual Food Diary
+    Log all food items with approximate portions.
+    Focus on hitting macros: 180g protein, 350g carbs, 85g fat.
+
+---
+
+Workout Date: 2025-10-11
+Lower Body Strength
+
+@weight: 185.5 lbs
+@sleep: 7.5 hours
+@recovery: 8 1-10
+
+Squat
+3x5 @ 405
+    Keep chest up and focus on depth
+
+Deadlift
+1x5 @ 495
+
+Romanian Deadlift
+3x8 @ 315
+    Focus on hamstring stretch
+
+---
+
+Nutrition Date: 2025-10-12
+Tuesday Nutrition - Lower Carb Day
+
+@calories: 2400 cal
+@carbs: 200 g
+@protein: 180 g
+
+Visual Food Diary
+    Track all meals for carb intake monitoring
+    Aim for carbs around training window
+
+Meal Pictures
+    Focus on portion sizes today
+
+---
+
+Workout Date: 2025-10-12
+Upper Body Press
+
+@sleep: 8 hours
+
+Bench Press
+3x5 @ 315
+1xAMRAP @ 275
+
+Press
+3x8 @ 135
+
+Close Grip Bench Press
+3x10 @ 225
+    Tricep focus
+
+---
+
+Nutrition Date: 2025-10-13
+Rest Day Nutrition
+
+@weight: 185.0 lbs
+@calories: 2200 cal
+@protein: 160 g
+
+Visual Food Diary
+    Lower calories on rest day
+    Maintain adequate protein
+
+Meal Pictures
+    All meals
+
+---
+
+Workout Date: 2025-10-14
+Conditioning Day
+
+@weight: 185.0 lbs
+@recovery: 7 1-10
+
+Run
+1x30:00 @ RPE 6
+    Easy conversational pace
+
+Sled Push
+6x50 feet @ RPE 8
+    Focus on power and speed

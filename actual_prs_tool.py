@@ -104,7 +104,7 @@ def run_actual_prs_viewer(token, client):
         display_prs(client_name, best_lifts, date_range_str)
 
         console.print("\n" + "-"*50)
-        console.print("\[a]ll Time | \[3]m | \[6]m | \[y]ear | \[m]ore PRs | \[q]uit")
+        console.print(r"\[a]ll Time | \[3]m | \[6]m | \[y]ear | \[m]ore PRs | \[q]uit")
         choice = console.input("> ").lower()
 
         if choice == 'q':
