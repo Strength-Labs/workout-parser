@@ -1,0 +1,25 @@
+🚀 FINAL STEPS TO COMPLETE v1.4.0 RELEASE:
+
+1. DOWNLOAD WINDOWS FILES:
+   - Go to: https://github.com/Strength-Labs/workout-parser/actions
+   - Click the latest "Build Windows Release" workflow
+   - Download "windows-release" artifact (ZIP file)
+   - Extract to get Windows files
+
+2. CREATE GITHUB RELEASE:
+   - Go to: https://github.com/Strength-Labs/workout-parser/releases
+   - Click "Create a new release"
+   - Tag: v1.4.0
+   - Title: Turnkey Coach Tools v1.4.0
+   - Copy-paste content from RELEASE_NOTES.md
+
+3. UPLOAD FILES:
+   - TurnkeyCoachTools-1.4.0-WithIcon.dmg (already in this folder)
+   - TurnkeyCoachTools-1.4.0-Setup.exe (from GitHub Actions)
+   - TurnkeyCoachTools-1.4.0-Windows.zip (from GitHub Actions)
+
+4. PUBLISH:
+   - Check "Set as latest release"
+   - Click "Publish release"
+
+🎊 THEN GO TO THE WATERPARK! 🏊‍♂️

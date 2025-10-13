@@ -204,6 +204,30 @@ def get_clients(token, user_id):
             return []
 
 
+def get_user_profile(token, user_id):
+    """Get user profile information from workspace settings."""
+    try:
+        from settings import get_current_workspace
+        
+        current_workspace = get_current_workspace()
+        if current_workspace:
+            return {
+                'user_id': user_id,
+                'email': current_workspace.get('email'),
+                'company_name': current_workspace.get('company_name'),
+                'relationships': []
+            }
+    except Exception:
+        pass
+    
+    # Fallback - return basic profile with user ID
+    return {
+        'user_id': user_id,
+        'email': None,
+        'company_name': None,
+        'relationships': []
+    }
+
 def get_access_token():
     token, user_id = load_auth_data()
     if token and user_id:
@@ -235,3 +259,15 @@ def get_access_token():
         except requests.exceptions.RequestException as e:
             console.print(f"\n[bold red]Login failed:[/bold red] {e}")
             return None, None
+
+def sanitize_workspace_name(company_name):
+    """Convert company name to a safe directory name."""
+    if not company_name:
+        return "default"
+    
+    # Remove/replace unsafe characters and convert to lowercase
+    safe_name = company_name.lower()
+    safe_name = ''.join(c if c.isalnum() or c in '-_' else '-' for c in safe_name)
+    # Remove multiple consecutive dashes and trim
+    safe_name = '-'.join(filter(None, safe_name.split('-')))
+    return safe_name or "default"

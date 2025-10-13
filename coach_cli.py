@@ -10,6 +10,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text  # Added for explicit text rendering
 from settings import get_default_editor, get_stored_credentials, clear_stored_credentials
+from workspace_manager import workspace_selector, get_workspace_info, logout_current_workspace, ensure_workspace_directories
 
 # Import our shared functions
 from api_client import get_access_token, get_clients, clear_screen, get_workout_history, load_exercise_map, update_exercise_list
@@ -46,20 +47,50 @@ def select_client(token, user_id):
         console.print(Text("Options:", style="dim"))
         console.print(Text("  [l] Logout (clear credentials)", style="dim"))  # Use Text to avoid markdown
         console.print(Text("  [s] Adjust Settings (editor, credentials)", style="dim"))
+        console.print(Text("  [w] Create New Workspace", style="dim"))
+        
+        # Show workspace switcher option only if user has multiple workspaces
+        from settings import list_workspaces
+        workspaces = list_workspaces()
+        if len(workspaces) > 1:
+            console.print(Text("  [ws] Switch Workspace", style="dim"))
+        
         console.print(Text("{:>80}".format("Enter a number to select a client, or 'q' to quit > "), style="bold green"), end="")
         choice = input("").strip().lower()  # Raw input for clean capture
         if choice == 'q':
             return None
         if choice == 'l':
-            clear_stored_credentials()
-            if 'TOKEN_CACHE_FILE' in globals() and os.path.exists(TOKEN_CACHE_FILE):
-                os.remove(TOKEN_CACHE_FILE)
-            console.print("[green]Logged out. Bye![/green]")
+            if logout_current_workspace():
+                console.print("[green]Logged out. You can now switch workspaces or quit.[/green]")
+                console.input("Press Enter to return to workspace selector...")
+                # Restart the main loop to show workspace selector
+                main()
+            else:
+                console.print("[red]Logout failed.[/red]")
             sys.exit()
         if choice == 's':
             adjust_settings()
             clear_screen()
             console.print(table)  # Redisplay table after settings change
+            continue
+        if choice == 'w':
+            from workspace_manager import setup_new_workspace
+            new_workspace_key = setup_new_workspace()
+            if new_workspace_key:
+                console.print(f"[green]✅ Created workspace successfully! Restart the app to use it.[/green]")
+                console.input("Press Enter to continue...")
+            clear_screen()
+            console.print(table)
+            continue
+        if choice == 'ws':
+            from workspace_manager import quick_workspace_switcher
+            switched_workspace = quick_workspace_switcher()
+            if switched_workspace:
+                console.print(f"[green]✅ Switched to {switched_workspace}! Loading clients...[/green]")
+                # Return a special signal to restart client selection with new workspace
+                return "WORKSPACE_SWITCHED"
+            clear_screen()
+            console.print(table)
             continue
         try:
             index = int(choice) - 1
@@ -338,10 +369,15 @@ def adjust_settings():
         console.input("Press Enter to continue...")
 
 
-def main():
-    """The main application loop."""
+def main_with_workspace_selected():
+    """Main application loop assuming workspace is already selected."""
+    # Ensure workspace directories exist
+    if not ensure_workspace_directories():
+        sys.exit("Failed to create workspace directories. Exiting.")
+    
     clear_screen()
-    console.print(Panel("[bold blue]Turnkey Coach Tools CLI[/bold blue]", expand=False))
+    workspace_info = get_workspace_info()
+    console.print(Panel(f"[bold blue]Turnkey Coach Tools CLI[/bold blue]\n[dim]Workspace: {workspace_info}[/dim]", expand=False))
     
     token, user_id = get_access_token()
     if not token or not user_id:
@@ -363,8 +399,23 @@ def main():
         selected_client = select_client(token, user_id)
         if selected_client is None:
             break  # Exit on 'q' or logout from select_client
+        elif selected_client == "WORKSPACE_SWITCHED":
+            # Workspace was switched, restart the main loop with new workspace
+            main_with_workspace_selected()
+            break  # Exit current main loop
         get_workout_history(token, selected_client)
         show_tool_menu(token, user_id, selected_client, exercise_map)
+
+def main():
+    """The main application loop."""
+    # First, select workspace
+    selected_workspace = workspace_selector()
+    if not selected_workspace:
+        console.print("\nExiting. Goodbye!", style="dim")
+        return
+    
+    # Continue with the main app loop
+    main_with_workspace_selected()
 
 if __name__ == "__main__":
     main()
