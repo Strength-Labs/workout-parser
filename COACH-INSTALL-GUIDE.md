@@ -16,7 +16,7 @@
 
 ## ✅ **Method 1: Right-Click Method (Easiest)**
 
-1. **Download** `TurnkeyCoachTools-1.0.0-WithIcon.dmg` from GitHub
+1. **Download** `TurnkeyCoachTools-1.4.0-WithIcon.dmg` from GitHub
 2. **Open** the DMG file (double-click)
 3. **Drag** the app to Applications folder
 4. **Go to Applications** folder
@@ -50,10 +50,10 @@ If Method 1 doesn't work:
 ### Option B: Manual Terminal Command
 ```bash
 # Remove quarantine from the DMG file
-xattr -d com.apple.quarantine ~/Downloads/TurnkeyCoachTools-1.0.0-WithIcon.dmg
+xattr -d com.apple.quarantine ~/Downloads/TurnkeyCoachTools-1.4.0-WithIcon.dmg
 
 # Then open normally
-open ~/Downloads/TurnkeyCoachTools-1.0.0-WithIcon.dmg
+open ~/Downloads/TurnkeyCoachTools-1.4.0-WithIcon.dmg
 ```
 
 ---

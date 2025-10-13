@@ -1,167 +1,288 @@
 # Turnkey Coach Tools
 
-A comprehensive set of command-line interface (CLI) tools designed for fitness coaches using the Turnkey Coach platform. These tools streamline client management, workout analysis, and data interaction through an intuitive terminal-based application.
+A comprehensive toolkit for fitness coaches using the Turnkey Coach platform. Streamline client management, workout analysis, nutrition tracking, and AI-powered programming through an intuitive terminal-based application.
 
-Note: There is a Dummies' Guide to using these tools currently [here](https://docs.google.com/document/d/1EnBFnMKmasEkQG9uq_fyoxqqoBcQIRP4y1ocV4-1FdI/edit?usp=sharing)
-## Table of Contents
+## 🚀 Quick Install for Coaches
 
-- [Description](#description)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Tools Overview](#tools-overview)
-- [Dependencies](#dependencies)
-- [API Client](#api-client)
-- [Contributing](#contributing)
-- [License](#license)
+### 🍎 **macOS Installation**
 
-## Description
+1. **Download**: `TurnkeyCoachTools-1.4.0-WithIcon.dmg` from [GitHub Releases](https://github.com/your-org/workout-parser/releases)
+2. **Install**: 
+   - Click the DMG file
+   - Drag the app to Applications folder
+   - Admire the beautiful icon! 🎨
 
-Turnkey Coach Tools provides coaches with powerful CLI utilities to interact with the Turnkey Coach API. The suite includes tools for viewing unified feeds, analyzing personal records, browsing workout histories, uploading workouts, and managing client data. Built with Python, it leverages modern libraries for a rich user experience and efficient data handling.
+3. **⚠️ Security Warning (Expected!)**
+   
+   **macOS will show a security warning** - this is normal! The app is completely safe.
+   
+   **Quick Fix:**
+   - Try to open the app (it gets blocked)
+   - **Right-click** the app → **"Open"**
+   - Click **"Open"** in the security dialog
+   
+   **OR:**
+   - Apple menu → **System Settings** → **Privacy & Security**
+   - Look for the blocked app message
+   - Click **"Open Anyway"**
 
-## Features
+4. **🎉 You're Ready!** 
+   - App launches in Terminal
+   - Login with your Turnkey Coach credentials
+   - Select a client and start coaching!
 
-- **Client Management**: Authenticate and select from your list of clients
-- **Unified Feed**: Aggregate and interact with messages and workout comments in chronological order
-- **PR Analysis**: Calculate estimated 1RM using Wendler's formula and compute Wilks scores
-- **Actual PRs Viewer**: Fetch and display official personal records directly from the API
-- **Workout History Browser**: Save formatted workout histories to markup files for review in your editor
-- **Workout Uploader**: Parse workout text files and upload to the platform with fuzzy exercise matching
-- **Utilities**: Add notes, clean up directories, refresh caches, and update exercise lists
-- **Caching**: Intelligent caching of workout data and messages to reduce API calls
-- **Rich CLI**: Beautiful terminal interface with panels, tables, and interactive menus
+---
 
-## Installation
+### 🪟 **Windows Installation**
 
-1. Ensure you have Python 3.7+ installed
-2. Clone the repository containing these tools
-3. Navigate to the `workout-parser` directory
-4. Install dependencies:
+1. **Download**: `TurnkeyCoachTools-1.4.0-Setup.exe` from [GitHub Releases](https://github.com/your-org/workout-parser/releases)
 
-```bash
-pip install requests rich rapidfuzz
+2. **⚠️ Security Warning (Expected!)**
+   
+   **Windows will show "Windows protected your PC"** - this is normal!
+   
+   **Quick Fix:**
+   - Click **"More info"** 
+   - Click **"Run anyway"**
+   - Follow the installation wizard
+
+3. **🎉 You're Ready!**
+   - Launch from Start Menu
+   - App opens in Command Prompt
+   - Login and start coaching!
+
+---
+
+### 🐧 **Linux**
+See [Developer Installation](#developer-installation) below for Python setup.
+
+---
+
+## 🛡️ **Why the Security Warnings?**
+
+**Don't panic!** These warnings are **completely normal** and expected:
+
+- ✅ **The app is 100% safe** - no malware, no viruses
+- ✅ **Only connects to Turnkey Coach servers** - no data harvesting
+- ✅ **Source code is open and inspectable** - full transparency
+- ❌ **Not code-signed** - we don't pay Apple/Microsoft's yearly certificate fees
+
+The warnings only appear because we're not paying $99/year to Apple and Microsoft for code signing certificates. The app is identical whether signed or not!
+
+---
+
+## ✨ **What's New in v1.4.0**
+
+🎉 **Major Features Added:**
+- **🥗 Nutrition Calendar**: Full nutrition assignment support alongside workout programming
+- **📊 Enhanced Metrics System**: Track body composition, RPE, recovery, custom metrics
+- **📅 Dual Calendar Support**: Mix training and nutrition assignments in same files  
+- **🤖 Improved AI Chat**: Better context loading, date filtering, token management
+- **🔍 Fuzzy Metric Matching**: Intelligent metric name mapping (70% similarity)
+- **📝 Rich Markup**: Nutrition check-ins, fun facts, educational content
+
+---
+
+## 🎯 **Core Features**
+
+### **Client Management Tools**
+1. **📱 Unified Feed** - Timeline of all client interactions (messages + comments)
+2. **💪 Estimated 1RMs** - Strength analysis using Wendler's formula + Wilks scores
+3. **🏆 Actual PRs** - Official personal records from API
+4. **📋 Workout History Browser** - Export formatted histories to your editor
+5. **⬆️ Upload Workouts/Nutrition** - Parse text files, upload both training + nutrition
+6. **🤖 AI Chat** - LLM programming assistant with workout context
+7. **📊 Program Metrics** - Track client metrics (weight, body fat, RPE, etc.)
+8. **✅ Validate Markup** - Dry run parser to check files before upload
+
+### **🏋️ Dual Calendar System**
+- **Training Calendar** (`Workout Date:`): Exercises, sets, reps, weights, RPE, conditioning
+- **Nutrition Calendar** (`Nutrition Date:`): Meal check-ins, body metrics, education, habit tracking
+
+**Both support metrics tracking and can be mixed in the same file!**
+
+### **📊 Metrics System** 
+Track any quantifiable client data:
+- **Body Composition**: Weight, body fat %, measurements (waist, chest, etc.)
+- **Performance**: RPE, recovery scores, sleep quality, energy levels
+- **Subjective**: Stress, motivation, fatigue, difficulty ratings
+- **Custom**: Coach-defined metrics with intelligent fuzzy matching
+
+### **🤖 AI Integration**
+- **Context-aware chat** with recent workout history
+- **Date range filtering** (3 months default) to manage token costs
+- **Dual LLM support**: OpenAI GPT and xAI Grok models
+- **Encrypted API key storage** for security
+- **Programming assistance**: Exercise selection, periodization advice, program analysis
+
+---
+
+## 🎬 **Getting Started**
+
+### **First Launch**
+1. **Download Exercise Database**: Say **"yes"** when prompted to download `exerciselist.json`
+2. **Login**: Use your Turnkey Coach email and password
+3. **Select Client**: **Pick a recent client first!** Initial downloads take a while for clients with long histories
+4. **Look Around**: Browse workouts, try different tools - but be patient on first loads!
+
+### **For AI Chat (Optional)**
+To use the AI programming assistant:
+1. **Get API Key**: 
+   - **OpenAI**: [platform.openai.com](https://platform.openai.com) (GPT models)
+   - **xAI**: [console.x.ai](https://console.x.ai) (Grok models - often cheaper!)
+2. **Buy Credits**: Both services require prepaid credits (very affordable)
+3. **Save Securely**: Store your API key safely in the app settings
+
+### **File Upload Tips**
+- Create workout files in the markup format (see [Markup Guide](markup.md))
+- Use **Validate Markup** (option 8) to test files before uploading
+- Mix training and nutrition assignments in the same file
+- The parser is forgiving - it will help fix common mistakes!
+
+---
+
+## 📝 **Markup Language Examples**
+
+### **Training Assignment**
+```markdown
+Workout Date: 2025-10-14
+
+Squat
+3x5 @ 225
+    Focus on hitting depth, keep chest up
+    
+Bench Press  
+1x5 @ RPE 8
+
+Deadlift
+1x3 @ 85%
 ```
 
-Note: `rapidfuzz` is required for the workout uploader's fuzzy matching feature. If not needed, you can omit it, but the uploader will have reduced functionality.
+### **Nutrition Assignment**
+```markdown
+Nutrition Date: 2025-10-14
+@weight_kgs: 85.5
+@body_fat: 15.2%
+@waist_in:
 
-## Usage
+Nutrition Check-In
+    How are you feeling this week?
+    Tell me about your energy levels.
+    Any challenges with the meal plan?
+    
+    Fun fact: Protein needs increase 20-25% during intensive 
+    strength training phases to support muscle recovery!
+```
 
-1. Run the main CLI application:
+### **Mixed Assignment (Both in One File)**
+```markdown
+Workout Date: 2025-10-14
+Squat
+3x5 @ 225
 
+---
+Nutrition Date: 2025-10-14
+@weight_kgs:
+@sleep: 8 hours
+
+Nutrition Check-In
+    How did you sleep?
+    Rate your energy 1-10.
+```
+
+---
+
+## 📖 **Documentation**
+
+- **[macOS Installation Guide](COACH-INSTALL-GUIDE.md)** - Detailed setup for macOS
+- **[Markup Language Guide](markup.md)** - Complete syntax reference
+- **[Build Guide](BUILD-GUIDE.md)** - For developers building apps
+- **[DevGuides/](DevGuides/)** - Architecture documentation
+
+---
+
+## 🆘 **Need Help?**
+
+### **Common Issues**
+- **"No clients showing"**: Check internet connection and login credentials
+- **"App won't open"**: Follow the security warning fixes above
+- **"Slow performance"**: Some tools take time with large workout histories - be patient!
+- **"Upload failed"**: Use **Validate Markup** first to check your file format
+
+### **You Can't Break Anything!**
+**Seriously** - play around, click everything, try all the tools. The worst that happens is you see an error message. All your client data is safely stored on Turnkey's servers.
+
+---
+
+## 👨‍💻 **Developer Installation**
+
+*For Linux users, developers, or those who want to run from Python source:*
+
+### **Prerequisites**
+- **Python 3.7+** (3.9+ recommended)
+- **pip** package manager  
+- **Virtual environment** (highly recommended)
+
+### **Quick Install**
 ```bash
+# 1. Clone repository
+git clone https://github.com/your-org/workout-parser.git
+cd workout-parser
+
+# 2. Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # Linux/macOS
+# venv\Scripts\activate  # Windows
+
+# 3. Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# 4. Run the application
 python coach_cli.py
 ```
 
-2. Enter your Turnkey Coach email and password when prompted
-3. Select a client from the displayed list
-4. Choose from the available tools in the client menu
+### **Linux Distribution Specifics**
 
-### Keyboard Shortcuts
-
-- Use arrow keys or j/k for navigation in feeds
-- Press `q` to quit menus
-- Press `u` to refresh data
-- In feed view: `m` to send message, `c` to reply to comments, `/` to search
-
-## Tools Overview
-
-### 1. Unified Feed
-- Combines messages from conversations and comments from workouts
-- Chronological timeline of all client interactions
-- Search functionality with highlighting
-- Reply to messages or workout comments directly
-- Export feed to text file for archiving
-
-### 2. Estimated 1RMs (from history)
-- Analyzes workout history to find best performances
-- Calculates estimated 1RM using Wendler's formula
-- Supports date range filtering (3 months, 6 months, year, all time, custom)
-- Wilks score calculation for powerlifting totals
-- Displays main lifts (Squat, Bench Press, Deadlift, Press) prominently
-
-### 3. Actual PRs (from API)
-- Fetches official personal records stored in the platform
-- Shows both actual 1RM and estimated 1RM for multi-rep sets
-- Date range filtering
-- Displays all lifts, not just main compound movements
-
-### 4. Browse & Save Workout History
-- Downloads and caches detailed workout data
-- Formats workouts into readable markup
-- Opens saved files in your default editor ($EDITOR)
-- Incremental caching to avoid re-downloading unchanged data
-
-### 5. Upload Workout from File
-- Parses workout text files in custom markup format
-- Fuzzy matching for exercise names using RapidFuzz
-- Interactive selection for ambiguous matches
-- Supports various set formats (weight/reps, RPE, percentage, time-based)
-- Auto-detects weight units (lbs/kg)
-
-### Utilities
-- **Add a Quick Note**: Create timestamped notes in client directories
-- **Clean Up Directory**: Remove temporary files and generated exports
-- **Force Refresh Workout History**: Clear cache and re-download data
-- **Update Exercise List**: Download latest exercise database from API
-
-## Dependencies
-
-- **requests**: HTTP library for API communication
-- **rich**: Terminal styling and interactive elements
-- **rapidfuzz** (optional): Fuzzy string matching for exercise names
-- **Standard library**: json, datetime, os, re, etc.
-
-## API Client
-
-The `api_client.py` module provides shared functionality:
-
-- Authentication with token caching
-- Client list retrieval
-- Workout history downloading with incremental updates
-- Exercise list management
-- Shared helper functions for text cleaning and caching
-
-## File Structure
-
-```
-turnkey-coach-tools/
-├── coach_cli.py          # Main CLI application
-├── api_client.py         # Shared API functions
-├── feed_tool.py          # Unified feed functionality
-├── pr_tool.py            # Estimated PR analyzer
-├── actual_prs_tool.py    # Actual PRs viewer
-├── format_tool.py        # Workout markup formatter
-├── upload_tool.py        # Workout uploader
-├── exerciselist.json     # Exercise database (downloaded)
-├── plan.txt              # Example workout plan
-├── messages_cache.json   # Cached messages (generated)
-├── workouts_index.json   # Workout cache index (generated)
-└── feed_cache.json       # Feed cache (generated)
+**Ubuntu/Debian:**
+```bash
+sudo apt update
+sudo apt install python3 python3-pip python3-venv
+# Then follow Quick Install above
 ```
 
-## Contributing
+**CentOS/RHEL/Fedora:**
+```bash
+sudo dnf install python3 python3-pip  # Fedora
+# sudo yum install python3 python3-pip  # RHEL/CentOS
+# Then follow Quick Install above
+```
 
-Contributions are welcome! Please:
+**Arch Linux:**
+```bash
+sudo pacman -S python python-pip
+# Then follow Quick Install above
+```
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+### **Development Testing**
+```bash
+# Run test suite
+pytest tests/
 
-Ensure code follows Python best practices and includes appropriate error handling.
+# Validate markup parsing
+python coach_cli.py  # Choose option 8
+```
 
-## License
+---
 
-This project is licensed under the MIT License - see the LICENSE file in the parent directory for details.
+## 📄 **License & Credits**
 
-## Support
+MIT License - see [LICENSE](LICENSE) for details.
 
-For issues or questions:
+**Built for coaches, by coaches.** 💪
 
-- Check the Turnkey Coach API documentation
-- Ensure all dependencies are installed
-- Verify your account has appropriate permissions
-- Clear caches (`messages_cache.json`, `workouts_index.json`) if experiencing issues
+*Questions? Issues? The waterpark can wait! 🏊‍♂️*
 
-Last updated: 2025-09-30
+---
+
+**Version 1.4.0** • *October 2025* • **[Download Latest Release](https://github.com/your-org/workout-parser/releases)**

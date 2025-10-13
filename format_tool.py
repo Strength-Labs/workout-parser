@@ -46,7 +46,7 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
 
         output_lines.append("")
 
-        # Add metrics for this workout date
+        # Add metrics for this workout date (from external metrics parameter)
         workout_date_str = workout['workout_date']
         if workout_date_str in metrics_by_date:
             for metric in metrics_by_date[workout_date_str]:
@@ -69,6 +69,60 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
                     metric_line += f" {' '.join(components)}"
 
                 output_lines.append(metric_line)
+            output_lines.append("")
+        
+        # Add assigned metrics from the workout data itself
+        assigned_metrics = workout.get('assigned_metrics', [])
+        if assigned_metrics:
+            for assigned_metric in assigned_metrics:
+                # Extract metric info from the assigned metric structure
+                description = assigned_metric.get('description', '')
+                metric_info = assigned_metric.get('metric', {})
+                metric_answer = assigned_metric.get('metric_answer')
+                
+                # Get the canonical metric name from the metric definition
+                metric_name = metric_info.get('name', '').lower().replace(' ', '_').replace('(', '').replace(')', '')
+                if not metric_name:
+                    metric_name = f"metric_{assigned_metric.get('id', 'unknown')}"
+                
+                # Determine if this is prescribed (has target value) or tracking (client enters value)
+                # Based on API structure: metric_answer.value exists when there's a prescribed target
+                # or when client has responded to a tracking metric
+                
+                if metric_answer and metric_answer.get('value') is not None:
+                    # There's a value - this could be either:
+                    # 1. Prescribed target (coach set a goal)
+                    # 2. Client response to tracking request
+                    
+                    # The API structure doesn't clearly distinguish these cases in the download
+                    # For now, we'll assume most metrics with values are client responses
+                    # and should show both the request and response
+                    
+                    # Output the coach's request (either with description or just the metric name)
+                    if description:
+                        metric_line = f"@{metric_name}: {description}"
+                    else:
+                        # Even without description, this is likely a tracking request
+                        # The client provided a value, so show it as a tracking request
+                        metric_line = f"@{metric_name}:"
+                    
+                    output_lines.append(metric_line)
+                    
+                    # Output the client's actual response in parentheses
+                    client_value = metric_answer['value']
+                    # Include any additional info from metric_answer if available
+                    response_parts = [str(client_value)]
+                    
+                    # Check if there are additional fields in metric_answer we should include
+                    # (like units or notes from the client's response)
+                    response_line = f"(@{metric_name}: {' '.join(response_parts)})"
+                    output_lines.append(response_line)
+                else:
+                    # No value - this is a tracking metric that client hasn't responded to yet
+                    metric_line = f"@{metric_name}: {description}" if description else f"@{metric_name}:"
+                    output_lines.append(metric_line)
+                    # No parentheses = client didn't provide a value
+            
             output_lines.append("")
 
         if 'comments' in workout and workout['comments']:

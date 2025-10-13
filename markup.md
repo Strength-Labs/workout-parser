@@ -58,24 +58,61 @@ The first line after the date header (workout or nutrition), if it exists and is
 
 Metrics allow you to track client data such as body weight, body fat percentage, measurements, sleep, recovery scores, and other health/performance indicators. Metrics are associated with the date they appear under (either Workout Date or Nutrition Date).
 
-**Metrics work with both workout and nutrition assignments.** They are specified using the `@` symbol followed by the metric type, a colon, the value, unit, and optional notes.
+**Metrics work with both workout and nutrition assignments.** The `@` symbol represents a coach's declaration or inquiry to the client.
 
-* **Format**: `@metric_type: value unit [optional notes]`
+##### Prescribed Metrics (Coach Sets Target/Goal)
+When you include a **numeric value**, you're giving the client a target or goal to achieve.
+
+* **Format**: `@metric_type: [NUMBER] unit [optional notes]`
+* **Use for**: Goals, targets, recommendations that clients should aim for
 * **Examples**:
-    * `@weight: 185.5 lbs`
-    * `@body_fat: 15.2%`
-    * `@sleep: 7.5 hours feeling well-rested`
-    * `@waist: 34 inches`
-    * `@stress: 6 1-10 work deadline this week`
+    * `@sleep: 8 hours target for recovery`
+    * `@calories: 2400 cal daily target`
+    * `@protein: 150 g daily goal`
+
+##### Tracked Metrics (Client Reports Actual Values)
+When you **omit the numeric value**, the client is prompted to enter their own measurement or data.
+
+* **Format**: `@metric_type: unit [measurement instructions]`
+* **Use for**: Measurements, subjective ratings, actual data that only the client can provide
+* **Examples**:
+    * `@weight: kg morning weight, fasted, post-restroom`
+    * `@waist: cm measure relaxed at navel after gentle exhale`
+    * `@stress: 1-10 current stress level`
+
+##### Actual Metric Values (Client's Responses)
+When workout data is generated from the API, the client's actual reported values are displayed in parentheses `()`. The uploader ignores these lines during re-upload.
+
+* **Format**: `(@metric_type: [CLIENT_VALUE] unit [optional notes])`
+* **Examples**:
+    * Coach declares: `@weight: kg morning weight, fasted`
+    * Client reported: `(@weight: 82.3 kg)`
+    * If client skipped: No parentheses appear
+
+**Complete Example:**
+```
+@calories: 2400 cal daily target
+(@calories: 2250 cal actual intake)
+
+@weight: kg morning weight, fasted
+(@weight: 82.3 kg)
+
+@sleep: hours actual sleep last night
+[Client skipped - no parentheses shown]
+```
+
+**Key Distinction:**
+- **`@metric:`** = Coach's declaration/inquiry (prescribed target OR tracking request)
+- **`(@metric:)`** = Client's actual reported value (only appears when client enters data)
+- **No parentheses** = Client did not provide a value
 
 **Common Metric Types:**
-* `weight` - Body weight (lbs or kg)
-* `body_fat` - Body fat percentage (%)
-* `waist`, `chest`, `arms`, `thighs` - Body measurements (inches or cm)
-* `sleep` - Sleep duration (hours)
-* `stress`, `recovery`, `energy` - Subjective scales (1-10)
-* `calories` - Caloric intake (cal)
-* `protein`, `carbs`, `fat` - Macronutrients (grams)
+* `weight` - Body weight (lbs or kg) - *usually tracked*
+* `body_fat` - Body fat percentage (%) - *usually tracked*
+* `waist`, `chest`, `arms`, `thighs` - Body measurements (inches or cm) - *usually tracked*
+* `sleep` - Sleep duration (hours) - *can be prescribed (goal) or tracked (actual)*
+* `stress`, `recovery`, `energy` - Subjective scales (1-10) - *usually tracked*
+* `calories`, `protein`, `carbs`, `fat` - Nutrition targets (cal/grams) - *usually prescribed*
 * Custom types can be used (e.g., `resting_hr`, `hrv`, `vertical_jump`, `water_intake`)
 
 Metrics appear after the assignment title (if present) and before the exercises/nutrition items. They will be uploaded to the Turnkey Coach API along with the assignment data.
@@ -233,9 +270,11 @@ id: 7
 Nutrition Date: 2025-10-01
 Weekly Meal Plan - High Protein Focus
 
-@weight: 185.5 lbs
+@weight: kg morning weight, fasted, post-restroom
 @calories: 2800 cal daily target
-@protein: 180 g target
+@protein: 180 g daily goal
+(@weight: 84.2 kg)
+(@calories: 2650 cal actual intake)
 
 Meal Pictures
     Upload photos of all meals and snacks throughout the day.

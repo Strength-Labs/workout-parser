@@ -2,7 +2,7 @@
 # Creates standalone EXE and Inno Setup installer for Windows
 
 param(
-    [string]$Version = "1.0.0"
+    [string]$Version = "1.4.0"
 )
 
 Write-Host "🪟 Turnkey Coach Tools - Windows Build" -ForegroundColor Cyan

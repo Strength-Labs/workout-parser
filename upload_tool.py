@@ -12,16 +12,21 @@ except ImportError:
     pass
 
 METRIC_NAME_OVERRIDES = {
-    "weight": ["body_weight", "weight"],
-    "body_weight": ["body_weight"],
+    "weight": ["body_weight", "weight", "body weight"],
+    "weight_kgs": ["body_weight", "weight", "body weight"],
+    "weight_lbs": ["body_weight", "weight", "body weight"],
+    "body_weight": ["body_weight", "body weight"],
     "body_fat": ["body_fat", "body_fat_percentage"],
-    "waist": ["waist"],
+    "waist": ["waist", "waist_in", "waist (in)"],
+    "waist_in": ["waist", "waist (in)", "waist_in"],
+    "waist_cm": ["waist", "waist (cm)", "waist_cm"],
     "chest": ["chest"],
     "arms": ["arm", "arms"],
     "thighs": ["thighs"],
-    "sleep": ["sleep", "sleep_hours"],
+    "sleep": ["sleep", "sleep_hours", "sleep hours"],
     "stress": ["stress"],
     "recovery": ["recovery"],
+    "recovery_%": ["recovery"],
     "energy": ["energy"],
     "fatigue": ["fatigue"],
     "difficulty": ["difficulty", "session_difficulty"],
@@ -104,6 +109,26 @@ def _find_metric_definition(metric_slug: str, candidate_slugs: Iterable[str], in
                 if best_match is None or slug_length < best_slug_length:
                     best_match = entry
                     best_slug_length = slug_length
+    
+    # Final fallback: use fuzzy matching if rapidfuzz is available
+    if best_match is None and 'process' in globals():
+        try:
+            # Extract all available metric names for fuzzy matching
+            all_metric_names = [entry.get('name', '') for _, entry in slug_entries if entry.get('name')]
+            original_metric_name = candidate_slugs[0] if candidate_slugs else metric_slug
+            
+            # Find closest match with decent similarity threshold
+            matches = process.extract(original_metric_name, all_metric_names, limit=1)
+            if matches and matches[0][1] >= 70:  # 70% similarity threshold
+                matched_name = matches[0][0]
+                # Find the entry with this name
+                for _, entry in slug_entries:
+                    if entry.get('name') == matched_name:
+                        console.print(f"[dim]Fuzzy matched '{original_metric_name}' → '{matched_name}' ({matches[0][1]}% similarity)[/dim]")
+                        return entry
+        except Exception:
+            pass  # Silently fall back if fuzzy matching fails
+    
     return best_match
 
 
@@ -124,8 +149,12 @@ def prepare_assigned_metrics_for_workout(workout: dict, metric_catalog_index: Di
         definition = _find_metric_definition(metric_slug, candidate_slugs, metric_catalog_index, slug_entries)
 
         if not definition:
+            console.print(f"[yellow]Warning: Could not find metric definition for '{metric.get('metric_type')}' (tried: {', '.join(candidate_slugs)})[/yellow]")
             skipped_metrics.append(metric)
             continue
+        else:
+            # Log successful metric mapping
+            console.print(f"[dim]✓ Mapped '{metric.get('metric_type')}' → '{definition.get('name')}' (ID: {definition.get('id')})[/dim]")
 
         assigned_entry = {
             "metric_id": definition["id"],
@@ -444,13 +473,28 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
                 else:
                     console.print(f"[yellow]Warning: Could not parse or find match for line: '{stripped_line}'[/yellow]")
 
-            if current_exercise:
-                workout["assigned_exercises"].append(current_exercise)
-        if workout["assigned_exercises"]:
+        # After processing all lines, append any remaining current_exercise
+        if current_exercise:
+            workout["assigned_exercises"].append(current_exercise)
+            
+        # Include workouts that have either exercises OR metrics
+        has_exercises = bool(workout["assigned_exercises"])
+        has_metrics = bool(workout.get("pending_metrics"))
+        
+        if has_exercises or has_metrics:
             if kg_detected:
                 workout["weight_type"] = "kgs"
                 console.print(f"[green]Detected kg units—setting workout weight_type to 'kgs' for API compatibility.[/green]")
             workouts.append(workout)
+            
+            # Log what type of assignment was added
+            assignment_type = "nutrition assignment" if workout.get('workout_type') == "nutrition" else "workout"
+            if has_exercises and has_metrics:
+                console.print(f"[dim]Added {assignment_type} with {len(workout['assigned_exercises'])} exercises and {len(workout.get('pending_metrics', []))} metrics[/dim]")
+            elif has_exercises:
+                console.print(f"[dim]Added {assignment_type} with {len(workout['assigned_exercises'])} exercises[/dim]")
+            elif has_metrics:
+                console.print(f"[dim]Added {assignment_type} with {len(workout.get('pending_metrics', []))} metrics only[/dim]")
 
     return workouts
 

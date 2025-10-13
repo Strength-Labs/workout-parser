@@ -74,9 +74,7 @@ Each tool is a self-contained module:
 - **PR Analyzers** (`pr_tool.py`, `actual_prs_tool.py`): Different approaches to analyzing personal records
 - **Workout Browser** (`format_tool.py`): Converts workout data to readable markup
 - **Workout Uploader** (`upload_tool.py`): Parses text files and uploads via fuzzy exercise matching
-- **AI Chat** (`ai_chat_tool.py`): LLM integration for workout programming assistance  
-- **Metrics Tool** (`metrics_tool.py`): Client metrics tracking and analysis (v1.4.0+)
-- **Dual Calendar Support**: Training and nutrition assignments with comprehensive metrics (v1.4.0+)
+- **AI Chat** (`ai_chat_tool.py`): LLM integration for workout programming assistance
 
 #### 3. Data Caching Strategy
 - **New directory structure** (with automatic migration from old):

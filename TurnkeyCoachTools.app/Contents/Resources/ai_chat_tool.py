@@ -3,7 +3,6 @@ import json
 import tempfile
 import subprocess
 import base64
-from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 from openai import OpenAI
 from rich.console import Console
@@ -11,7 +10,7 @@ from rich.console import Console
 # Import shared functions
 from api_client import get_workout_history
 from format_tool import format_workouts_to_markup
-from upload_tool import parse_workouts_from_file, upload_workout, prepare_assigned_metrics_for_workout, get_metric_lookup_structures
+from upload_tool import parse_workouts_from_file, upload_workout
 from settings import get_default_editor, get_llm_credentials
 from directory_migration import get_client_dir, get_coaching_context_dir
 from encoding_utils import safe_open, safe_temp_file, read_text_file, write_text_file
@@ -31,80 +30,6 @@ def input_with_completion(prompt: str) -> str:
     except (EOFError, KeyboardInterrupt):
         return ""
 
-def select_date_range() -> tuple:
-    """Let user select how much workout history to include in AI context.
-    
-    Returns:
-        (start_date, description) tuple where start_date is datetime or None for all history
-    """
-    console.print("\n[bold]Select workout history range for AI context:[/bold]")
-    console.print("[dim](Less history = fewer tokens = lower cost, more history = more context)[/dim]\n")
-    
-    options = [
-        ("3 months", 90),
-        ("6 months", 180), 
-        ("1 year", 365),
-        ("All history", None),
-        ("Custom date range", 'custom')
-    ]
-    
-    for i, (desc, _) in enumerate(options, 1):
-        marker = " [bold green](recommended)[/bold green]" if desc == "3 months" else ""
-        console.print(f"  [bold]{i}.[/bold] {desc}{marker}")
-    
-    while True:
-        try:
-            choice = input("\nSelect option (1-5): ").strip()
-            if not choice:
-                choice = "1"  # Default to 3 months
-                
-            idx = int(choice) - 1
-            if 0 <= idx < len(options):
-                desc, days = options[idx]
-                
-                if days is None:  # All history
-                    return None, "all history"
-                elif days == 'custom':
-                    console.print("\n[bold]Enter custom date range:[/bold]")
-                    start_date_str = input("Start date (YYYY-MM-DD) or press Enter for 3 months: ").strip()
-                    if not start_date_str:
-                        # Default to 3 months if empty
-                        start_date = datetime.now() - timedelta(days=90)
-                        return start_date, "3 months (default)"
-                    else:
-                        try:
-                            start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-                            days_ago = (datetime.now() - start_date).days
-                            return start_date, f"since {start_date_str} (~{days_ago} days)"
-                        except ValueError:
-                            console.print("[red]Invalid date format. Using 3 months default.[/red]")
-                            start_date = datetime.now() - timedelta(days=90)
-                            return start_date, "3 months (default)"
-                else:  # Preset range
-                    start_date = datetime.now() - timedelta(days=days)
-                    return start_date, desc
-            else:
-                console.print("[red]Invalid option. Please try again.[/red]")
-        except ValueError:
-            console.print("[red]Invalid input. Please enter a number 1-5.[/red]")
-
-def filter_workouts_by_date(workouts: list, start_date: datetime = None) -> list:
-    """Filter workouts to only include those on or after start_date.
-    
-    Args:
-        workouts: List of workout dictionaries
-        start_date: Only include workouts on/after this date. None = include all
-        
-    Returns:
-        Filtered list of workouts
-    """
-    if start_date is None:
-        return workouts
-        
-    start_date_str = start_date.strftime("%Y-%m-%d")
-    
-    return [w for w in workouts if w.get('workout_date') and w['workout_date'] >= start_date_str]
-
 def run_ai_chat(token, user_id, client, exercise_map):
     """AI chat for workout assistance."""
     try:
@@ -119,21 +44,8 @@ def run_ai_chat(token, user_id, client, exercise_map):
         console.print("[red]No workout history found.[/red]")
         input("Press Enter to continue.")
         return
-    
-    # Let user select date range for context
-    start_date, range_description = select_date_range()
-    filtered_workouts = filter_workouts_by_date(valid_workouts, start_date)
-    
-    if not filtered_workouts:
-        console.print(f"[red]No workouts found in selected range ({range_description}).[/red]")
-        console.print("[yellow]Try selecting a longer time range.[/yellow]")
-        input("Press Enter to continue.")
-        return
-        
-    console.print(f"[green]Using {len(filtered_workouts)} workouts from {range_description}[/green]")
-    
-    filtered_workouts.sort(key=lambda w: w['workout_date'])
-    markup_content = format_workouts_to_markup(filtered_workouts, user_id)
+    valid_workouts.sort(key=lambda w: w['workout_date'])
+    markup_content = format_workouts_to_markup(valid_workouts, user_id)
 
     # Load markup guide
     try:
@@ -327,27 +239,9 @@ def run_ai_chat(token, user_id, client, exercise_map):
                     temp_path = temp_file.name
                 
                 try:
-                    assignments = parse_workouts_from_file(temp_path, client['id'], exercise_map)
-                    pending_total = sum(len(a.get("pending_metrics", [])) for a in assignments)
-                    metric_index = {}
-                    metric_slugs = []
-                    if pending_total:
-                        console.print(f"[dim]Resolving {pending_total} metric placeholder(s) before upload...[/dim]")
-                        metric_index, metric_slugs = get_metric_lookup_structures(token)
-                        if not metric_index:
-                            console.print("[yellow]Warning: Could not load metric catalog. Metrics will be skipped.[/yellow]")
-                    for assignment in assignments:
-                        if metric_index and assignment.get("pending_metrics"):
-                            _, skipped = prepare_assigned_metrics_for_workout(assignment, metric_index, metric_slugs)
-                            for metric in skipped:
-                                console.print(
-                                    f"[yellow]Warning: Unknown metric '{metric.get('metric_type')}' "
-                                    f"on {assignment.get('workout_date')} – skipping.[/yellow]"
-                                )
-                        else:
-                            assignment.pop("pending_metrics", None)
-                            assignment.setdefault("assigned_metrics", [])
-                        upload_workout(token, assignment)
+                    workouts_parsed = parse_workouts_from_file(temp_path, client['id'], exercise_map)
+                    for workout in workouts_parsed:
+                        upload_workout(token, workout)
                 finally:
                     # Clean up temp file
                     try:
@@ -372,27 +266,9 @@ def run_ai_chat(token, user_id, client, exercise_map):
                     idx = int(input("Select file number: ")) - 1
                     if 0 <= idx < len(files):
                         file_path = os.path.join(client_dir, files[idx])
-                        assignments = parse_workouts_from_file(file_path, client['id'], exercise_map)
-                        pending_total = sum(len(a.get("pending_metrics", [])) for a in assignments)
-                        metric_index = {}
-                        metric_slugs = []
-                        if pending_total:
-                            console.print(f"[dim]Resolving {pending_total} metric placeholder(s) before upload...[/dim]")
-                            metric_index, metric_slugs = get_metric_lookup_structures(token)
-                            if not metric_index:
-                                console.print("[yellow]Warning: Could not load metric catalog. Metrics will be skipped.[/yellow]")
-                        for assignment in assignments:
-                            if metric_index and assignment.get("pending_metrics"):
-                                _, skipped = prepare_assigned_metrics_for_workout(assignment, metric_index, metric_slugs)
-                                for metric in skipped:
-                                    console.print(
-                                        f"[yellow]Warning: Unknown metric '{metric.get('metric_type')}' "
-                                        f"on {assignment.get('workout_date')} – skipping.[/yellow]"
-                                    )
-                            else:
-                                assignment.pop("pending_metrics", None)
-                                assignment.setdefault("assigned_metrics", [])
-                            upload_workout(token, assignment)
+                        workouts_parsed = parse_workouts_from_file(file_path, client['id'], exercise_map)
+                        for workout in workouts_parsed:
+                            upload_workout(token, workout)
                         console.print(f"[green]Uploaded {files[idx]}.[/green]")
                     else:
                         console.print("[red]Invalid selection.[/red]")

@@ -4,7 +4,7 @@
 
 set -e
 
-VERSION="1.0.0"
+VERSION="1.4.0"
 OUTPUT_DIR="dist/app-with-icon"
 APP_NAME="TurnkeyCoachTools"
 
@@ -138,7 +138,7 @@ cat > "$CONTENTS_DIR/Info.plist" << 'EOF'
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.0</string>
+    <string>1.4.0</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>LSMinimumSystemVersion</key>

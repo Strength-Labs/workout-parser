@@ -4,7 +4,7 @@
 
 set -e
 
-VERSION="1.0.0"
+VERSION="1.4.0"
 OUTPUT_DIR="dist/onefile"
 EXECUTABLE_NAME="turnkey-coach"
 
