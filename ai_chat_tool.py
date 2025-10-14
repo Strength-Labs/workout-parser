@@ -141,7 +141,8 @@ def run_ai_chat(token, user_id, client, exercise_map):
     except FileNotFoundError:
         markup_guide = "Markup guide not found. Use standard workout formatting."
 
-    system_prompt = f"You are an AI assistant for strength coaching. Use the following markup guide for workouts: {markup_guide}. The client's workout history is: {markup_content}"
+    # system_prompt = f"You are an AI assistant for strength coaching. Use the following markup guide for workouts: {markup_guide}. The client's workout history is: {markup_content}"
+    system_prompt = f"You are an AI assistant for the user, who is a strength coach. Use the following markup guide for workouts: {markup_guide}. The user is coaching the client. Do not add nutrition workouts or metrics unless directed by the coach. The client's workout history is: {markup_content}"
     
     # Display token count estimate for context
     estimated_tokens = estimate_token_count(system_prompt)
