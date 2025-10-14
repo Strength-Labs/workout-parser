@@ -1,0 +1,14 @@
+# Web Interface Requirements
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+jinja2>=3.1.0
+python-multipart>=0.0.6
+
+# From parent directory
+requests>=2.32.0
+rapidfuzz>=3.10.0
+rich>=13.7.0
+cryptography>=42.0.0
+openai==2.2.0
+httpx>=0.24.0
+pyreadline3; sys_platform == "win32"
