@@ -269,6 +269,166 @@ def add_note(client):
     console.print(f"[green]Note saved to {note_filename}.[/green]")
     console.input("Press Enter to continue.")
 
+def delete_workouts_ui(token, client):
+    """Interactive UI for deleting workouts with various filtering options."""
+    from datetime import datetime, date
+    from api_client import delete_workouts_filtered
+    
+    client_name = client['full_name']
+    client_id = client['id']
+    
+    while True:
+        clear_screen()
+        console.print(Panel(f"Delete Workouts - [bold green]{client_name}[/bold green]", expand=False))
+        
+        console.print("\n[bold]Delete Options:[/bold]")
+        console.print("  [bold]1.[/bold] Delete after TODAY (default)")
+        console.print("  [bold]2.[/bold] Delete after specific date")
+        console.print("  [bold]3.[/bold] Delete date range")
+        console.print("  [bold]q.[/bold] Back to menu")
+        
+        date_choice = console.input("\n> ").lower()
+        if date_choice == 'q':
+            return
+        
+        # Date selection logic
+        start_date = None
+        end_date = None
+        
+        if date_choice == '1':  # After today
+            today = date.today()
+            start_date = (today).isoformat()
+            date_desc = f"after today ({start_date})"
+        elif date_choice == '2':  # After specific date
+            date_str = console.input("Enter start date (YYYY-MM-DD): ").strip()
+            try:
+                # Validate date format
+                datetime.strptime(date_str, '%Y-%m-%d')
+                start_date = date_str
+                date_desc = f"on/after {start_date}"
+            except ValueError:
+                console.print("[red]Invalid date format. Please use YYYY-MM-DD.[/red]")
+                console.input("Press Enter to try again...")
+                continue
+        elif date_choice == '3':  # Date range
+            start_str = console.input("Enter start date (YYYY-MM-DD): ").strip()
+            end_str = console.input("Enter end date (YYYY-MM-DD): ").strip()
+            try:
+                # Validate date formats
+                datetime.strptime(start_str, '%Y-%m-%d')
+                datetime.strptime(end_str, '%Y-%m-%d')
+                start_date = start_str
+                end_date = end_str
+                date_desc = f"from {start_date} to {end_date}"
+            except ValueError:
+                console.print("[red]Invalid date format. Please use YYYY-MM-DD.[/red]")
+                console.input("Press Enter to try again...")
+                continue
+        else:
+            console.print("[red]Invalid choice.[/red]")
+            console.input("Press Enter to try again...")
+            continue
+        
+        # Workout type selection
+        clear_screen()
+        console.print(Panel(f"Delete Workouts {date_desc} - [bold green]{client_name}[/bold green]", expand=False))
+        
+        console.print("\n[bold]Workout Type:[/bold]")
+        console.print("  [bold]1.[/bold] Strength workouts only")
+        console.print("  [bold]2.[/bold] Nutrition assignments only")
+        console.print("  [bold]3.[/bold] Both strength and nutrition")
+        console.print("  [bold]q.[/bold] Back")
+        
+        type_choice = console.input("\n> ").lower()
+        if type_choice == 'q':
+            continue
+        
+        workout_types = None
+        type_desc = ""
+        if type_choice == '1':
+            workout_types = ['default']
+            type_desc = "strength workouts"
+        elif type_choice == '2':
+            workout_types = ['nutrition']
+            type_desc = "nutrition assignments"
+        elif type_choice == '3':
+            workout_types = ['default', 'nutrition']
+            type_desc = "strength workouts and nutrition assignments"
+        else:
+            console.print("[red]Invalid choice.[/red]")
+            console.input("Press Enter to try again...")
+            continue
+        
+        # Preview what would be deleted (dry run)
+        console.print(f"\n[dim]Checking what {type_desc} would be deleted {date_desc}...[/dim]")
+        
+        preview_result = delete_workouts_filtered(
+            token, client_id, start_date, end_date, workout_types, dry_run=True
+        )
+        
+        if preview_result['errors']:
+            console.print("[red]Error fetching workouts for preview:[/red]")
+            for error in preview_result['errors']:
+                console.print(f"  - {error}")
+            console.input("Press Enter to continue...")
+            continue
+        
+        if not preview_result['would_delete']:
+            console.print(f"[yellow]No {type_desc} found {date_desc}.[/yellow]")
+            console.input("Press Enter to continue...")
+            continue
+        
+        # Show preview
+        console.print(f"\n[bold yellow]Preview: {len(preview_result['would_delete'])} workout(s) would be deleted:[/bold yellow]")
+        for workout in preview_result['would_delete']:
+            workout_type_label = "Nutrition" if workout['type'] == 'nutrition' else "Strength"
+            title_part = f" - {workout['title']}" if workout['title'] else ""
+            console.print(f"  • {workout['date']} ({workout_type_label}){title_part}")
+        
+        # Final confirmation
+        console.print(f"\n[bold red]⚠️  WARNING: This will permanently delete {len(preview_result['would_delete'])} workout(s)![/bold red]")
+        console.print("[dim]Completed workouts cannot be deleted and will be skipped.[/dim]")
+        
+        confirm = console.input("\nAre you ABSOLUTELY SURE you want to delete these workouts? Type 'DELETE' to confirm: ").strip()
+        
+        if confirm != 'DELETE':
+            console.print("[green]Deletion cancelled.[/green]")
+            console.input("Press Enter to continue...")
+            continue
+        
+        # Perform actual deletion
+        console.print("\n[yellow]Deleting workouts...[/yellow]")
+        
+        delete_result = delete_workouts_filtered(
+            token, client_id, start_date, end_date, workout_types, dry_run=False
+        )
+        
+        # Show results
+        deleted_count = len(delete_result['deleted'])
+        skipped_count = len(delete_result['skipped'])
+        error_count = len(delete_result['errors'])
+        
+        if deleted_count > 0:
+            console.print(f"[bold green]✅ Successfully deleted {deleted_count} workout(s)![/bold green]")
+        
+        if skipped_count > 0:
+            console.print(f"[yellow]⚠️  Skipped {skipped_count} workout(s):[/yellow]")
+            for workout in delete_result['skipped']:
+                console.print(f"  • {workout['date']}: {workout['reason']}")
+        
+        if error_count > 0:
+            console.print(f"[red]❌ {error_count} error(s) occurred:[/red]")
+            for workout in delete_result['errors']:
+                console.print(f"  • {workout['date']}: {workout['error']}")
+        
+        # Force refresh the workout cache since we deleted workouts
+        console.print("\n[dim]Refreshing workout cache...[/dim]")
+        get_workout_history(token, client, force_refresh=True)
+        
+        console.input("\nPress Enter to continue...")
+        return  # Exit after successful operation
+
+
 def show_tool_menu(token, user_id, client, exercise_map):
     """Displays the main tool menu for a selected client."""
     while True:
@@ -284,6 +444,7 @@ def show_tool_menu(token, user_id, client, exercise_map):
         console.print("  [bold]7.[/bold] Program Metrics")
         console.print("  [bold]8.[/bold] Validate Markup (Dry Run)")
         console.print("\n[bold]Utilities:[/bold]")
+        console.print("  [bold]d.[/bold] Delete Workouts")
         console.print("  [bold]n.[/bold] Add a Quick Note")
         console.print("  [bold]c.[/bold] Clean Up Directory")
         console.print("  [bold]r.[/bold] Force Refresh Workout History")
@@ -307,6 +468,8 @@ def show_tool_menu(token, user_id, client, exercise_map):
             run_metrics_tool(token, client)
         elif choice == '8':
             run_uploader_tool(token, client, exercise_map, dry_run=True)
+        elif choice == 'd':
+            delete_workouts_ui(token, client)
         elif choice == 'n':
             add_note(client)
         elif choice == 'c':

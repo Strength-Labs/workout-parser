@@ -1,0 +1,10 @@
+✅ DONE: Clean up the names in the client list. Should be [COACH] (role) where role is either Strength or Nutrition, not workout. 
+✅ DONE: Clarify whether if I delete workouts, the app will figure it out. (Implemented ID-based sync to detect deletions)
+
+✅ DONE: Add "delete workouts after today" function, with choice of either nutrition, strength, or both.
+
+Perhaps add the dryrun to the AI chat commands?
+
+Fix up the dummy's guide. 
+
+
