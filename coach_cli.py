@@ -28,6 +28,63 @@ from metrics_tool import run_metrics_tool
 console = Console()
 
 
+def run_bulk_sync_from_cli(token, user_id):
+    """Launch the standalone bulk sync script with user-friendly options."""
+    clear_screen()
+    console.print(Panel.fit("🌙 [bold blue]Bulk Sync All Clients[/bold blue] 🌙", border_style="blue"))
+    
+    console.print("\n[dim]This will launch the bulk sync tool to sync workout history and feed data for all your clients.[/dim]")
+    console.print("[dim]The process runs in a separate window with a live progress display.[/dim]")
+    console.print("[dim]Depending on data volume, this may take several minutes.[/dim]")
+    
+    # Show sync options
+    console.print("\n[bold]Sync Options:[/bold]")
+    console.print("  [bold]1.[/bold] Quick Sync (2 workers, recommended)")
+    console.print("  [bold]2.[/bold] Fast Sync (4 workers)")
+    console.print("  [bold]3.[/bold] Test Mode (first 5 clients only)")
+    console.print("  [bold]q.[/bold] Cancel")
+    
+    choice = console.input("\n> ").strip().lower()
+    if choice == 'q':
+        return
+    
+    # Set parameters based on choice
+    cmd_args = ["python3", "bulk_sync.py"]
+    
+    if choice == '1':
+        cmd_args.extend(["--workers", "2"])
+        mode_desc = "Quick Sync with 2 workers"
+    elif choice == '2':
+        cmd_args.extend(["--workers", "4"])
+        mode_desc = "Fast Sync with 4 workers"
+    elif choice == '3':
+        cmd_args.extend(["--workers", "2", "--test", "5"])
+        mode_desc = "Test Mode (first 5 clients)"
+    else:
+        cmd_args.extend(["--workers", "2"])  # default
+        mode_desc = "Quick Sync with 2 workers (default)"
+    
+    # Final confirmation
+    console.print(f"\n[yellow]Ready to launch {mode_desc}[/yellow]")
+    if console.input("Proceed? [y/N]: ").lower() != 'y':
+        console.print("[yellow]Bulk sync cancelled.[/yellow]")
+        console.input("Press Enter to continue...")
+        return
+    
+    # Launch the bulk sync script
+    console.print("\n[dim]Launching bulk sync tool...[/dim]")
+    try:
+        result = subprocess.run(cmd_args, cwd=os.getcwd(), check=False)
+        if result.returncode == 0:
+            console.print("\n[bold green]✨ Bulk sync tool completed successfully! ✨[/bold green]")
+        else:
+            console.print(f"\n[yellow]⚠️ Bulk sync tool exited with code {result.returncode}[/yellow]")
+    except Exception as e:
+        console.print(f"\n[bold red]❌ Failed to launch bulk sync tool: {e}[/bold red]")
+    
+    console.input("\nPress Enter to return to client list...")
+
+
 def select_client(token, user_id):
     """Displays a table of clients and prompts the user to select one."""
     clients = get_clients(token, user_id)
@@ -45,6 +102,7 @@ def select_client(token, user_id):
     while True:
         console.print("\n")  # Spacer for clarity
         console.print(Text("Options:", style="dim"))
+        console.print(Text("  [b] Bulk Sync All Clients", style="dim"))
         console.print(Text("  [l] Logout (clear credentials)", style="dim"))  # Use Text to avoid markdown
         console.print(Text("  [s] Adjust Settings (editor, credentials)", style="dim"))
         console.print(Text("  [w] Create New Workspace", style="dim"))
@@ -59,6 +117,11 @@ def select_client(token, user_id):
         choice = input("").strip().lower()  # Raw input for clean capture
         if choice == 'q':
             return None
+        if choice == 'b':
+            run_bulk_sync_from_cli(token, user_id)
+            clear_screen()
+            console.print(table)  # Redisplay table after bulk sync
+            continue
         if choice == 'l':
             if logout_current_workspace():
                 console.print("[green]Logged out. You can now switch workspaces or quit.[/green]")

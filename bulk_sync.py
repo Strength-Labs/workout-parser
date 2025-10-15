@@ -17,8 +17,8 @@ from rich.table import Table
 from rich.text import Text
 
 # Import your existing efficient sync functions
-from api_client import get_access_token, get_clients, get_workout_history
-from feed_tool import fetch_and_aggregate_data
+from api_client import get_access_token, get_clients, get_workout_history_headless
+from feed_tool import fetch_and_aggregate_data_headless
 from directory_migration import get_client_dir
 
 console = Console()
@@ -49,42 +49,31 @@ class BulkSyncManager:
         }
         
         try:
-            # Verbose logging - always show what we're doing
-            console.print(f"🔄 [cyan]Starting sync for {client_name}[/cyan]")
-            
-            # Update status
+            # Update status silently to avoid Rich display conflicts
             result['status'] = 'syncing_workouts'
             self._update_result(client_id, result)
-            console.print(f"  💪 [yellow]Syncing workouts for {client_name}...[/yellow]")
             
-            # Sync workouts using your existing efficient system
-            workouts = get_workout_history(token, client, force_refresh=False)
+            # Sync workouts using headless version to avoid Rich display conflicts
+            workouts = get_workout_history_headless(token, client, force_refresh=False)
             result['workouts_synced'] = len(workouts) if workouts else 0
-            console.print(f"  ✅ [green]{client_name}: {result['workouts_synced']} workouts synced[/green]")
             
             # Update status
             result['status'] = 'syncing_feed'
             self._update_result(client_id, result)
-            console.print(f"  📡 [yellow]Syncing feed data for {client_name}...[/yellow]")
             
             # Sync feed data (this includes incremental workout updates and messages)
-            feed_data_lock = threading.Lock()
-            feed_data = {"events": [], "is_refreshing": True}
+            # Use headless version to avoid Rich display conflicts
+            feed_result = fetch_and_aggregate_data_headless(token, client)
             
-            # Use your existing feed aggregation
-            fetch_and_aggregate_data(token, client, feed_data_lock, feed_data)
+            if 'error' in feed_result:
+                raise Exception(f"Feed sync error: {feed_result['error']}")
             
-            with feed_data_lock:
-                result['feed_events'] = len(feed_data.get('events', []))
-            
-            console.print(f"  📊 [green]{client_name}: {result['feed_events']} feed events synced[/green]")
-            console.print(f"🎉 [bold green]{client_name} sync completed![/bold green]")
+            result['feed_events'] = len(feed_result.get('events', []))
             
             result['status'] = 'completed'
             result['end_time'] = time.time()
             
         except Exception as e:
-            console.print(f"❌ [bold red]ERROR syncing {client_name}: {str(e)}[/bold red]")
             result['status'] = 'error'
             result['error'] = str(e)
             result['end_time'] = time.time()
@@ -157,7 +146,7 @@ def create_progress_display(sync_manager):
     
     return make_progress_table
 
-def run_bulk_sync(max_workers=4, force_refresh=False):
+def run_bulk_sync(max_workers=4, force_refresh=False, test_limit=None):
     """Run the bulk sync operation"""
     console.print(Panel.fit("🌙 [bold blue]Overnight Bulk Sync Starting[/bold blue] 🌙", border_style="blue"))
     
@@ -175,6 +164,11 @@ def run_bulk_sync(max_workers=4, force_refresh=False):
     if not clients:
         console.print("❌ [red]No clients found. Exiting.[/red]")
         return False
+    
+    # Apply test limit if specified
+    if test_limit and test_limit > 0:
+        clients = clients[:test_limit]
+        console.print(f"🧪 [yellow]TEST MODE: Limited to first {len(clients)} clients[/yellow]")
     
     console.print(f"📋 [bold green]Found {len(clients)} clients to sync:[/bold green]")
     for i, client in enumerate(clients, 1):
@@ -214,18 +208,16 @@ def run_bulk_sync(max_workers=4, force_refresh=False):
                 for client in clients
             }
             
-            # Wait for completion
+            # Wait for completion (no individual messages to avoid Live display conflicts)
             for future in as_completed(future_to_client):
                 client = future_to_client[future]
                 try:
                     result = future.result()
                     # Result already stored by sync_single_client
-                    # Show completion message
-                    duration = result['end_time'] - result['start_time'] if result['end_time'] else 0
-                    if result['status'] == 'completed':
-                        console.print(f"✨ [bold green]{client['full_name']} completed in {duration:.1f}s[/bold green]")
                 except Exception as e:
-                    console.print(f"❌ [red]Unexpected error for {client['full_name']}: {e}[/red]")
+                    # Store error in results instead of printing
+                    sync_manager.results[client['id']]['status'] = 'error'
+                    sync_manager.results[client['id']]['error'] = f"Unexpected error: {e}"
                 
                 # Update display
                 live.update(progress_table_fn())
@@ -276,6 +268,7 @@ def main():
     parser.add_argument("--workers", "-w", type=int, default=4, help="Number of concurrent workers (default: 4)")
     parser.add_argument("--force", "-f", action="store_true", help="Force refresh all data (ignore cache)")
     parser.add_argument("--dry-run", action="store_true", help="Show what would be synced without actually syncing")
+    parser.add_argument("--test", "-t", type=int, help="Test mode: limit to first N clients")
     
     args = parser.parse_args()
     
@@ -307,7 +300,7 @@ def main():
     console.print(f"🕐 [dim]Started at: {start_time.strftime('%Y-%m-%d %H:%M:%S')}[/dim]\n")
     
     # Run the sync
-    success = run_bulk_sync(max_workers=args.workers, force_refresh=args.force)
+    success = run_bulk_sync(max_workers=args.workers, force_refresh=args.force, test_limit=args.test)
     
     end_time = datetime.now()
     console.print(f"\n🕐 [dim]Finished at: {end_time.strftime('%Y-%m-%d %H:%M:%S')}[/dim]")

@@ -144,6 +144,28 @@ def _download_workouts_from_api(token, client_id, start_date=None):
         except requests.exceptions.RequestException:
             return []
 
+def _download_workouts_from_api_headless(token, client_id, start_date=None):
+    """Headless version of _download_workouts_from_api - no Rich console output"""
+    headers = {"Authorization": f"Bearer {token}"}
+    list_url = f"{API_BASE_URL}/api/v1/workouts"
+    params = {"user_id": client_id, "sort": "ascending", "published": True}
+    if start_date:
+        params["start_date"] = start_date
+    try:
+        response = requests.get(list_url, headers=headers, params=params)
+        response.raise_for_status()
+        workouts_summary = response.json()
+        detailed_workouts = []
+        for summary in workouts_summary:
+            workout_id = summary['id']
+            detail_url = f"{API_BASE_URL}/api/v1/workouts/{workout_id}"
+            detail_response = requests.get(detail_url, headers=headers)
+            if detail_response.status_code == 200:
+                detailed_workouts.append(detail_response.json())
+        return detailed_workouts
+    except requests.exceptions.RequestException:
+        return []
+
 def get_workout_history(token, client, force_refresh=False):
     """Get workout history with intelligent caching, deletion detection, and incremental updates."""
     client_id = client["id"]
@@ -215,6 +237,71 @@ def get_workout_history(token, client, force_refresh=False):
             # No changes detected
             console.print("[dim]Workout history is up to date.[/dim]")
             return existing_workouts
+
+def get_workout_history_headless(token, client, force_refresh=False):
+    """Headless version of get_workout_history for bulk operations - no Rich console output"""
+    client_id = client["id"]
+    client_dir = get_client_dir(client_id)
+    workout_cache_path = os.path.join(client_dir, f"workouts_user_{client_id}.json")
+    os.makedirs(client_dir, exist_ok=True)
+    
+    # Force refresh - download everything fresh
+    if force_refresh:
+        workouts = _download_workouts_from_api_headless(token, client_id)
+        safe_json_dump(workouts, workout_cache_path, indent=4)
+        return workouts
+    
+    # No cache file - do initial download
+    if not os.path.exists(workout_cache_path):
+        return get_workout_history_headless(token, client, force_refresh=True)
+    
+    # Load existing cache
+    existing_workouts = safe_json_load(workout_cache_path, default=[])
+    if not existing_workouts:
+        return get_workout_history_headless(token, client, force_refresh=True)
+    
+    # Filter for valid workouts
+    valid_workouts = [w for w in existing_workouts if w.get('workout_date') and w.get('id')]
+    if not valid_workouts:
+        return get_workout_history_headless(token, client, force_refresh=True)
+    
+    # Smart sync: Compare IDs to detect deletions and additions (no status display)
+    server_workout_ids = _get_workout_ids_from_api(token, client_id)
+    if not server_workout_ids:  # API error - use cached data
+        return existing_workouts
+    
+    cached_workout_ids = {w['id'] for w in valid_workouts}
+    
+    # Detect deletions
+    deleted_ids = cached_workout_ids - server_workout_ids
+    if deleted_ids:
+        valid_workouts = [w for w in valid_workouts if w['id'] not in deleted_ids]
+    
+    # Detect new workouts that need to be fetched
+    missing_ids = server_workout_ids - cached_workout_ids
+    
+    if missing_ids:
+        # For new workouts, we need to fetch full details
+        # Get the latest date from remaining cached workouts to optimize the API call
+        if valid_workouts:
+            latest_date_str = max(w['workout_date'] for w in valid_workouts)
+            start_date = datetime.fromisoformat(latest_date_str).date() + timedelta(days=1)
+            new_workouts = _download_workouts_from_api_headless(token, client_id, start_date=start_date.isoformat())
+        else:
+            # No cached workouts left, download everything
+            new_workouts = _download_workouts_from_api_headless(token, client_id)
+        
+        # Combine and save
+        all_workouts = valid_workouts + new_workouts
+        safe_json_dump(all_workouts, workout_cache_path, indent=4)
+        return all_workouts
+    elif deleted_ids:
+        # Only deletions occurred, save the cleaned cache
+        safe_json_dump(valid_workouts, workout_cache_path, indent=4)
+        return valid_workouts
+    else:
+        # No changes detected
+        return existing_workouts
 
 
 def delete_workout_by_id(token, workout_id):

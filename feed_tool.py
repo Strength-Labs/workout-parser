@@ -350,6 +350,69 @@ def fetch_and_aggregate_data(token, client, feed_data_lock, feed_data):
         with feed_data_lock:
             feed_data["is_refreshing"] = False
 
+def fetch_and_aggregate_data_headless(token, client):
+    """Headless version of fetch_and_aggregate_data for bulk operations - no Rich console output"""
+    try:
+        client_id = client["id"]
+        client_full_name = client["full_name"]
+        client_dir = get_client_dir(client_id)
+        
+        # Refresh messages cache
+        messages_cache = _refresh_messages_cache(token, client_full_name, client_dir)
+        conversation_id = messages_cache.get('conversation_id')
+        
+        # Update workouts cache incrementally
+        workouts, _changed = _update_workouts_cache_incremental(token, client, client_dir)
+        
+        # Process events
+        all_events = []
+        for msg in (messages_cache.get('messages') or {}).values():
+            ts = _parse_ts(msg.get('created_at'))
+            user = msg.get('user') or {}
+            all_events.append({
+                "type": "message",
+                "content": msg.get('body'),
+                "author_id": user.get('id'),
+                "author": user.get('full_name'),
+                "timestamp": ts,
+            })
+        
+        all_events.extend(_extract_comments_from_workouts(workouts))
+        all_events = [e for e in all_events if e.get('timestamp') is not None]
+        all_events.sort(key=lambda x: x['timestamp'])
+        
+        # Create alias map for comments
+        comment_alias_map = {}
+        alias_counter = 1
+        for item in reversed(all_events):
+            if item['type'] == 'workout_comment':
+                item['alias_id'] = str(alias_counter)
+                comment_alias_map[str(alias_counter)] = item.get('comment_id')
+                alias_counter += 1
+        
+        # Save cache
+        cache_path = os.path.join(client_dir, "feed_cache.json")
+        events_to_cache = [dict(event) for event in all_events]
+        for event in events_to_cache:
+            if isinstance(event.get('timestamp'), datetime):
+                event['timestamp'] = event['timestamp'].isoformat()
+        
+        try:
+            safe_json_dump({"events": events_to_cache, "conversation_id": conversation_id, "alias_map": comment_alias_map}, cache_path)
+        except Exception:
+            pass  # Silent failure in headless mode
+        
+        return {
+            'events': all_events,
+            'conversation_id': conversation_id,
+            'alias_map': comment_alias_map,
+            'workouts_count': len(workouts) if workouts else 0
+        }
+        
+    except Exception as e:
+        # Return error info instead of printing
+        return {'error': str(e), 'events': [], 'workouts_count': 0}
+
 # --- API Posting Functions ---
 
 def post_message(token, conversation_id, message_body):
