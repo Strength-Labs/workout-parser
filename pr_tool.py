@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta, date
 from rich.console import Console
 from rich.text import Text
-from api_client import get_workout_history
+from api_client import get_workout_history_headless, clear_screen
 
 console = Console()
 
@@ -115,7 +115,7 @@ def run_pr_analyzer(token, client):
     client_name = client['full_name']
     client_gender = None
     
-    workouts = get_workout_history(token, client)
+    workouts = get_workout_history_headless(token, client)
     if not workouts:
         console.input("\nCould not load workout history. Press Enter to return.")
         return

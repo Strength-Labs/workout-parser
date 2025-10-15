@@ -13,7 +13,7 @@ from settings import get_default_editor, get_stored_credentials, clear_stored_cr
 from workspace_manager import workspace_selector, get_workspace_info, logout_current_workspace, ensure_workspace_directories
 
 # Import our shared functions
-from api_client import get_access_token, get_clients, clear_screen, get_workout_history, load_exercise_map, update_exercise_list
+from api_client import get_access_token, get_clients, clear_screen, get_workout_history, get_workout_history_headless, load_exercise_map, update_exercise_list
 from directory_migration import get_client_dir, get_shared_dir
 # Import our tools
 from feed_tool import run_feed
@@ -66,10 +66,13 @@ def run_bulk_sync_from_cli(token, user_id):
     
     # Final confirmation
     console.print(f"\n[yellow]Ready to launch {mode_desc}[/yellow]")
-    if console.input("Proceed? [y/N]: ").lower() != 'y':
+    if console.input("[bold green]Proceed? [y/N]: [/bold green]").lower() != 'y':
         console.print("[yellow]Bulk sync cancelled.[/yellow]")
         console.input("Press Enter to continue...")
         return
+    
+    # Add --skip-confirm flag to avoid double confirmation
+    cmd_args.append("--skip-confirm")
     
     # Launch the bulk sync script
     console.print("\n[dim]Launching bulk sync tool...[/dim]")
@@ -169,7 +172,7 @@ def browse_history(token, client, coach_user_id):
     """Generates a markup file and opens it in an editor inside the client's directory."""
     client_name = client['full_name']
     client_dir = get_client_dir(client['id'])
-    workouts = get_workout_history(token, client)
+    workouts = get_workout_history_headless(token, client)
     valid_workouts = [w for w in workouts if w.get('workout_date')]
     if not valid_workouts:
         console.input("\nCould not load workout history. Press Enter to return.")
@@ -486,7 +489,7 @@ def delete_workouts_ui(token, client):
         
         # Force refresh the workout cache since we deleted workouts
         console.print("\n[dim]Refreshing workout cache...[/dim]")
-        get_workout_history(token, client, force_refresh=True)
+        get_workout_history_headless(token, client, force_refresh=True)
         
         console.input("\nPress Enter to continue...")
         return  # Exit after successful operation
@@ -538,7 +541,7 @@ def show_tool_menu(token, user_id, client, exercise_map):
         elif choice == 'c':
             clean_client_directory(client)
         elif choice == 'r':
-            get_workout_history(token, client, force_refresh=True)
+            get_workout_history_headless(token, client, force_refresh=True)
             console.input("Workout history has been refreshed. Press Enter to continue.")
         elif choice == 'u':
             if update_exercise_list(token):
@@ -629,7 +632,6 @@ def main_with_workspace_selected():
             # Workspace was switched, restart the main loop with new workspace
             main_with_workspace_selected()
             break  # Exit current main loop
-        get_workout_history(token, selected_client)
         show_tool_menu(token, user_id, selected_client, exercise_map)
 
 def main():

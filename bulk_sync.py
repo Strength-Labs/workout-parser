@@ -269,6 +269,7 @@ def main():
     parser.add_argument("--force", "-f", action="store_true", help="Force refresh all data (ignore cache)")
     parser.add_argument("--dry-run", action="store_true", help="Show what would be synced without actually syncing")
     parser.add_argument("--test", "-t", type=int, help="Test mode: limit to first N clients")
+    parser.add_argument("--skip-confirm", action="store_true", help="Skip confirmation prompt (for CLI integration)")
     
     args = parser.parse_args()
     
@@ -285,15 +286,16 @@ def main():
     # Show current time for reference
     console.print(f"🕐 [dim]Current time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}[/dim]")
     
-    # Confirm before starting
-    console.print("\n🌙 [bold yellow]About to start overnight bulk sync...[/bold yellow]")
-    console.print("This will sync workout data and feed data for ALL clients.")
-    console.print("The process may take a while depending on the amount of data.")
-    console.print("[bold]Progress will be shown continuously during the sync.[/bold]")
-    
-    if input("\n🚀 Ready to start? [y/N]: ").lower() != 'y':
-        console.print("❌ Sync cancelled.")
-        return
+    # Confirm before starting (unless skipped)
+    if not args.skip_confirm:
+        console.print("\n🌙 [bold yellow]About to start overnight bulk sync...[/bold yellow]")
+        console.print("This will sync workout data and feed data for ALL clients.")
+        console.print("The process may take a while depending on the amount of data.")
+        console.print("[bold]Progress will be shown continuously during the sync.[/bold]")
+        
+        if input("\n🚀 Ready to start? [y/N]: ").lower() != 'y':
+            console.print("❌ Sync cancelled.")
+            return
     
     console.print("\n🎬 [bold green]Starting sync...[/bold green]")
     start_time = datetime.now()

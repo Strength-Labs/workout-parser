@@ -9,7 +9,7 @@ from openai import OpenAI
 from rich.console import Console
 
 # Import shared functions
-from api_client import get_workout_history
+from api_client import get_workout_history_headless
 from format_tool import format_workouts_to_markup
 from upload_tool import parse_workouts_from_file, upload_workout, prepare_assigned_metrics_for_workout, get_metric_lookup_structures
 from settings import get_default_editor, get_llm_credentials
@@ -108,7 +108,7 @@ def filter_workouts_by_date(workouts: list, start_date: datetime = None) -> list
 def run_ai_chat(token, user_id, client, exercise_map):
     """AI chat for workout assistance."""
     try:
-        workouts = get_workout_history(token, client)
+        workouts = get_workout_history_headless(token, client)
     except Exception as e:
         console.print(f"[red]Error loading workout history: {e}[/red]")
         input("Press Enter to continue.")
