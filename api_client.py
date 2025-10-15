@@ -361,7 +361,7 @@ def delete_workouts_filtered(token, client_id, start_date=None, end_date=None,
     try:
         # Create a minimal client object for get_workout_history
         client = {'id': client_id}
-        workouts = get_workout_history(token, client, force_refresh=False)
+        workouts = get_workout_history_headless(token, client, force_refresh=False)
     except Exception as e:
         return {
             'would_delete' if dry_run else 'deleted': [],

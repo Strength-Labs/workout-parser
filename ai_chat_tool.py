@@ -107,8 +107,30 @@ def filter_workouts_by_date(workouts: list, start_date: datetime = None) -> list
 
 def run_ai_chat(token, user_id, client, exercise_map):
     """AI chat for workout assistance."""
+    console.print(f"[dim]Loading workout history for {client['full_name']}...[/dim]")
+    
+    # Try cache-only first
+    from directory_migration import get_client_dir
+    from encoding_utils import safe_json_load
+    import os
+    
+    client_dir = get_client_dir(client['id'])
+    workout_cache_path = os.path.join(client_dir, f"workouts_user_{client['id']}.json")
+    
     try:
-        workouts = get_workout_history_headless(token, client)
+        if os.path.exists(workout_cache_path):
+            console.print(f"[dim]Found cache file, loading directly...[/dim]")
+            try:
+                workouts = safe_json_load(workout_cache_path, default=[])
+                console.print(f"[dim]Cache loaded: {len(workouts)} workouts[/dim]")
+            except Exception as e:
+                console.print(f"[red]Cache load error: {e}[/red]")
+                console.print(f"[dim]Falling back to API...[/dim]")
+                workouts = get_workout_history_headless(token, client)
+        else:
+            console.print(f"[dim]No cache found, using API...[/dim]")
+            workouts = get_workout_history_headless(token, client)
+        console.print(f"[dim]Workout history loaded successfully[/dim]")
     except Exception as e:
         console.print(f"[red]Error loading workout history: {e}[/red]")
         input("Press Enter to continue.")
@@ -132,6 +154,7 @@ def run_ai_chat(token, user_id, client, exercise_map):
         
     console.print(f"[green]Using {len(filtered_workouts)} workouts from {range_description}[/green]")
     
+    console.print(f"[dim]Processing workout data for AI context...[/dim]")
     filtered_workouts.sort(key=lambda w: w['workout_date'])
     markup_content = format_workouts_to_markup(filtered_workouts, user_id)
 
@@ -218,6 +241,7 @@ def run_ai_chat(token, user_id, client, exercise_map):
                 console.print("[green]Saved.[/green]")
 
     # Set up the client based on provider
+    console.print(f"[dim]Setting up {provider.upper()} AI client...[/dim]")
     if provider == 'xai':
         try:
             client_ai = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
@@ -240,6 +264,7 @@ def run_ai_chat(token, user_id, client, exercise_map):
         return
 
     # Start the chat loop
+    console.print(f"[dim]Initializing AI chat session...[/dim]")
     messages = [{"role": "system", "content": system_prompt}]
     console.print("[bold green]AI Chat started. Type 'exit' or 'quit' to quit, 'edit' to edit the last AI response, 'upload' to upload workouts.[/bold green]" )
 
