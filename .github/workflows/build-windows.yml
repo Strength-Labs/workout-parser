@@ -24,11 +24,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
+      shell: powershell
     
     - name: Build Windows executable
       run: |
         pyinstaller --onefile --console --name "turnkey-coach" --icon=app-icon.ico coach_cli.py
-      shell: cmd
+      shell: powershell
     
     - name: Create Inno Setup installer script
       run: |

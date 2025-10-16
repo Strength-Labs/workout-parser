@@ -17,6 +17,7 @@ console = Console()
 
 # Directory paths (now managed by migration module)
 def get_token_cache_file():
+    # Primary: workspace-aware shared dir (auto-creates if missing)
     return os.path.join(get_shared_dir(), '.tokencache')
 
 def get_exercise_list_file():
@@ -453,15 +454,45 @@ def save_auth_data(token, user_id):
     os.makedirs(os.path.dirname(token_cache_file), exist_ok=True)
     safe_json_dump(auth_data, token_cache_file)
 
+def _scan_for_legacy_token_cache():
+    """Search common legacy/shared locations for an existing .tokencache.
+    Returns the first valid (token, user_id) tuple if found, else (None, None).
+    """
+    import glob
+    candidates = []
+    # Legacy single-dir path
+    candidates.append(os.path.expanduser(os.path.join('~', 'Turnkey', 'shared', '.tokencache')))
+    # Workspace paths: Turnkey-*/shared/.tokencache
+    workspace_glob = os.path.expanduser(os.path.join('~', 'Turnkey-*', 'shared', '.tokencache'))
+    candidates.extend(glob.glob(workspace_glob))
+    for path in candidates:
+        try:
+            data = safe_json_load(path)
+            if not data:
+                continue
+            exp = data.get('expires_at')
+            if exp and datetime.fromisoformat(exp) > datetime.now():
+                return data.get('token'), data.get('resource_owner', {}).get('id') or data.get('user_id')
+        except Exception:
+            continue
+    return None, None
+
+
 def load_auth_data():
     token_cache_file = get_token_cache_file()
-    if not os.path.exists(token_cache_file): return None, None
-    data = safe_json_load(token_cache_file)
-    if data:
-        try:
-            if datetime.fromisoformat(data.get("expires_at")) > datetime.now():
-                return data.get("token"), data.get("user_id")
-        except (KeyError, TypeError, ValueError): pass
+    # Try current workspace first
+    if os.path.exists(token_cache_file):
+        data = safe_json_load(token_cache_file)
+        if data:
+            try:
+                if datetime.fromisoformat(data.get("expires_at")) > datetime.now():
+                    return data.get("token"), data.get("user_id")
+            except (KeyError, TypeError, ValueError):
+                pass
+    # Fallback: scan other known locations to ease migration/first-run
+    token, user_id = _scan_for_legacy_token_cache()
+    if token and user_id:
+        return token, user_id
     return None, None
 
 
