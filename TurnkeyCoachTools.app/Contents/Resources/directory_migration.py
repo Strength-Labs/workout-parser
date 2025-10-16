@@ -37,6 +37,13 @@ def get_new_paths():
         'cache': os.path.join(NEW_BASE_DIR, 'cache')
     }
 
+
+def ensure_new_structure_exists():
+    """Ensure the NEW_BASE_DIR structure exists even when no migration is needed."""
+    paths = get_new_paths()
+    for path in paths.values():
+        os.makedirs(path, exist_ok=True)
+
 def needs_migration():
     """Check if migration is needed."""
     # If new structure exists, assume migration is done
@@ -166,23 +173,38 @@ def get_client_dir(client_id):
     """Get the client directory path, handling migration if needed."""
     if needs_migration():
         perform_migration()
+    else:
+        # First run with no existing directories: create them now
+        ensure_new_structure_exists()
     
     paths = get_new_paths()
-    return os.path.join(paths['clients'], str(client_id))
+    client_dir = os.path.join(paths['clients'], str(client_id))
+    os.makedirs(client_dir, exist_ok=True)
+    return client_dir
 
 def get_shared_dir():
     """Get the shared directory path, handling migration if needed."""
     if needs_migration():
         perform_migration()
+    else:
+        # First run with no existing directories: create them now
+        ensure_new_structure_exists()
     
-    return get_new_paths()['shared']
+    shared_dir = get_new_paths()['shared']
+    os.makedirs(shared_dir, exist_ok=True)
+    return shared_dir
 
 def get_coaching_context_dir():
     """Get the coaching context directory path, handling migration if needed."""
     if needs_migration():
         perform_migration()
+    else:
+        # First run with no existing directories: create them now
+        ensure_new_structure_exists()
     
-    return get_new_paths()['coaching_context']
+    context_dir = get_new_paths()['coaching_context']
+    os.makedirs(context_dir, exist_ok=True)
+    return context_dir
 
 if __name__ == "__main__":
     # Run migration if called directly

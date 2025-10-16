@@ -449,6 +449,8 @@ def save_auth_data(token, user_id):
     expires_at = datetime.now() + timedelta(hours=1)
     auth_data = {"token": token, "user_id": user_id, "expires_at": expires_at.isoformat()}
     token_cache_file = get_token_cache_file()
+    # Ensure parent directory exists (first run on fresh systems)
+    os.makedirs(os.path.dirname(token_cache_file), exist_ok=True)
     safe_json_dump(auth_data, token_cache_file)
 
 def load_auth_data():
@@ -549,7 +551,11 @@ def get_access_token():
     else:
         # Fallback to manual prompt
         email = console.input("[bold]Enter your email:[/bold] ")
-        password = getpass.getpass("Enter your password: ")
+        try:
+            password = getpass.getpass("Enter your password: ")
+        except Exception:
+            console.print("[yellow]Could not securely hide password input on this terminal.[/yellow]")
+            password = console.input("Password (visible): ")
     
     url = f"{API_BASE_URL}/users/tokens/sign_in"
     headers = {"Content-Type": "application/json"}

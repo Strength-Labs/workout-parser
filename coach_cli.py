@@ -66,7 +66,8 @@ def run_bulk_sync_from_cli(token, user_id):
     
     # Final confirmation
     console.print(f"\n[yellow]Ready to launch {mode_desc}[/yellow]")
-    if console.input("[bold green]Proceed? [y/N]: [/bold green]").lower() != 'y':
+    prompt = "Proceed? Type 'y' to proceed (default is No) [y/N]: "
+    if console.input(f"[bold green]{prompt}[/bold green]").lower() != 'y':
         console.print("[yellow]Bulk sync cancelled.[/yellow]")
         console.input("Press Enter to continue...")
         return

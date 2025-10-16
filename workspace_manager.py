@@ -105,7 +105,11 @@ def setup_new_workspace():
     # Get credentials
     console.print(f"\n[bold]Credentials for '{workspace_name}' workspace:[/bold]")
     email = console.input("Email: ").strip()
-    password = getpass.getpass("Password: ")
+    try:
+        password = getpass.getpass("Password: ")
+    except Exception:
+        console.print("[yellow]Could not securely hide password input on this terminal.[/yellow]")
+        password = console.input("Password (visible): ")
     
     if not email or not password:
         console.print("[red]Email and password are required.[/red]")
@@ -159,10 +163,18 @@ def setup_new_workspace():
     ai_choice = console.input("Choose AI provider (1/2/3): ").strip()
     if ai_choice == "1":
         llm_provider = "openai"
-        llm_api_key = getpass.getpass("OpenAI API Key: ")
+        try:
+            llm_api_key = getpass.getpass("OpenAI API Key: ")
+        except Exception:
+            console.print("[yellow]Could not securely hide input on this terminal.[/yellow]")
+            llm_api_key = console.input("OpenAI API Key (visible): ")
     elif ai_choice == "2":
         llm_provider = "xai"
-        llm_api_key = getpass.getpass("xAI API Key: ")
+        try:
+            llm_api_key = getpass.getpass("xAI API Key: ")
+        except Exception:
+            console.print("[yellow]Could not securely hide input on this terminal.[/yellow]")
+            llm_api_key = console.input("xAI API Key (visible): ")
     
     # Update workspace with company info and AI settings
     try:
