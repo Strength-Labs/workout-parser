@@ -4,7 +4,7 @@
 
 set -e
 
-VERSION="1.0.0"
+VERSION="1.5.0"
 PROJECT_NAME="TurnkeyCoachTools"
 
 echo "=== Turnkey Coach Tools - Master Build Script ==="

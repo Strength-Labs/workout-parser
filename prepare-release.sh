@@ -1,27 +1,27 @@
 #!/bin/bash
-# Prepare v1.4.0 Release Script
+# Prepare v1.5.0 Release Script
 # This script helps prepare the GitHub release
 
 set -e
 
-echo "🚀 Preparing Turnkey Coach Tools v1.4.0 Release"
+echo "🚀 Preparing Turnkey Coach Tools v1.5.0 Release"
 echo "=============================================="
 
 # Check if macOS build exists
-if [ ! -f "dist/app-with-icon/TurnkeyCoachTools-1.4.0-WithIcon.dmg" ]; then
+if [ ! -f "dist/app-with-icon/TurnkeyCoachTools-1.5.0-WithIcon.dmg" ]; then
     echo "❌ macOS DMG not found. Run ./build-onefile.sh then ./build-app-with-icon.sh first"
     exit 1
 fi
 
-echo "✅ Found macOS DMG: dist/app-with-icon/TurnkeyCoachTools-1.4.0-WithIcon.dmg"
+echo "✅ Found macOS DMG: dist/app-with-icon/TurnkeyCoachTools-1.5.0-WithIcon.dmg"
 
 # Create release directory
 mkdir -p release-files
-cp "dist/app-with-icon/TurnkeyCoachTools-1.4.0-WithIcon.dmg" release-files/
+cp "dist/app-with-icon/TurnkeyCoachTools-1.5.0-WithIcon.dmg" release-files/
 
 # Create release notes file
 cat > release-files/RELEASE_NOTES.md << 'EOF'
-# 🎉 Turnkey Coach Tools v1.4.0
+# 🎉 Turnkey Coach Tools v1.5.0
 
 ## ✨ Major New Features
 
@@ -51,13 +51,13 @@ cat > release-files/RELEASE_NOTES.md << 'EOF'
 ## 📦 **Downloads**
 
 ### 🍎 **macOS** (Recommended)
-- **TurnkeyCoachTools-1.4.0-WithIcon.dmg** - Beautiful app with custom icon
+- **TurnkeyCoachTools-1.5.0-WithIcon.dmg** - Beautiful app with custom icon
 - Requires: macOS 10.15+, Apple Silicon (M1/M2/M3/M4)
 - No Python installation needed - everything bundled!
 
 ### 🪟 **Windows**
-- **TurnkeyCoachTools-1.4.0-Setup.exe** - Professional installer
-- **TurnkeyCoachTools-1.4.0-Windows.zip** - Standalone executable
+- **TurnkeyCoachTools-1.5.0-Setup.exe** - Professional installer
+- **TurnkeyCoachTools-1.5.0-Windows.zip** - Standalone executable
 - Requires: Windows 10/11 (64-bit)
 - No Python installation needed - everything bundled!
 
@@ -80,7 +80,7 @@ echo "✅ Created release notes: release-files/RELEASE_NOTES.md"
 
 # Create instructions file
 cat > release-files/INSTRUCTIONS.txt << 'EOF'
-🚀 FINAL STEPS TO COMPLETE v1.4.0 RELEASE:
+🚀 FINAL STEPS TO COMPLETE v1.5.0 RELEASE:
 
 1. DOWNLOAD WINDOWS FILES:
    - Go to: https://github.com/Strength-Labs/workout-parser/actions
@@ -91,14 +91,14 @@ cat > release-files/INSTRUCTIONS.txt << 'EOF'
 2. CREATE GITHUB RELEASE:
    - Go to: https://github.com/Strength-Labs/workout-parser/releases
    - Click "Create a new release"
-   - Tag: v1.4.0
-   - Title: Turnkey Coach Tools v1.4.0
+- Tag: v1.5.0
+- Title: Turnkey Coach Tools v1.5.0
    - Copy-paste content from RELEASE_NOTES.md
 
 3. UPLOAD FILES:
-   - TurnkeyCoachTools-1.4.0-WithIcon.dmg (already in this folder)
-   - TurnkeyCoachTools-1.4.0-Setup.exe (from GitHub Actions)
-   - TurnkeyCoachTools-1.4.0-Windows.zip (from GitHub Actions)
+- TurnkeyCoachTools-1.5.0-WithIcon.dmg (already in this folder)
+- TurnkeyCoachTools-1.5.0-Setup.exe (from GitHub Actions)
+- TurnkeyCoachTools-1.5.0-Windows.zip (from GitHub Actions)
 
 4. PUBLISH:
    - Check "Set as latest release"
@@ -112,7 +112,7 @@ echo "✅ Created instructions: release-files/INSTRUCTIONS.txt"
 # Show summary
 echo ""
 echo "📊 RELEASE SUMMARY:"
-echo "  ✅ macOS DMG ready: $(du -h release-files/TurnkeyCoachTools-1.4.0-WithIcon.dmg | cut -f1)"
+echo "  ✅ macOS DMG ready: $(du -h release-files/TurnkeyCoachTools-1.5.0-WithIcon.dmg | cut -f1)"
 echo "  ✅ Release notes prepared"
 echo "  ✅ Step-by-step instructions created"
 echo ""
