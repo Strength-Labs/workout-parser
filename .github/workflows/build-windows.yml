@@ -54,7 +54,7 @@ jobs:
         AllowNoIcons=yes
         LicenseFile=
         OutputDir=dist\windows-installer
-OutputBaseFilename=TurnkeyCoachTools-1.5.0-Setup
+        OutputBaseFilename=TurnkeyCoachTools-1.5.0-Setup
         SetupIconFile=app-icon.ico
         Compression=lzma
         SolidCompression=yes
@@ -114,5 +114,5 @@ OutputBaseFilename=TurnkeyCoachTools-1.5.0-Setup
         name: windows-release
         path: |
           dist/turnkey-coach.exe
-dist/windows-installer/TurnkeyCoachTools-1.5.0-Setup.exe
-dist/TurnkeyCoachTools-1.5.0-Windows.zip
+          dist/windows-installer/TurnkeyCoachTools-1.5.0-Setup.exe
+          dist/TurnkeyCoachTools-1.5.0-Windows.zip
