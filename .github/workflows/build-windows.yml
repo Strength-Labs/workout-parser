@@ -1,10 +1,10 @@
 name: Build Windows Release
 
 on:
-  workflow_dispatch:  # Manual trigger from GitHub web interface
+  workflow_dispatch:
   push:
     tags:
-      - 'v*'  # Automatically trigger when you create version tags
+      - 'v*'
 
 jobs:
   build-windows:
