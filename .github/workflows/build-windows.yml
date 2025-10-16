@@ -35,7 +35,7 @@ jobs:
       run: |
         $setupScript = @"
         #define MyAppName "Turnkey Coach Tools"
-#define MyAppVersion "1.5.0"
+        #define MyAppVersion "1.5.0"
         #define MyAppPublisher "Barbell Logic"
         #define MyAppURL "https://github.com/Strength-Labs/workout-parser"
         #define MyAppExeName "turnkey-coach.exe"
