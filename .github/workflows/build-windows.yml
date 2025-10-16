@@ -40,7 +40,7 @@ jobs:
         #define MyAppExeName "turnkey-coach.exe"
         
         [Setup]
-        AppId={{12345678-1234-5678-9ABC-DEF123456789}
+        AppId={{12345678-1234-5678-9ABC-DEF123456789}}
         AppName={#MyAppName}
         AppVersion={#MyAppVersion}
         AppVerName={#MyAppName} {#MyAppVersion}
@@ -104,7 +104,7 @@ OutputBaseFilename=TurnkeyCoachTools-1.5.0-Setup
     
     - name: Create ZIP archive
       run: |
-Compress-Archive -Path "dist\turnkey-coach.exe" -DestinationPath "dist\TurnkeyCoachTools-1.5.0-Windows.zip"
+        Compress-Archive -Path "dist\turnkey-coach.exe" -DestinationPath "dist\TurnkeyCoachTools-1.5.0-Windows.zip"
       shell: powershell
     
     - name: Upload build artifacts
