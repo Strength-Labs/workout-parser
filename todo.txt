@@ -7,4 +7,6 @@ Perhaps add the dryrun to the AI chat commands?
 
 Fix up the dummy's guide. 
 
+Adjust the metrics markup. Perhaps $ for inquiry metrics, @ for prescribed metrics. and some way to distinguish between the number and the units?
 
+Ability to review and adjust workouts based on performance? That would be good! 
