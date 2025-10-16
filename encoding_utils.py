@@ -37,6 +37,7 @@ def safe_open(filepath: str, mode: str = 'r', **kwargs):
 def safe_json_dump(obj: Any, filepath: str, **kwargs) -> None:
     """
     Save JSON to file with proper Unicode handling.
+    Ensures parent directories exist to avoid FileNotFoundError on first run.
     
     Args:
         obj: Object to serialize
@@ -46,6 +47,14 @@ def safe_json_dump(obj: Any, filepath: str, **kwargs) -> None:
     # Ensure Unicode characters are preserved
     kwargs.setdefault('ensure_ascii', False)
     kwargs.setdefault('indent', 2)
+    
+    # Ensure parent directory exists (cross-platform, tolerant)
+    parent = os.path.dirname(os.path.abspath(filepath))
+    if parent:
+        try:
+            os.makedirs(parent, exist_ok=True)
+        except OSError:
+            pass
     
     with safe_open(filepath, 'w') as f:
         json.dump(obj, f, **kwargs)

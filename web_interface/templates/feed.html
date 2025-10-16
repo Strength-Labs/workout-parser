@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ client.full_name }} - Feed | Turnkey Coach Tools</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="icon" href="/static/images/app-icon.ico" type="image/x-icon">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="/static/images/app-icon.ico" alt="Turnkey Coach Tools" class="app-icon">
+            <h1>{{ client.full_name }}</h1>
+            <div class="subtitle">Unified Feed</div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="section-header">
+            <h2 class="section-title">Recent Activity</h2>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="/" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+                <a href="/client/{{ client.id }}/workouts" class="btn btn-secondary btn-sm">💪 Workouts</a>
+                <a href="/client/{{ client.id }}/chat" class="btn btn-primary btn-sm">🤖 AI Chat</a>
+            </div>
+        </div>
+
+        <div class="feed-container">
+            {% for item in feed_items %}
+            <div class="feed-item {{ item.type.replace('_', '-') }}">
+                <div class="feed-header">
+                    <div>
+                        {% if item.type == 'workout_completed' %}
+                            <div class="feed-title">✅ {{ item.title }}</div>
+                        {% elif item.type == 'workout_assigned' %}
+                            <div class="feed-title">📋 {{ item.title }}</div>
+                        {% elif item.type == 'message' %}
+                            <div class="feed-title">💬 Message from {{ item.author }}</div>
+                        {% elif item.type == 'metric_logged' %}
+                            <div class="feed-title">📊 {{ item.metric }}: {{ item.value }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="feed-timestamp">{{ item.timestamp }}</div>
+                </div>
+                
+                <div class="feed-details">
+                    {% if item.type == 'workout_completed' or item.type == 'workout_assigned' %}
+                        <p>{{ item.details }}</p>
+                    {% elif item.type == 'message' %}
+                        <p>{{ item.text }}</p>
+                    {% elif item.type == 'metric_logged' %}
+                        {% if item.note %}
+                            <p><em>"{{ item.note }}"</em></p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Load More Button -->
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn btn-secondary">Load More Activity</button>
+        </div>
+    </main>
+
+    <style>
+        /* Add specific feed item colors */
+        .feed-item.workout-completed {
+            border-left-color: var(--success-500);
+        }
+        .feed-item.workout-assigned {
+            border-left-color: var(--warning-500);
+        }
+        .feed-item.message {
+            border-left-color: var(--primary-400);
+        }
+        .feed-item.metric-logged {
+            border-left-color: var(--secondary-500);
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,24 @@
+#!/bin/bash
+# 🌙 Quick Overnight Sync Launcher
+# Just run: ./sync_all_clients
+
+clear
+echo "🌙 =============================================";
+echo "   TURNKEY COACH - OVERNIGHT BULK SYNC";
+echo "🌙 ============================================="
+echo "   Time: $(date)"
+echo ""
+
+# Activate virtual environment if it exists
+if [ -d "venv" ]; then
+    echo "🐍 Activating Python virtual environment..."
+    source venv/bin/activate
+fi
+
+# Run the bulk sync with all the verbose output
+python bulk_sync.py
+
+echo ""
+echo "🕐 Sync finished at: $(date)"
+echo "🏠 Check ~/Turnkey/ for all your data"
+echo ""

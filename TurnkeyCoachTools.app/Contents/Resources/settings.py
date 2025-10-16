@@ -63,7 +63,11 @@ def load_or_init_settings():
     # New: Prompt for email and password (added HERE, after editor setup)
     console.print("\n[bold]Enter your Turnkey Coach credentials (stored securely for auto-login):[/bold]")
     email = console.input("Email: ").strip()
-    password = getpass.getpass("Password: ")  # Secure input, no echo
+    try:
+        password = getpass.getpass("Password: ")  # Secure input, no echo
+    except Exception:
+        console.print("[yellow]Could not securely hide password input on this terminal.[/yellow]")
+        password = console.input("Password (visible): ")
     
     # Generate encryption key for password
     key = Fernet.generate_key()

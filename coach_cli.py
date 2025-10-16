@@ -10,9 +10,10 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text  # Added for explicit text rendering
 from settings import get_default_editor, get_stored_credentials, clear_stored_credentials
+from workspace_manager import workspace_selector, get_workspace_info, logout_current_workspace, ensure_workspace_directories
 
 # Import our shared functions
-from api_client import get_access_token, get_clients, clear_screen, get_workout_history, load_exercise_map, update_exercise_list
+from api_client import get_access_token, get_clients, clear_screen, get_workout_history, get_workout_history_headless, load_exercise_map, update_exercise_list
 from directory_migration import get_client_dir, get_shared_dir
 # Import our tools
 from feed_tool import run_feed
@@ -25,6 +26,67 @@ from ai_chat_tool import run_ai_chat
 from metrics_tool import run_metrics_tool
 
 console = Console()
+
+
+def run_bulk_sync_from_cli(token, user_id):
+    """Launch the standalone bulk sync script with user-friendly options."""
+    clear_screen()
+    console.print(Panel.fit("🌙 [bold blue]Bulk Sync All Clients[/bold blue] 🌙", border_style="blue"))
+    
+    console.print("\n[dim]This will launch the bulk sync tool to sync workout history and feed data for all your clients.[/dim]")
+    console.print("[dim]The process runs in a separate window with a live progress display.[/dim]")
+    console.print("[dim]Depending on data volume, this may take several minutes.[/dim]")
+    
+    # Show sync options
+    console.print("\n[bold]Sync Options:[/bold]")
+    console.print("  [bold]1.[/bold] Quick Sync (2 workers, recommended)")
+    console.print("  [bold]2.[/bold] Fast Sync (4 workers)")
+    console.print("  [bold]3.[/bold] Test Mode (first 5 clients only)")
+    console.print("  [bold]q.[/bold] Cancel")
+    
+    choice = console.input("\n> ").strip().lower()
+    if choice == 'q':
+        return
+    
+    # Set parameters based on choice
+    cmd_args = ["python3", "bulk_sync.py"]
+    
+    if choice == '1':
+        cmd_args.extend(["--workers", "2"])
+        mode_desc = "Quick Sync with 2 workers"
+    elif choice == '2':
+        cmd_args.extend(["--workers", "4"])
+        mode_desc = "Fast Sync with 4 workers"
+    elif choice == '3':
+        cmd_args.extend(["--workers", "2", "--test", "5"])
+        mode_desc = "Test Mode (first 5 clients)"
+    else:
+        cmd_args.extend(["--workers", "2"])  # default
+        mode_desc = "Quick Sync with 2 workers (default)"
+    
+    # Final confirmation
+    console.print(f"\n[yellow]Ready to launch {mode_desc}[/yellow]")
+    prompt = "Proceed? Type 'y' to proceed (default is No) [y/N]: "
+    if console.input(f"[bold green]{prompt}[/bold green]").lower() != 'y':
+        console.print("[yellow]Bulk sync cancelled.[/yellow]")
+        console.input("Press Enter to continue...")
+        return
+    
+    # Add --skip-confirm flag to avoid double confirmation
+    cmd_args.append("--skip-confirm")
+    
+    # Launch the bulk sync script
+    console.print("\n[dim]Launching bulk sync tool...[/dim]")
+    try:
+        result = subprocess.run(cmd_args, cwd=os.getcwd(), check=False)
+        if result.returncode == 0:
+            console.print("\n[bold green]✨ Bulk sync tool completed successfully! ✨[/bold green]")
+        else:
+            console.print(f"\n[yellow]⚠️ Bulk sync tool exited with code {result.returncode}[/yellow]")
+    except Exception as e:
+        console.print(f"\n[bold red]❌ Failed to launch bulk sync tool: {e}[/bold red]")
+    
+    console.input("\nPress Enter to return to client list...")
 
 
 def select_client(token, user_id):
@@ -44,22 +106,58 @@ def select_client(token, user_id):
     while True:
         console.print("\n")  # Spacer for clarity
         console.print(Text("Options:", style="dim"))
+        console.print(Text("  [b] Bulk Sync All Clients", style="dim"))
         console.print(Text("  [l] Logout (clear credentials)", style="dim"))  # Use Text to avoid markdown
         console.print(Text("  [s] Adjust Settings (editor, credentials)", style="dim"))
+        console.print(Text("  [w] Create New Workspace", style="dim"))
+        
+        # Show workspace switcher option only if user has multiple workspaces
+        from settings import list_workspaces
+        workspaces = list_workspaces()
+        if len(workspaces) > 1:
+            console.print(Text("  [ws] Switch Workspace", style="dim"))
+        
         console.print(Text("{:>80}".format("Enter a number to select a client, or 'q' to quit > "), style="bold green"), end="")
         choice = input("").strip().lower()  # Raw input for clean capture
         if choice == 'q':
             return None
+        if choice == 'b':
+            run_bulk_sync_from_cli(token, user_id)
+            clear_screen()
+            console.print(table)  # Redisplay table after bulk sync
+            continue
         if choice == 'l':
-            clear_stored_credentials()
-            if 'TOKEN_CACHE_FILE' in globals() and os.path.exists(TOKEN_CACHE_FILE):
-                os.remove(TOKEN_CACHE_FILE)
-            console.print("[green]Logged out. Bye![/green]")
+            if logout_current_workspace():
+                console.print("[green]Logged out. You can now switch workspaces or quit.[/green]")
+                console.input("Press Enter to return to workspace selector...")
+                # Restart the main loop to show workspace selector
+                main()
+            else:
+                console.print("[red]Logout failed.[/red]")
             sys.exit()
         if choice == 's':
             adjust_settings()
             clear_screen()
             console.print(table)  # Redisplay table after settings change
+            continue
+        if choice == 'w':
+            from workspace_manager import setup_new_workspace
+            new_workspace_key = setup_new_workspace()
+            if new_workspace_key:
+                console.print(f"[green]✅ Created workspace successfully! Restart the app to use it.[/green]")
+                console.input("Press Enter to continue...")
+            clear_screen()
+            console.print(table)
+            continue
+        if choice == 'ws':
+            from workspace_manager import quick_workspace_switcher
+            switched_workspace = quick_workspace_switcher()
+            if switched_workspace:
+                console.print(f"[green]✅ Switched to {switched_workspace}! Loading clients...[/green]")
+                # Return a special signal to restart client selection with new workspace
+                return "WORKSPACE_SWITCHED"
+            clear_screen()
+            console.print(table)
             continue
         try:
             index = int(choice) - 1
@@ -75,7 +173,7 @@ def browse_history(token, client, coach_user_id):
     """Generates a markup file and opens it in an editor inside the client's directory."""
     client_name = client['full_name']
     client_dir = get_client_dir(client['id'])
-    workouts = get_workout_history(token, client)
+    workouts = get_workout_history_headless(token, client)
     valid_workouts = [w for w in workouts if w.get('workout_date')]
     if not valid_workouts:
         console.input("\nCould not load workout history. Press Enter to return.")
@@ -238,6 +336,166 @@ def add_note(client):
     console.print(f"[green]Note saved to {note_filename}.[/green]")
     console.input("Press Enter to continue.")
 
+def delete_workouts_ui(token, client):
+    """Interactive UI for deleting workouts with various filtering options."""
+    from datetime import datetime, date
+    from api_client import delete_workouts_filtered
+    
+    client_name = client['full_name']
+    client_id = client['id']
+    
+    while True:
+        clear_screen()
+        console.print(Panel(f"Delete Workouts - [bold green]{client_name}[/bold green]", expand=False))
+        
+        console.print("\n[bold]Delete Options:[/bold]")
+        console.print("  [bold]1.[/bold] Delete after TODAY (default)")
+        console.print("  [bold]2.[/bold] Delete after specific date")
+        console.print("  [bold]3.[/bold] Delete date range")
+        console.print("  [bold]q.[/bold] Back to menu")
+        
+        date_choice = console.input("\n> ").lower()
+        if date_choice == 'q':
+            return
+        
+        # Date selection logic
+        start_date = None
+        end_date = None
+        
+        if date_choice == '1':  # After today
+            today = date.today()
+            start_date = (today).isoformat()
+            date_desc = f"after today ({start_date})"
+        elif date_choice == '2':  # After specific date
+            date_str = console.input("Enter start date (YYYY-MM-DD): ").strip()
+            try:
+                # Validate date format
+                datetime.strptime(date_str, '%Y-%m-%d')
+                start_date = date_str
+                date_desc = f"on/after {start_date}"
+            except ValueError:
+                console.print("[red]Invalid date format. Please use YYYY-MM-DD.[/red]")
+                console.input("Press Enter to try again...")
+                continue
+        elif date_choice == '3':  # Date range
+            start_str = console.input("Enter start date (YYYY-MM-DD): ").strip()
+            end_str = console.input("Enter end date (YYYY-MM-DD): ").strip()
+            try:
+                # Validate date formats
+                datetime.strptime(start_str, '%Y-%m-%d')
+                datetime.strptime(end_str, '%Y-%m-%d')
+                start_date = start_str
+                end_date = end_str
+                date_desc = f"from {start_date} to {end_date}"
+            except ValueError:
+                console.print("[red]Invalid date format. Please use YYYY-MM-DD.[/red]")
+                console.input("Press Enter to try again...")
+                continue
+        else:
+            console.print("[red]Invalid choice.[/red]")
+            console.input("Press Enter to try again...")
+            continue
+        
+        # Workout type selection
+        clear_screen()
+        console.print(Panel(f"Delete Workouts {date_desc} - [bold green]{client_name}[/bold green]", expand=False))
+        
+        console.print("\n[bold]Workout Type:[/bold]")
+        console.print("  [bold]1.[/bold] Strength workouts only")
+        console.print("  [bold]2.[/bold] Nutrition assignments only")
+        console.print("  [bold]3.[/bold] Both strength and nutrition")
+        console.print("  [bold]q.[/bold] Back")
+        
+        type_choice = console.input("\n> ").lower()
+        if type_choice == 'q':
+            continue
+        
+        workout_types = None
+        type_desc = ""
+        if type_choice == '1':
+            workout_types = ['default']
+            type_desc = "strength workouts"
+        elif type_choice == '2':
+            workout_types = ['nutrition']
+            type_desc = "nutrition assignments"
+        elif type_choice == '3':
+            workout_types = ['default', 'nutrition']
+            type_desc = "strength workouts and nutrition assignments"
+        else:
+            console.print("[red]Invalid choice.[/red]")
+            console.input("Press Enter to try again...")
+            continue
+        
+        # Preview what would be deleted (dry run)
+        console.print(f"\n[dim]Checking what {type_desc} would be deleted {date_desc}...[/dim]")
+        
+        preview_result = delete_workouts_filtered(
+            token, client_id, start_date, end_date, workout_types, dry_run=True
+        )
+        
+        if preview_result['errors']:
+            console.print("[red]Error fetching workouts for preview:[/red]")
+            for error in preview_result['errors']:
+                console.print(f"  - {error}")
+            console.input("Press Enter to continue...")
+            continue
+        
+        if not preview_result['would_delete']:
+            console.print(f"[yellow]No {type_desc} found {date_desc}.[/yellow]")
+            console.input("Press Enter to continue...")
+            continue
+        
+        # Show preview
+        console.print(f"\n[bold yellow]Preview: {len(preview_result['would_delete'])} workout(s) would be deleted:[/bold yellow]")
+        for workout in preview_result['would_delete']:
+            workout_type_label = "Nutrition" if workout['type'] == 'nutrition' else "Strength"
+            title_part = f" - {workout['title']}" if workout['title'] else ""
+            console.print(f"  • {workout['date']} ({workout_type_label}){title_part}")
+        
+        # Final confirmation
+        console.print(f"\n[bold red]⚠️  WARNING: This will permanently delete {len(preview_result['would_delete'])} workout(s)![/bold red]")
+        console.print("[dim]Completed workouts cannot be deleted and will be skipped.[/dim]")
+        
+        confirm = console.input("\nAre you ABSOLUTELY SURE you want to delete these workouts? Type 'DELETE' to confirm: ").strip()
+        
+        if confirm != 'DELETE':
+            console.print("[green]Deletion cancelled.[/green]")
+            console.input("Press Enter to continue...")
+            continue
+        
+        # Perform actual deletion
+        console.print("\n[yellow]Deleting workouts...[/yellow]")
+        
+        delete_result = delete_workouts_filtered(
+            token, client_id, start_date, end_date, workout_types, dry_run=False
+        )
+        
+        # Show results
+        deleted_count = len(delete_result['deleted'])
+        skipped_count = len(delete_result['skipped'])
+        error_count = len(delete_result['errors'])
+        
+        if deleted_count > 0:
+            console.print(f"[bold green]✅ Successfully deleted {deleted_count} workout(s)![/bold green]")
+        
+        if skipped_count > 0:
+            console.print(f"[yellow]⚠️  Skipped {skipped_count} workout(s):[/yellow]")
+            for workout in delete_result['skipped']:
+                console.print(f"  • {workout['date']}: {workout['reason']}")
+        
+        if error_count > 0:
+            console.print(f"[red]❌ {error_count} error(s) occurred:[/red]")
+            for workout in delete_result['errors']:
+                console.print(f"  • {workout['date']}: {workout['error']}")
+        
+        # Force refresh the workout cache since we deleted workouts
+        console.print("\n[dim]Refreshing workout cache...[/dim]")
+        get_workout_history_headless(token, client, force_refresh=True)
+        
+        console.input("\nPress Enter to continue...")
+        return  # Exit after successful operation
+
+
 def show_tool_menu(token, user_id, client, exercise_map):
     """Displays the main tool menu for a selected client."""
     while True:
@@ -253,6 +511,7 @@ def show_tool_menu(token, user_id, client, exercise_map):
         console.print("  [bold]7.[/bold] Program Metrics")
         console.print("  [bold]8.[/bold] Validate Markup (Dry Run)")
         console.print("\n[bold]Utilities:[/bold]")
+        console.print("  [bold]d.[/bold] Delete Workouts")
         console.print("  [bold]n.[/bold] Add a Quick Note")
         console.print("  [bold]c.[/bold] Clean Up Directory")
         console.print("  [bold]r.[/bold] Force Refresh Workout History")
@@ -276,12 +535,14 @@ def show_tool_menu(token, user_id, client, exercise_map):
             run_metrics_tool(token, client)
         elif choice == '8':
             run_uploader_tool(token, client, exercise_map, dry_run=True)
+        elif choice == 'd':
+            delete_workouts_ui(token, client)
         elif choice == 'n':
             add_note(client)
         elif choice == 'c':
             clean_client_directory(client)
         elif choice == 'r':
-            get_workout_history(token, client, force_refresh=True)
+            get_workout_history_headless(token, client, force_refresh=True)
             console.input("Workout history has been refreshed. Press Enter to continue.")
         elif choice == 'u':
             if update_exercise_list(token):
@@ -338,10 +599,15 @@ def adjust_settings():
         console.input("Press Enter to continue...")
 
 
-def main():
-    """The main application loop."""
+def main_with_workspace_selected():
+    """Main application loop assuming workspace is already selected."""
+    # Ensure workspace directories exist
+    if not ensure_workspace_directories():
+        sys.exit("Failed to create workspace directories. Exiting.")
+    
     clear_screen()
-    console.print(Panel("[bold blue]Turnkey Coach Tools CLI[/bold blue]", expand=False))
+    workspace_info = get_workspace_info()
+    console.print(Panel(f"[bold blue]Turnkey Coach Tools CLI[/bold blue]\n[dim]Workspace: {workspace_info}[/dim]", expand=False))
     
     token, user_id = get_access_token()
     if not token or not user_id:
@@ -363,8 +629,22 @@ def main():
         selected_client = select_client(token, user_id)
         if selected_client is None:
             break  # Exit on 'q' or logout from select_client
-        get_workout_history(token, selected_client)
+        elif selected_client == "WORKSPACE_SWITCHED":
+            # Workspace was switched, restart the main loop with new workspace
+            main_with_workspace_selected()
+            break  # Exit current main loop
         show_tool_menu(token, user_id, selected_client, exercise_map)
+
+def main():
+    """The main application loop."""
+    # First, select workspace
+    selected_workspace = workspace_selector()
+    if not selected_workspace:
+        console.print("\nExiting. Goodbye!", style="dim")
+        return
+    
+    # Continue with the main app loop
+    main_with_workspace_selected()
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turnkey Coach Tools - Dashboard</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="icon" href="/static/images/app-icon.ico" type="image/x-icon">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="/static/images/app-icon.ico" alt="Turnkey Coach Tools" class="app-icon">
+            <h1>Turnkey Coach Tools</h1>
+            <div class="subtitle">Web Interface Preview</div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Coming Soon Banner -->
+        <div class="coming-soon">
+            <h2>🚀 Coming Soon!</h2>
+            <p>The web interface for your favorite coaching tools is in development. Say goodbye to the terminal and hello to beautiful, point-and-click coaching!</p>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="number">{{ total_clients }}</div>
+                <div class="label">Total Clients</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">{{ active_today }}</div>
+                <div class="label">Active Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">{{ pending_reviews }}</div>
+                <div class="label">Need Review</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">12</div>
+                <div class="label">PRs This Week</div>
+            </div>
+        </div>
+
+        <!-- Client List -->
+        <div class="section-header">
+            <h2 class="section-title">Your Clients</h2>
+            <button class="btn btn-primary">+ Add Client</button>
+        </div>
+
+        <div class="client-grid">
+            {% for client in clients %}
+            <a href="/client/{{ client.id }}/feed" class="client-card">
+                <div class="client-header">
+                    <div>
+                        <div class="client-name">{{ client.full_name }}</div>
+                        <div class="client-meta">Last workout: {{ client.last_workout }}</div>
+                    </div>
+                    <span class="client-status status-{{ client.status.replace('_', '-') }}">
+                        {{ client.status.replace('_', ' ').title() }}
+                    </span>
+                </div>
+                
+                <div class="client-actions">
+                    <span class="btn btn-primary btn-sm">📊 Feed</span>
+                    <span class="btn btn-secondary btn-sm">💪 Workouts</span>
+                    <span class="btn btn-secondary btn-sm">🤖 AI Chat</span>
+                    <span class="btn btn-secondary btn-sm">📈 Metrics</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Features Preview -->
+        <div style="margin-top: 3rem;">
+            <h2 class="section-title" style="text-align: center; margin-bottom: 2rem;">What's Coming</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                <div class="stat-card" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📱</div>
+                    <h3 style="margin-bottom: 0.5rem;">Mobile-First Design</h3>
+                    <p style="color: var(--gray-600); font-size: 0.9rem;">Use your tablet or phone anywhere in the gym</p>
+                </div>
+                
+                <div class="stat-card" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+                    <h3 style="margin-bottom: 0.5rem;">Drag & Drop Uploads</h3>
+                    <p style="color: var(--gray-600); font-size: 0.9rem;">No more command line file navigation</p>
+                </div>
+                
+                <div class="stat-card" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+                    <h3 style="margin-bottom: 0.5rem;">Real-time AI Chat</h3>
+                    <p style="color: var(--gray-600); font-size: 0.9rem;">Grok and GPT with sound effects and bubbles!</p>
+                </div>
+                
+                <div class="stat-card" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                    <h3 style="margin-bottom: 0.5rem;">Beautiful Workout Browser</h3>
+                    <p style="color: var(--gray-600); font-size: 0.9rem;">Your markup.md rendered with syntax highlighting</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Add some interactivity
+        document.querySelectorAll('.client-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.boxShadow = 'var(--shadow-lg)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.boxShadow = 'var(--shadow-sm)';
+            });
+        });
+        
+        // Coming soon animation
+        console.log('🚀 Turnkey Coach Tools Web Interface Preview');
+        console.log('Built with FastAPI + HTMX + Love');
+    </script>
+</body>
+</html>

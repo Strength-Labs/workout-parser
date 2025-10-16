@@ -24,23 +24,24 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
+      shell: powershell
     
     - name: Build Windows executable
       run: |
         pyinstaller --onefile --console --name "turnkey-coach" --icon=app-icon.ico coach_cli.py
-      shell: cmd
+      shell: powershell
     
     - name: Create Inno Setup installer script
       run: |
         $setupScript = @"
         #define MyAppName "Turnkey Coach Tools"
-        #define MyAppVersion "1.4.0"
+#define MyAppVersion "1.5.0"
         #define MyAppPublisher "Barbell Logic"
         #define MyAppURL "https://github.com/Strength-Labs/workout-parser"
         #define MyAppExeName "turnkey-coach.exe"
         
         [Setup]
-        AppId={{12345678-1234-5678-9ABC-DEF123456789}
+        AppId={{12345678-1234-5678-9ABC-DEF123456789}}
         AppName={#MyAppName}
         AppVersion={#MyAppVersion}
         AppVerName={#MyAppName} {#MyAppVersion}
@@ -53,7 +54,7 @@ jobs:
         AllowNoIcons=yes
         LicenseFile=
         OutputDir=dist\windows-installer
-        OutputBaseFilename=TurnkeyCoachTools-1.4.0-Setup
+OutputBaseFilename=TurnkeyCoachTools-1.5.0-Setup
         SetupIconFile=app-icon.ico
         Compression=lzma
         SolidCompression=yes
@@ -104,7 +105,7 @@ jobs:
     
     - name: Create ZIP archive
       run: |
-        Compress-Archive -Path "dist\turnkey-coach.exe" -DestinationPath "dist\TurnkeyCoachTools-1.4.0-Windows.zip"
+        Compress-Archive -Path "dist\turnkey-coach.exe" -DestinationPath "dist\TurnkeyCoachTools-1.5.0-Windows.zip"
       shell: powershell
     
     - name: Upload build artifacts
@@ -113,5 +114,5 @@ jobs:
         name: windows-release
         path: |
           dist/turnkey-coach.exe
-          dist/windows-installer/TurnkeyCoachTools-1.4.0-Setup.exe
-          dist/TurnkeyCoachTools-1.4.0-Windows.zip
+dist/windows-installer/TurnkeyCoachTools-1.5.0-Setup.exe
+dist/TurnkeyCoachTools-1.5.0-Windows.zip
