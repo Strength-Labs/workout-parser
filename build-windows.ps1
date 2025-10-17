@@ -46,7 +46,7 @@ pip install pyinstaller
 Write-Host "🔨 Building Windows executable..."
 $iconParam = if (Test-Path "app-icon.ico") { "--icon=app-icon.ico" } else { "" }
 
-pyinstaller --onefile --console --name "turnkey-coach" $iconParam --distpath "dist\windows" coach_cli.py
+pyinstaller --onefile --console --name "turnkey-coach" --hidden-import bulk_sync $iconParam --distpath "dist\windows" coach_cli.py
 
 if (-not (Test-Path "dist\windows\turnkey-coach.exe")) {
     Write-Host "❌ Build failed - executable not found" -ForegroundColor Red
