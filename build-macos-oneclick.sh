@@ -208,6 +208,7 @@ PYTHON_FILES=(
     "format_tool.py"
     "upload_tool.py"
     "ai_chat_tool.py"
+    "bulk_sync.py"
     "requirements.txt"
     "exerciselist.json"
     "README.md"

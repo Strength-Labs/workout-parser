@@ -49,7 +49,10 @@ def run_bulk_sync_from_cli(token, user_id):
         return
     
     # Set parameters based on choice
-    cmd_args = ["python3", "bulk_sync.py"]
+    resources_dir = os.path.dirname(os.path.abspath(__file__))
+    bulk_script = os.path.join(resources_dir, "bulk_sync.py")
+    python_bin = sys.executable if sys.executable else "python3"
+    cmd_args = [python_bin, bulk_script]
     
     if choice == '1':
         cmd_args.extend(["--workers", "2"])
@@ -78,7 +81,8 @@ def run_bulk_sync_from_cli(token, user_id):
     # Launch the bulk sync script
     console.print("\n[dim]Launching bulk sync tool...[/dim]")
     try:
-        result = subprocess.run(cmd_args, cwd=os.getcwd(), check=False)
+        # Ensure we run from Resources so relative imports and files resolve
+        result = subprocess.run(cmd_args, cwd=resources_dir, check=False)
         if result.returncode == 0:
             console.print("\n[bold green]✨ Bulk sync tool completed successfully! ✨[/bold green]")
         else:
