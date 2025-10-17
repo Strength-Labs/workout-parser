@@ -3,6 +3,8 @@
 ## Purpose
 This guide provides setup instructions, development workflows, testing strategies, and contribution guidelines for developers working on the Turnkey Coach Tools codebase.
 
+**Note**: As of v1.5, the application supports multi-workspace management, allowing coaches to manage multiple companies with isolated data directories, credentials, and tokens.
+
 ## Prerequisites
 
 ### Required Software
@@ -65,7 +67,22 @@ httpx==0.24.1
 python coach_cli.py
 ```
 
-Should prompt for credentials on first run.
+**First Run Behavior**:
+- Prompts for workspace selection (or creates "default" workspace)
+- Requests credentials (email/password)
+- Authenticates and stores encrypted credentials
+- Creates workspace directory structure: `~/Turnkey-{workspace}/`
+- Initializes global settings: `~/.turnkey_coach_settings.json`
+
+**Multi-Workspace Setup**:
+On subsequent runs, you can:
+- Switch workspaces via Settings menu
+- Create new workspaces for different coach accounts
+- Each workspace maintains isolated:
+  - Client data (`~/Turnkey-{workspace}/clients/`)
+  - Exercise list (`~/Turnkey-{workspace}/shared/exerciselist.json`)
+  - Token cache (`~/Turnkey-{workspace}/shared/.tokencache`)
+  - Credentials (encrypted in global settings file)
 
 ## Project Structure
 
@@ -79,18 +96,23 @@ workout-parser/
 ├── README.md                    # User documentation
 ├── markup.md                    # Markup language specification
 │
-├── coach_cli.py                 # Main entry point
-├── api_client.py                # API layer
-├── settings.py                  # Configuration management
-├── encoding_utils.py            # UTF-8 utilities
-├── directory_migration.py       # File system management
+├── coach_cli.py                 # Main entry point (651 lines)
+├── api_client.py                # API layer (618 lines)
+├── settings.py                  # Configuration management (374 lines)
+├── encoding_utils.py            # UTF-8 utilities (141 lines)
+├── directory_migration.py       # Legacy directory migration (289 lines)
 │
-├── feed_tool.py                 # Unified feed
-├── pr_tool.py                   # Estimated PRs
-├── actual_prs_tool.py           # Actual PRs
-├── upload_tool.py               # Workout uploader
-├── format_tool.py               # Workout formatter
-├── ai_chat_tool.py              # AI assistant
+├── workspace_manager.py         # Multi-workspace management (465 lines)
+├── workspace_setup.py           # Workspace initialization (186 lines)
+├── bulk_sync.py                 # Parallel client synchronization (316 lines)
+│
+├── feed_tool.py                 # Unified feed (886 lines)
+├── pr_tool.py                   # Estimated PRs (325 lines)
+├── actual_prs_tool.py           # Actual PRs (158 lines)
+├── metrics_tool.py              # Metrics programming (603 lines)
+├── upload_tool.py               # Workout uploader (513 lines)
+├── format_tool.py               # Workout formatter (186 lines)
+├── ai_chat_tool.py              # AI assistant (451 lines)
 │
 ├── backups/                     # Backup files (if any)
 ├── oldstuff/                    # Deprecated code
@@ -216,11 +238,19 @@ if is_completed and not actual_sets:
 - [ ] Token expiry and refresh
 - [ ] Logout and credential clearing
 
+**Workspace Management**:
+- [ ] First-time workspace setup
+- [ ] Switch between workspaces
+- [ ] Create new workspace
+- [ ] Isolated credentials per workspace
+- [ ] Workspace data directory isolation
+
 **Client Selection**:
 - [ ] Display client list
 - [ ] Select client by number
 - [ ] Handle invalid selection
 - [ ] Multiple coaches per client
+- [ ] Bulk sync all clients (headless mode)
 
 **Feed Tool**:
 - [ ] Load cached feed instantly
@@ -241,15 +271,26 @@ if is_completed and not actual_sets:
 **Workout Management**:
 - [ ] Browse history in editor
 - [ ] Upload workout from file
+- [ ] Delete single workout
+- [ ] Delete batch of workouts (with filters)
+- [ ] Dry-run deletion preview
 - [ ] Fuzzy exercise matching
 - [ ] Unit detection (lbs/kg)
 - [ ] AI chat with context loading
 - [ ] Edit AI responses
 
+**Metrics Programming**:
+- [ ] View metric catalog
+- [ ] Program metrics for client
+- [ ] Configure intervals and goals
+- [ ] Exercise selection and grouping
+
 **Settings**:
+- [ ] Switch workspace
 - [ ] Change editor
 - [ ] Change credentials
 - [ ] LLM provider configuration
+- [ ] Workspace-specific settings persistence
 
 #### Unit Testing (Future)
 
@@ -291,8 +332,10 @@ pytest tests/
 4. Verify cache files created correctly
 
 **Test Data Locations**:
-- Test client directory: `~/Turnkey/clients/test_client_id/`
-- Test settings: Use separate settings file for testing
+- Test workspace: `~/Turnkey-test/` (create via workspace setup)
+- Test client directory: `~/Turnkey-test/clients/test_client_id/`
+- Test settings: `~/.turnkey_coach_settings.json` (workspace: "test")
+- Isolated from production workspaces
 
 ### Debugging
 
@@ -360,13 +403,25 @@ import pdb; pdb.set_trace()
 ```python
 # new_tool.py
 from rich.console import Console
-from api_client import API_BASE_URL
+from api_client import API_BASE_URL, get_client_dir
+from encoding_utils import safe_json_load, safe_json_dump
 
 console = Console()
 
-def run_new_tool(token, client):
-    """Main function for new tool."""
+def run_new_tool(token, client, workspace=None):
+    """Main function for new tool.
+
+    Args:
+        token (str): API authentication token
+        client (dict): Selected client data
+        workspace (str, optional): Current workspace name
+    """
     console.print("[bold]New Tool[/bold]")
+
+    # Access workspace-aware paths
+    client_dir = get_client_dir(client['id'], workspace)
+    cache_path = os.path.join(client_dir, "new_tool_cache.json")
+
     # Implementation...
 ```
 
@@ -405,10 +460,11 @@ def get_new_data(token, client_id):
         return None
 ```
 
-**2. Add caching if appropriate**:
+**2. Add caching if appropriate (workspace-aware)**:
 ```python
-def get_new_data(token, client_id):
-    cache_path = os.path.join(get_client_dir(client_id), "new_data_cache.json")
+def get_new_data(token, client_id, workspace=None):
+    """Fetch new data with workspace-aware caching."""
+    cache_path = os.path.join(get_client_dir(client_id, workspace), "new_data_cache.json")
 
     # Check cache
     if os.path.exists(cache_path):
@@ -422,6 +478,21 @@ def get_new_data(token, client_id):
         safe_json_dump(data, cache_path)
 
     return data
+```
+
+**3. Add headless mode for bulk operations (optional)**:
+```python
+def get_new_data_headless(token, client_id, workspace=None):
+    """Headless version for bulk sync - no Rich console output.
+
+    Returns:
+        dict: Result with 'data' key if successful, 'error' key if failed.
+    """
+    try:
+        data = _fetch_new_data_from_api(token, client_id)
+        return {'data': data, 'client_id': client_id}
+    except Exception as e:
+        return {'error': str(e), 'client_id': client_id}
 ```
 
 ### Extending the Markup Parser
@@ -476,6 +547,34 @@ Format: `{sets} x {distance} {unit}`
 Examples:
 - `5 x 400 m` - 5 sets of 400 meters
 - `1 x 5 km` - 1 set of 5 kilometers
+```
+
+### Adding a New Workspace-Aware Feature
+
+**1. Access workspace context**:
+```python
+from settings import get_current_workspace
+from api_client import get_client_dir
+
+def new_feature(token, client):
+    """Workspace-aware feature implementation."""
+    workspace = get_current_workspace()
+    client_dir = get_client_dir(client['id'], workspace)
+
+    # Feature uses workspace-isolated paths
+    data_path = os.path.join(client_dir, "feature_data.json")
+    # ... implementation
+```
+
+**2. Support legacy migration if needed**:
+```python
+def migrate_legacy_data(client_id, workspace):
+    """Migrate data from ~/Turnkey/ to ~/Turnkey-{workspace}/."""
+    legacy_path = os.path.expanduser("~/Turnkey/clients/{}/data.json".format(client_id))
+    new_path = os.path.join(get_client_dir(client_id, workspace), "data.json")
+
+    if os.path.exists(legacy_path) and not os.path.exists(new_path):
+        shutil.copy2(legacy_path, new_path)
 ```
 
 ### Adding Configuration Options
@@ -691,10 +790,14 @@ def calculate_expensive_metric(data):
 __pycache__/
 .tokencache
 exerciselist.json
+.turnkey_coach_settings.json  # Global settings with encrypted credentials
 *.json  # Cache files
 *.txt   # Generated files
 !requirements.txt
 !markup.md
+
+# Workspace directories (all user data)
+Turnkey-*/
 ```
 
 ### Input Validation
@@ -770,7 +873,86 @@ pip install pyinstaller
 pyinstaller --onefile --name turnkey-coach coach_cli.py
 ```
 
+## Workspace Management for Developers
+
+### Understanding Workspace Isolation
+
+**Directory Structure**:
+```
+~/Turnkey-default/              # Default workspace (legacy compatibility)
+~/Turnkey-acme-fitness/         # ACME Fitness company workspace
+~/Turnkey-powerhouse/           # Powerhouse Gym workspace
+~/.turnkey_coach_settings.json  # Global settings + workspace registry
+```
+
+**Each workspace contains**:
+- `clients/{client_id}/` - All client data (workouts, messages, feed cache)
+- `shared/.tokencache` - API token cache
+- `shared/exerciselist.json` - Exercise catalog
+- `cache/` - Temporary files
+
+**Global settings file** (`~/.turnkey_coach_settings.json`):
+```json
+{
+  "workspaces": {
+    "default": {
+      "credentials": "encrypted_string",
+      "user_id": "coach_user_id",
+      "last_used": "2025-10-16T10:30:00"
+    },
+    "acme-fitness": {
+      "credentials": "encrypted_string_2",
+      "user_id": "another_coach_id",
+      "last_used": "2025-10-15T14:20:00"
+    }
+  },
+  "current_workspace": "default",
+  "llm_provider": "openai",
+  "llm_api_key": "encrypted_key",
+  "editor": "nano"
+}
+```
+
+### Creating Test Workspaces
+
+**For feature development**:
+```bash
+# Run CLI and select "Create New Workspace" from Settings
+python coach_cli.py
+# Settings > Switch/Create Workspace > Create "dev-test"
+
+# Or manually create workspace directory
+mkdir -p ~/Turnkey-dev-test/clients
+mkdir -p ~/Turnkey-dev-test/shared
+mkdir -p ~/Turnkey-dev-test/cache
+```
+
+### Switching Workspaces Programmatically
+
+```python
+from settings import load_or_init_settings, get_current_workspace
+from encoding_utils import safe_json_dump
+
+def switch_to_workspace(workspace_name):
+    """Switch active workspace."""
+    settings = load_or_init_settings()
+    if workspace_name in settings.get('workspaces', {}):
+        settings['current_workspace'] = workspace_name
+        safe_json_dump(settings, os.path.expanduser('~/.turnkey_coach_settings.json'))
+        return True
+    return False
+```
+
 ## Troubleshooting Development Issues
+
+### Workspace Issues
+**Symptom**: Data not appearing or credential errors
+
+**Solutions**:
+1. Check current workspace: Settings > Switch/Create Workspace
+2. Verify workspace directory exists: `ls ~/Turnkey-*`
+3. Check global settings: `cat ~/.turnkey_coach_settings.json`
+4. Ensure workspace has valid credentials in settings
 
 ### Import Errors
 **Symptom**: `ModuleNotFoundError`

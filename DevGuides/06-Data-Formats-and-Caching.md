@@ -5,9 +5,9 @@ This guide documents all data formats, caching strategies, file structures, and 
 
 ## File System Structure
 
-### Directory Layout
+### Directory Layout (Workspace-Aware, v1.5+)
 ```
-~/Turnkey/
+~/Turnkey-{workspace}/               # Multi-workspace support
 ├── clients/                          # Per-client data
 │   └── {client_id}/
 │       ├── workouts_user_{id}.json           # Complete workout cache
@@ -18,13 +18,13 @@ This guide documents all data formats, caching strategies, file structures, and 
 │       ├── Unified_Feed_{name}_{ts}.txt      # Exported feeds
 │       └── note-{date}.txt                   # Coach notes
 ├── shared/
-│   ├── exerciselist.json             # Exercise database
-│   ├── .tokencache                   # Auth token
+│   ├── exerciselist.json             # Exercise database (workspace-specific)
+│   ├── .tokencache                   # Auth token (workspace-specific)
 │   └── coaching_context/             # AI context files
 │       └── *.md, *.txt               # Custom context documents
 └── cache/                            # Reserved for future use
 
-~/.turnkey_coach_settings.json        # User settings and credentials
+~/.turnkey_coach_settings.json        # Global settings + workspace registry
 
 {app_directory}/
 ├── coach_cli.py
@@ -37,7 +37,7 @@ This guide documents all data formats, caching strategies, file structures, and 
 
 ### 1. Authentication Token Cache
 
-**File**: `~/Turnkey/shared/.tokencache`
+**File**: `~/Turnkey-{workspace}/shared/.tokencache`
 
 **Format**: JSON
 
@@ -100,7 +100,7 @@ This guide documents all data formats, caching strategies, file structures, and 
 
 ### 3. Exercise List
 
-**File**: `~/Turnkey/shared/exerciselist.json`
+**File**: `~/Turnkey-{workspace}/shared/exerciselist.json`
 
 **Format**: JSON array
 
@@ -144,7 +144,7 @@ This guide documents all data formats, caching strategies, file structures, and 
 
 ### 4. Workout Cache
 
-**File**: `~/Turnkey/clients/{client_id}/workouts_user_{client_id}.json`
+**File**: `~/Turnkey-{workspace}/clients/{client_id}/workouts_user_{client_id}.json`
 
 **Format**: JSON array
 
@@ -288,7 +288,7 @@ This guide documents all data formats, caching strategies, file structures, and 
 
 ### 5. Workout Index
 
-**File**: `~/Turnkey/clients/{client_id}/workouts_index.json`
+**File**: `~/Turnkey-{workspace}/clients/{client_id}/workouts_index.json`
 
 **Format**: JSON
 
@@ -340,7 +340,7 @@ Save index
 
 ### 6. Messages Cache
 
-**File**: `~/Turnkey/clients/{client_id}/messages_cache.json`
+**File**: `~/Turnkey-{workspace}/clients/{client_id}/messages_cache.json`
 
 **Format**: JSON
 
@@ -397,7 +397,7 @@ Else (first load):
 
 ### 7. Feed Cache
 
-**File**: `~/Turnkey/clients/{client_id}/feed_cache.json`
+**File**: `~/Turnkey-{workspace}/clients/{client_id}/feed_cache.json`
 
 **Format**: JSON
 
@@ -704,7 +704,7 @@ See [03-Feed-Tool-Deep-Dive.md](./03-Feed-Tool-Deep-Dive.md) for details.
 
 ### Encoding Utilities Module
 
-**File**: `encoding_utils.py` (133 lines)
+**File**: `encoding_utils.py` (141 lines)
 
 **Purpose**: Ensure consistent UTF-8 handling across all platforms (especially Windows).
 

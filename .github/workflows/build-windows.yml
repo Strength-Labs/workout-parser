@@ -28,7 +28,7 @@ jobs:
     
     - name: Build Windows executable
       run: |
-        pyinstaller --onefile --console --name "turnkey-coach" --hidden-import bulk_sync --icon=app-icon.ico coach_cli.py
+        pyinstaller --onefile --console --name "turnkey-coach" --hidden-import bulk_sync --hidden-import display_utils --hidden-import workspace_manager --hidden-import workspace_setup --hidden-import metrics_tool --hidden-import rich.live --icon=app-icon.ico coach_cli.py
       shell: powershell
     
     - name: Create Inno Setup installer script

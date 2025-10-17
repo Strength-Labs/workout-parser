@@ -5,15 +5,16 @@ This guide provides comprehensive documentation for the unified feed tool, the m
 
 ## Module Overview
 
-**File**: `feed_tool.py` (824 lines)
+**File**: `feed_tool.py` (886 lines)
 
 **Purpose**: Unified timeline of messages and workout comments with advanced features:
 - Real-time data aggregation from multiple sources
-- Incremental caching for performance
-- Vim-like navigation modes
-- Message/comment posting
-- Search functionality
-- Export to text files
+- Incremental caching with timestamp-based updates
+- Vim-like navigation modes with search
+- Message/comment posting to API
+- Export to text files with context enrichment
+- Editor integration for viewing exports
+- **Headless mode for bulk operations** (New in v1.5)
 
 ## Architecture
 
@@ -29,7 +30,8 @@ run_feed() - Main orchestrator
     │   └── _save_workouts_index()
     │
     ├── Data Aggregation
-    │   ├── fetch_and_aggregate_data() [background thread]
+    │   ├── fetch_and_aggregate_data() [background thread - interactive]
+    │   ├── fetch_and_aggregate_data_headless() [silent mode - v1.5]
     │   ├── _extract_comments_from_workouts()
     │   └── _update_workouts_cache_incremental()
     │
@@ -77,7 +79,7 @@ Main command loop (user interaction)
 ### Cache Files
 
 #### 1. Messages Cache
-**File**: `~/Turnkey/clients/{client_id}/messages_cache.json`
+**File**: `~/Turnkey-{workspace}/clients/{client_id}/messages_cache.json`
 
 **Structure**:
 ```json
@@ -102,7 +104,7 @@ Main command loop (user interaction)
 **Purpose**: Store conversation messages with incremental update tracking.
 
 #### 2. Workouts Index
-**File**: `~/Turnkey/clients/{client_id}/workouts_index.json`
+**File**: `~/Turnkey-{workspace}/clients/{client_id}/workouts_index.json`
 
 **Structure**:
 ```json
@@ -124,7 +126,7 @@ Main command loop (user interaction)
 **Purpose**: Track workout update timestamps to enable incremental fetching.
 
 #### 3. Feed Cache
-**File**: `~/Turnkey/clients/{client_id}/feed_cache.json`
+**File**: `~/Turnkey-{workspace}/clients/{client_id}/feed_cache.json`
 
 **Structure**:
 ```json
@@ -372,9 +374,9 @@ alias_map["1"] = "Workout-5001-0"
 **Function**: `fetch_and_aggregate_data()`
 **Location**: feed_tool.py:305-351
 
-**Purpose**: Refresh all data without blocking UI.
+**Purpose**: Refresh all data without blocking UI (interactive mode with Rich console output).
 
-**Thread Launch** (feed_tool.py:819-823):
+**Thread Launch** (feed_tool.py:882-886):
 ```python
 refresh_thread = threading.Thread(
     target=fetch_and_aggregate_data,
@@ -404,12 +406,114 @@ with feed_data_lock:
 - Users can issue commands while refreshing
 - Race conditions prevented by lock
 
+### Headless Mode for Bulk Operations (New in v1.5)
+
+**Function**: `fetch_and_aggregate_data_headless()`
+**Location**: feed_tool.py:353-414
+
+**Purpose**: Silent version of data aggregation for bulk sync operations - no Rich console output.
+
+**Implementation**:
+```python
+def fetch_and_aggregate_data_headless(token, client):
+    """Headless version of fetch_and_aggregate_data for bulk operations - no Rich console output"""
+    try:
+        client_id = client["id"]
+        client_full_name = client["full_name"]
+        client_dir = get_client_dir(client_id)
+
+        # Refresh messages cache
+        messages_cache = _refresh_messages_cache(token, client_full_name, client_dir)
+        conversation_id = messages_cache.get('conversation_id')
+
+        # Update workouts cache incrementally
+        workouts, _changed = _update_workouts_cache_incremental(token, client, client_dir)
+
+        # Process events (same as interactive mode)
+        all_events = []
+        for msg in (messages_cache.get('messages') or {}).values():
+            ts = _parse_ts(msg.get('created_at'))
+            user = msg.get('user') or {}
+            all_events.append({
+                "type": "message",
+                "content": msg.get('body'),
+                "author_id": user.get('id'),
+                "author": user.get('full_name'),
+                "timestamp": ts,
+            })
+
+        all_events.extend(_extract_comments_from_workouts(workouts))
+        all_events = [e for e in all_events if e.get('timestamp') is not None]
+        all_events.sort(key=lambda x: x['timestamp'])
+
+        # Create alias map for comments
+        comment_alias_map = {}
+        alias_counter = 1
+        for item in reversed(all_events):
+            if item['type'] == 'workout_comment':
+                item['alias_id'] = str(alias_counter)
+                comment_alias_map[str(alias_counter)] = item.get('comment_id')
+                alias_counter += 1
+
+        # Save cache
+        cache_path = os.path.join(client_dir, "feed_cache.json")
+        events_to_cache = [dict(event) for event in all_events]
+        for event in events_to_cache:
+            if isinstance(event.get('timestamp'), datetime):
+                event['timestamp'] = event['timestamp'].isoformat()
+
+        try:
+            safe_json_dump({"events": events_to_cache, "conversation_id": conversation_id, "alias_map": comment_alias_map}, cache_path)
+        except Exception:
+            pass  # Silent failure in headless mode
+
+        return {
+            'events': all_events,
+            'conversation_id': conversation_id,
+            'alias_map': comment_alias_map,
+            'workouts_count': len(workouts) if workouts else 0
+        }
+
+    except Exception as e:
+        # Return error info instead of printing
+        return {'error': str(e), 'events': [], 'workouts_count': 0}
+```
+
+**Key Differences from Interactive Mode**:
+- No `console.print()` or `console.status()` calls
+- No Rich progress bars or status messages
+- Silent error handling (returns error in dict instead of displaying)
+- No shared `feed_data` object (stateless, returns result)
+- No thread-safe locking needed (no UI updates)
+- Returns structured dict with results or error
+
+**Return Structure**:
+```python
+{
+    'events': [...],                # List of aggregated events
+    'conversation_id': 5001,        # Conversation ID
+    'alias_map': {...},             # Comment alias mapping
+    'workouts_count': 42,           # Number of workouts processed
+    'error': "..."                  # Error message (if failed)
+}
+```
+
+**Usage in bulk_sync.py**:
+```python
+for client in clients:
+    result = fetch_and_aggregate_data_headless(token, client)
+    if 'error' in result:
+        console.print(f"[red]Error syncing {client['full_name']}: {result['error']}[/red]")
+    else:
+        console.print(f"[green]✓ {client['full_name']}: {len(result['events'])} events[/green]")
+```
+
 ## Display System
 
 ### Display Function
 
 **Function**: `display_feed()`
-**Location**: feed_tool.py:478-516
+**Location**: feed_tool.py:541-579
 
 **Signature**:
 ```python
@@ -465,7 +569,7 @@ if search_term and search_term.lower() in cleaned_content.lower():
 
 ### Command-Based Navigation
 
-**Main Loop** (feed_tool.py:692-823)
+**Main Loop** (feed_tool.py:755-886)
 
 **Available Commands**:
 
@@ -492,7 +596,7 @@ if search_term and search_term.lower() in cleaned_content.lower():
 ### Vim-like Navigation Mode
 
 **Function**: `nav_mode(events)`
-**Location**: feed_tool.py:530-652
+**Location**: feed_tool.py:593-712
 
 **Purpose**: Single-keystroke navigation without Enter key.
 
@@ -540,7 +644,7 @@ finally:
 ### Search System
 
 **Function**: `rebuild_matches(events, term)`
-**Location**: feed_tool.py:655-670
+**Location**: feed_tool.py:718-733
 
 **Purpose**: Find all events matching search term and enable navigation between matches.
 
@@ -593,7 +697,7 @@ Re-center on event 45
 ### Sending Messages
 
 **Function**: `post_message(token, conversation_id, message_body)`
-**Location**: feed_tool.py:355-368
+**Location**: feed_tool.py:418-431
 
 **API Endpoint**: `POST /api/v1/messages`
 
@@ -631,7 +735,7 @@ def post_message(token, conversation_id, message_body):
 ### Posting Workout Comments
 
 **Function**: `post_workout_comment(token, parent_id, parent_type, comment_body)`
-**Location**: feed_tool.py:370-381
+**Location**: feed_tool.py:433-444
 
 **API Endpoint**: `POST /api/v1/comments?parent_type={type}&parent_id={id}`
 
@@ -677,7 +781,7 @@ POST /api/v1/comments?parent_type=Workout&parent_id=5001
 ### Exporting Feed
 
 **Function**: `_export_unified_feed_text()`
-**Location**: feed_tool.py:385-446
+**Location**: feed_tool.py:448-509
 
 **Purpose**: Generate human-readable text file of entire feed.
 
@@ -716,7 +820,7 @@ filename = f"Unified_Feed_{safe_client}_{timestamp}.txt"
 ### Opening in Editor
 
 **Function**: `_open_in_editor(path)`
-**Location**: feed_tool.py:458-474
+**Location**: feed_tool.py:521-537
 
 **Purpose**: Open exported file in user's configured editor.
 

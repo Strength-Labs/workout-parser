@@ -21,6 +21,9 @@ from api_client import get_access_token, get_clients, get_workout_history_headle
 from feed_tool import fetch_and_aggregate_data_headless
 from directory_migration import get_client_dir
 
+# Import display utilities for bundled app compatibility
+from display_utils import create_progress_tracker, safe_input, is_bundled
+
 console = Console()
 
 class BulkSyncManager:
@@ -88,9 +91,12 @@ class BulkSyncManager:
             if result['status'] in ['completed', 'error']:
                 self.completed_clients += 1
 
+# Legacy function kept for compatibility - now handled by display_utils
 def create_progress_display(sync_manager):
-    """Create a rich display for progress monitoring"""
+    """Create a rich display for progress monitoring (legacy - use display_utils instead)"""
     def make_progress_table():
+        from rich.table import Table
+
         table = Table(title="🌙 Overnight Bulk Sync Progress")
         table.add_column("Client", style="cyan", width=25)
         table.add_column("Status", style="yellow", width=15)
@@ -98,15 +104,16 @@ def create_progress_display(sync_manager):
         table.add_column("Feed Events", style="blue", width=12)
         table.add_column("Time", style="magenta", width=10)
         table.add_column("Error", style="red", width=30)
-        
+
         with sync_manager.lock:
             results = sync_manager.results.copy()
-        
+
         for client_id, result in results.items():
             client_name = result['client_name'][:23] + "..." if len(result['client_name']) > 25 else result['client_name']
-            
+
             # Status with emoji
             status_map = {
+                'queued': '⏳ Queued',
                 'starting': '🔄 Starting',
                 'syncing_workouts': '💪 Workouts',
                 'syncing_feed': '📡 Feed',
@@ -114,7 +121,7 @@ def create_progress_display(sync_manager):
                 'error': '❌ Error'
             }
             status = status_map.get(result['status'], result['status'])
-            
+
             # Time calculation
             if result['start_time']:
                 if result['end_time']:
@@ -125,14 +132,14 @@ def create_progress_display(sync_manager):
                     time_str = f"{duration:.1f}s"
             else:
                 time_str = "-"
-            
+
             # Workouts and events
             workouts_str = str(result['workouts_synced']) if result['workouts_synced'] > 0 else "-"
             events_str = str(result['feed_events']) if result['feed_events'] > 0 else "-"
-            
+
             # Error (truncated)
             error_str = result['error'][:28] + "..." if result['error'] and len(result['error']) > 30 else (result['error'] or "-")
-            
+
             table.add_row(
                 client_name,
                 status,
@@ -141,9 +148,9 @@ def create_progress_display(sync_manager):
                 time_str,
                 error_str
             )
-        
+
         return table
-    
+
     return make_progress_table
 
 def run_bulk_sync(max_workers=4, force_refresh=False, test_limit=None):
@@ -194,33 +201,13 @@ def run_bulk_sync(max_workers=4, force_refresh=False, test_limit=None):
         }
     
     console.print(f"🚀 [bold blue]Starting sync with {max_workers} parallel workers...[/bold blue]")
-    console.print("📊 [dim]Live progress table will update below...[/dim]\n")
-    
-    # Create progress display
-    progress_table_fn = create_progress_display(sync_manager)
-    
-    # Run sync with live progress display
-    with Live(progress_table_fn(), refresh_per_second=2) as live:
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            # Submit all sync tasks
-            future_to_client = {
-                executor.submit(sync_manager.sync_single_client, token, user_id, client): client
-                for client in clients
-            }
-            
-            # Wait for completion (no individual messages to avoid Live display conflicts)
-            for future in as_completed(future_to_client):
-                client = future_to_client[future]
-                try:
-                    result = future.result()
-                    # Result already stored by sync_single_client
-                except Exception as e:
-                    # Store error in results instead of printing
-                    sync_manager.results[client['id']]['status'] = 'error'
-                    sync_manager.results[client['id']]['error'] = f"Unexpected error: {e}"
-                
-                # Update display
-                live.update(progress_table_fn())
+
+    # Create appropriate progress tracker based on environment
+    progress_tracker = create_progress_tracker(sync_manager)
+
+    # Run sync with environment-appropriate display
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        progress_tracker.run(executor, clients, token, user_id)
     
     # Final summary
     end_time = time.time()
@@ -292,8 +279,8 @@ def main():
         console.print("This will sync workout data and feed data for ALL clients.")
         console.print("The process may take a while depending on the amount of data.")
         console.print("[bold]Progress will be shown continuously during the sync.[/bold]")
-        
-        if input("\n🚀 Ready to start? [y/N]: ").lower() != 'y':
+
+        if safe_input("\n🚀 Ready to start? [y/N]: ").lower() != 'y':
             console.print("❌ Sync cancelled.")
             return
     

@@ -107,12 +107,18 @@ pyinstaller \
     --hidden-import format_tool \
     --hidden-import upload_tool \
     --hidden-import ai_chat_tool \
+    --hidden-import bulk_sync \
+    --hidden-import display_utils \
+    --hidden-import workspace_manager \
+    --hidden-import workspace_setup \
+    --hidden-import metrics_tool \
     --hidden-import rich.console \
     --hidden-import rich.panel \
     --hidden-import rich.table \
     --hidden-import rich.text \
     --hidden-import rich.prompt \
     --hidden-import rich.progress \
+    --hidden-import rich.live \
     --hidden-import requests \
     --hidden-import rapidfuzz \
     --hidden-import cryptography \

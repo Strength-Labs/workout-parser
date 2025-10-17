@@ -4,6 +4,8 @@
 
 This directory contains comprehensive developer documentation for the Turnkey Coach Tools codebase. These guides are designed to help both new and experienced developers understand the architecture, contribute effectively, and maintain the codebase.
 
+**Current Version**: v1.5+ with multi-workspace management, bulk sync, workout deletion, and metrics programming.
+
 ## Purpose
 
 These guides serve multiple purposes:
@@ -28,15 +30,16 @@ The guides are organized by topic, progressing from high-level architecture to s
 
 **Topics Covered**:
 - System architecture diagram and component overview
-- Module organization (core, tools, supporting)
-- Data flow patterns (authentication, workout history, feed aggregation)
+- Module organization (15 modules: core, tools, supporting)
+- Multi-workspace architecture (v1.5+)
+- Data flow patterns (authentication, workspace selection, workout history, feed aggregation, bulk sync)
 - Nutrition & metrics routing through dual calendars
 - Metric catalog integration and tooling
-- Design patterns (incremental caching, background refresh, shared utilities)
-- Directory structure (runtime and application directories)
+- Design patterns (incremental caching, background refresh, headless mode, workspace isolation)
+- Directory structure (workspace-aware runtime directories: `~/Turnkey-{workspace}/`)
 - Error handling strategy
-- Performance optimizations
-- Security considerations
+- Performance optimizations (parallel sync, ThreadPoolExecutor)
+- Security considerations (workspace-isolated credentials)
 - Extension points for adding new features
 
 **Best For**:
@@ -46,12 +49,15 @@ The guides are organized by topic, progressing from high-level architecture to s
 - Getting a mental model of how components interact
 
 **Key Sections**:
-- Component diagrams
+- Component diagrams (15 modules with line counts)
+- Workspace selection flow (new in v1.5)
 - Authentication flow
 - Workout history flow
 - Feed aggregation flow
+- Bulk sync flow (new in v1.5)
+- Smart sync with deletion detection (new in v1.5)
 - Nutrition & metrics flow
-- File system structure
+- Workspace-aware file system structure
 
 ---
 
@@ -61,12 +67,17 @@ The guides are organized by topic, progressing from high-level architecture to s
 
 **Topics Covered**:
 - API configuration and base URL
-- Token-based authentication flow
+- Token-based authentication flow (workspace-aware)
 - Token caching and expiry handling
-- Stored credentials with encryption
+- Stored credentials with encryption (per workspace)
+- Legacy token scanning and migration
 - Client management (fetching client list)
 - Workout history management with incremental caching
-- Exercise database management
+- Smart sync with deletion detection (v1.5+)
+- Workout deletion operations (single and batch)
+- Exercise database management (with exercise types)
+- Metric catalog access
+- Headless mode functions for bulk operations
 - Shared utility functions (text cleaning, screen clearing)
 - Error handling patterns for API requests
 - Best practices for API integration
@@ -79,10 +90,13 @@ The guides are organized by topic, progressing from high-level architecture to s
 - Understanding caching strategies
 
 **Key Sections**:
-- Authentication flow diagram
-- Token cache structure
-- Workout history incremental update logic
-- Exercise list management
+- Workspace-aware authentication flow
+- Token cache structure (per workspace)
+- Smart sync with deletion detection algorithm
+- Workout deletion operations (single and batch)
+- Exercise list management (with type information)
+- Metric catalog access
+- Headless mode pattern
 - Error handling patterns
 
 ---
@@ -92,12 +106,13 @@ The guides are organized by topic, progressing from high-level architecture to s
 **Unified feed implementation, the most complex module in the codebase**
 
 **Topics Covered**:
-- Feed tool architecture and components
+- Feed tool architecture and components (886 lines - largest module)
 - Data flow and initialization
 - Caching system (messages, workouts index, feed cache)
 - Incremental update strategies
 - Comment extraction and alias ID system
 - Background data refresh with threading
+- Headless mode for bulk sync (v1.5+)
 - Display system and styling
 - Search functionality
 - Navigation system (command-based and vim-like modes)
@@ -116,6 +131,7 @@ The guides are organized by topic, progressing from high-level architecture to s
 - Feed initialization flow
 - Incremental update algorithms
 - Background threading model
+- Headless mode implementation
 - Search and navigation implementation
 - Alias ID system for comment replies
 
@@ -195,18 +211,19 @@ The guides are organized by topic, progressing from high-level architecture to s
 **Comprehensive documentation of all data formats, file structures, and caching strategies**
 
 **Topics Covered**:
-- File system structure
+- Workspace-aware file system structure (`~/Turnkey-{workspace}/`)
+- Global settings file (`~/.turnkey_coach_settings.json`)
 - All data format specifications:
-  - Authentication token cache
-  - User settings
-  - Exercise list
-  - Workout cache
-  - Workout index
-  - Messages cache
-  - Feed cache
+  - Authentication token cache (per workspace)
+  - User settings (global + workspace registry)
+  - Exercise list (per workspace)
+  - Workout cache (per client per workspace)
+  - Workout index (per client per workspace)
+  - Messages cache (per client per workspace)
+  - Feed cache (per client per workspace)
 - Caching strategies (time-based, date-based, timestamp-based, ID-based)
 - Data transformation patterns
-- UTF-8 handling with encoding_utils
+- UTF-8 handling with encoding_utils (141 lines)
 - Best practices for file I/O
 - Troubleshooting cache issues
 
@@ -218,7 +235,9 @@ The guides are organized by topic, progressing from high-level architecture to s
 - Ensuring UTF-8 compatibility
 
 **Key Sections**:
-- Complete JSON structure examples
+- Workspace directory structure
+- Global settings format
+- Complete JSON structure examples (all cache types)
 - Caching strategy comparisons
 - Data transformation pipelines
 - UTF-8 encoding utilities
@@ -233,21 +252,24 @@ The guides are organized by topic, progressing from high-level architecture to s
 **Topics Covered**:
 - Prerequisites and installation
 - Virtual environment setup
-- Project structure
+- First-run workspace setup (v1.5+)
+- Project structure (15 modules with line counts)
+- Workspace management for developers
 - Development workflow and branching strategy
 - Code style guidelines (PEP 8)
 - Documentation standards (docstrings)
-- Testing strategies (manual and automated)
+- Testing strategies (manual and automated, workspace-aware)
 - Debugging techniques
 - Common development tasks:
-  - Adding new tools
-  - Adding API endpoints
+  - Adding new tools (workspace-aware)
+  - Adding API endpoints (with headless mode)
   - Extending the markup parser
   - Adding configuration options
+  - Adding workspace-aware features
 - Contributing guidelines
 - Pull request process
-- Performance optimization
-- Security considerations
+- Performance optimization (parallel operations)
+- Security considerations (workspace isolation)
 - Deployment and release process
 
 **Best For**:
@@ -259,10 +281,14 @@ The guides are organized by topic, progressing from high-level architecture to s
 
 **Key Sections**:
 - Installation steps
+- First-run workspace setup
+- Workspace management guide
 - Code style guide
-- Testing checklist
+- Testing checklist (including workspace testing)
 - Common development tasks
+- Workspace-aware feature development
 - Contributing guidelines
+- Troubleshooting (workspace issues)
 
 ---
 
@@ -370,10 +396,12 @@ If the codebase grows significantly:
 ## Document Metadata
 
 **Created**: 2025-10-11
-**Last Updated**: 2025-10-11
+**Last Updated**: 2025-10-16
 **Maintained By**: Development Team
-**Total Guides**: 7
-**Total Documentation Lines**: ~5,500+ lines across all guides
+**Total Guides**: 7 core guides + 2 metric references
+**Total Documentation Lines**: ~6,500+ lines across all guides
+**Codebase**: 15 modules, ~6,800+ lines of Python
+**Current Version**: v1.5+ (multi-workspace architecture)
 
 ## Feedback and Improvements
 

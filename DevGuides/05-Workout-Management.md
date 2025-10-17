@@ -37,7 +37,7 @@ For more detail on the metric system, keep the dedicated references close:
 
 ## Workout Formatting (`format_tool.py`)
 
-**File**: `format_tool.py` (87 lines)
+**File**: `format_tool.py` (186 lines)
 
 ### Purpose
 Convert workout JSON data from the API into human-readable markup format for browsing, editing, and exporting.
@@ -312,7 +312,7 @@ def browse_history(token, client, coach_user_id):
 
 ## Workout Upload System (`upload_tool.py`)
 
-**File**: `upload_tool.py` (188 lines)
+**File**: `upload_tool.py` (513 lines)
 
 ### Purpose
 Parse workout files written in custom markup format and upload to Turnkey Coach API.
@@ -683,7 +683,7 @@ Display success/error for each
 
 ## AI Chat Tool (`ai_chat_tool.py`)
 
-**File**: `ai_chat_tool.py` (302 lines)
+**File**: `ai_chat_tool.py` (451 lines)
 
 ### Purpose
 AI-powered workout planning assistant with context loading, workout history integration, and direct upload capability.
@@ -733,7 +733,7 @@ if input("Upload custom context file? (y/n): ").lower() == 'y':
             custom_context += read_text_file(filepath) + "\n\n"
 ```
 
-**Context Directory**: `~/Turnkey/shared/coaching_context/`
+**Context Directory**: `~/Turnkey-{workspace}/shared/coaching_context/`
 
 #### 4. System Prompt Assembly
 ```python

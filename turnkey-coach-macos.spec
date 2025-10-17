@@ -27,16 +27,24 @@ a = Analysis(
     binaries=[],
     datas=datas,
     hiddenimports=[
+        # Core modules
         'api_client',
-        'settings', 
+        'settings',
         'directory_migration',
         'encoding_utils',
+        # Tool modules
         'feed_tool',
         'pr_tool',
         'actual_prs_tool',
         'format_tool',
         'upload_tool',
         'ai_chat_tool',
+        'metrics_tool',
+        # Workspace and sync modules (v1.5+)
+        'workspace_manager',
+        'workspace_setup',
+        'bulk_sync',
+        'display_utils',
         # Rich components
         'rich.console',
         'rich.panel',

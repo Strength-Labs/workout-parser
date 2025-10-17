@@ -82,7 +82,11 @@ def get_current_workspace():
     current_workspace_key = settings.get('current_workspace')
     if not current_workspace_key or current_workspace_key not in settings.get('workspaces', {}):
         return None
-    return settings['workspaces'][current_workspace_key]
+
+    # Return workspace data with the key included
+    workspace_data = settings['workspaces'][current_workspace_key].copy()
+    workspace_data['key'] = current_workspace_key
+    return workspace_data
 
 def create_workspace(workspace_key, name, email, password, company_name=None, llm_provider=None, llm_api_key=None):
     """Create a new workspace with encrypted credentials."""

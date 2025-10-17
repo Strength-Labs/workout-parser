@@ -15,6 +15,8 @@ from workspace_manager import workspace_selector, get_workspace_info, logout_cur
 # Import our shared functions
 from api_client import get_access_token, get_clients, clear_screen, get_workout_history, get_workout_history_headless, load_exercise_map, update_exercise_list
 from directory_migration import get_client_dir, get_shared_dir
+# Import display utilities for bundled app compatibility
+from display_utils import safe_input
 # Import our tools
 from feed_tool import run_feed
 from pr_tool import run_pr_analyzer
@@ -34,7 +36,7 @@ def run_bulk_sync_from_cli(token, user_id):
     console.print(Panel.fit("🌙 [bold blue]Bulk Sync All Clients[/bold blue] 🌙", border_style="blue"))
     
     console.print("\n[dim]This will launch the bulk sync tool to sync workout history and feed data for all your clients.[/dim]")
-    console.print("[dim]The process runs in a separate window with a live progress display.[/dim]")
+    console.print("[dim]This will run with a live progress display in this window.[/dim]")
     console.print("[dim]Depending on data volume, this may take several minutes.[/dim]")
     
     # Show sync options
@@ -44,53 +46,50 @@ def run_bulk_sync_from_cli(token, user_id):
     console.print("  [bold]3.[/bold] Test Mode (first 5 clients only)")
     console.print("  [bold]q.[/bold] Cancel")
     
-    choice = console.input("\n> ").strip().lower()
+    choice = safe_input("\n> ").strip().lower()
     if choice == 'q':
         return
     
-    # Set parameters based on choice
-    resources_dir = os.path.dirname(os.path.abspath(__file__))
-    bulk_script = os.path.join(resources_dir, "bulk_sync.py")
-    python_bin = sys.executable if sys.executable else "python3"
-    cmd_args = [python_bin, bulk_script]
-    
+    # Set parameters based on choice (in-process run for bundled apps)
+    workers = 2
+    test_limit = None
     if choice == '1':
-        cmd_args.extend(["--workers", "2"])
+        workers = 2
         mode_desc = "Quick Sync with 2 workers"
     elif choice == '2':
-        cmd_args.extend(["--workers", "4"])
+        workers = 4
         mode_desc = "Fast Sync with 4 workers"
     elif choice == '3':
-        cmd_args.extend(["--workers", "2", "--test", "5"])
+        workers = 2
+        test_limit = 5
         mode_desc = "Test Mode (first 5 clients)"
     else:
-        cmd_args.extend(["--workers", "2"])  # default
+        workers = 2  # default
         mode_desc = "Quick Sync with 2 workers (default)"
     
     # Final confirmation
     console.print(f"\n[yellow]Ready to launch {mode_desc}[/yellow]")
     prompt = "Proceed? Type 'y' to proceed (default is No) [y/N]: "
-    if console.input(f"[bold green]{prompt}[/bold green]").lower() != 'y':
+    if safe_input(f"[bold green]{prompt}[/bold green]").lower() != 'y':
         console.print("[yellow]Bulk sync cancelled.[/yellow]")
-        console.input("Press Enter to continue...")
+        safe_input("Press Enter to continue...")
         return
     
-    # Add --skip-confirm flag to avoid double confirmation
-    cmd_args.append("--skip-confirm")
-    
-    # Launch the bulk sync script
+    # Run the bulk sync in-process (works in source and packaged builds)
     console.print("\n[dim]Launching bulk sync tool...[/dim]")
     try:
-        # Ensure we run from Resources so relative imports and files resolve
-        result = subprocess.run(cmd_args, cwd=resources_dir, check=False)
-        if result.returncode == 0:
-            console.print("\n[bold green]✨ Bulk sync tool completed successfully! ✨[/bold green]")
+        from bulk_sync import run_bulk_sync
+        success = run_bulk_sync(max_workers=workers, force_refresh=False, test_limit=test_limit)
+        if success:
+            console.print("\n[bold green]✨ Bulk sync completed successfully! ✨[/bold green]")
         else:
-            console.print(f"\n[yellow]⚠️ Bulk sync tool exited with code {result.returncode}[/yellow]")
+            console.print("\n[yellow]⚠️ Bulk sync finished with errors or no work.[/yellow]")
     except Exception as e:
-        console.print(f"\n[bold red]❌ Failed to launch bulk sync tool: {e}[/bold red]")
-    
-    console.input("\nPress Enter to return to client list...")
+        console.print(f"\n[bold red]❌ Bulk sync failed: {e}[/bold red]")
+        import traceback
+        console.print(f"[dim]{traceback.format_exc()}[/dim]")
+
+    safe_input("\nPress Enter to return to client list...")
 
 
 def select_client(token, user_id):
@@ -122,7 +121,7 @@ def select_client(token, user_id):
             console.print(Text("  [ws] Switch Workspace", style="dim"))
         
         console.print(Text("{:>80}".format("Enter a number to select a client, or 'q' to quit > "), style="bold green"), end="")
-        choice = input("").strip().lower()  # Raw input for clean capture
+        choice = safe_input("").strip().lower()  # Use safe_input for bundled app compatibility
         if choice == 'q':
             return None
         if choice == 'b':
@@ -158,6 +157,7 @@ def select_client(token, user_id):
             switched_workspace = quick_workspace_switcher()
             if switched_workspace:
                 console.print(f"[green]✅ Switched to {switched_workspace}! Loading clients...[/green]")
+                safe_input("Press Enter to continue...")
                 # Return a special signal to restart client selection with new workspace
                 return "WORKSPACE_SWITCHED"
             clear_screen()

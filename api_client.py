@@ -489,10 +489,9 @@ def load_auth_data():
                     return data.get("token"), data.get("user_id")
             except (KeyError, TypeError, ValueError):
                 pass
-    # Fallback: scan other known locations to ease migration/first-run
-    token, user_id = _scan_for_legacy_token_cache()
-    if token and user_id:
-        return token, user_id
+    # DON'T scan other workspaces - each workspace should have its own token
+    # The legacy scan was causing tokens from other workspaces to be used incorrectly
+    # after workspace switching. Users should log in fresh to each workspace.
     return None, None
 
 
