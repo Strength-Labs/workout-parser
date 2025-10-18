@@ -505,6 +505,13 @@ def upload_workout(token, workout_data):
     try:
         assignment_type = "nutrition assignment" if workout_data.get('workout_type') == "nutrition" else "workout"
         console.print(f"Uploading {assignment_type} for [cyan]{workout_data['workout_date']}[/cyan]...")
+
+        # Debug: Print exercise IDs being uploaded
+        if workout_data.get('assigned_exercises'):
+            console.print("[dim]DEBUG: Exercise IDs in upload payload:[/dim]")
+            for ex in workout_data['assigned_exercises']:
+                console.print(f"[dim]  - exercise_id: {ex.get('exercise_id')}[/dim]")
+
         response = requests.post(url, headers=headers, json=workout_data)
         response.raise_for_status()
         console.print(f"✅ [bold green]Successfully uploaded {assignment_type}![/bold green]")
