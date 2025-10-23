@@ -46,19 +46,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/username/workout-parser",  # Replace with actual repo URL
     packages=find_packages(where="."),
-    py_modules=[
-        "coach_cli",
-        "api_client", 
-        "settings",
-        "directory_migration",
-        "encoding_utils",
-        "feed_tool",
-        "pr_tool",
-        "actual_prs_tool",
-        "format_tool",
-        "upload_tool",
-        "ai_chat_tool"
-    ],
+    package_dir={"": "."},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Healthcare Industry",
@@ -76,8 +64,8 @@ setup(
     install_requires=read_requirements(),
     entry_points={
         "console_scripts": [
-            "turnkey-coach=coach_cli:main",
-            "coach-cli=coach_cli:main",
+            "turnkey-coach=src.coach_cli:main",
+            "coach-cli=src.coach_cli:main",
         ],
     },
     include_package_data=True,

@@ -1,0 +1,60 @@
+Workout Date: 2025-10-18
+Heavy Lower Body
+
+@sleep: 8 hours minimum for recovery
+    Critical for CNS recovery after heavy squats
+    Aim for consistent bedtime
+
+@calories: 3000 cal post-training day
+
+?weight: lbs morning weight, fasted
+    After bathroom, before eating
+    Same time each day for consistency
+
+?recovery: 1-10 how do you feel today?
+    Overall body feeling, not just legs
+    Be honest, not just what you think I want to hear
+
+?soreness: 1-10 lower body only
+
+Squat
+3x5 @ 405
+    Keep your chest up and focus on hitting depth
+
+---
+
+Nutrition Date: 2025-10-19
+High Protein Day
+
+@calories: 2800 cal daily target
+    Higher than usual due to heavy training
+    Focus on post-workout nutrition
+
+@protein: 180 g daily goal
+@carbs: 300 g
+@fat: 85 g
+
+?weight: kg morning weight, fasted
+    Post-bathroom, before eating
+
+?sleep: hours last night
+?hunger: 1-10 throughout the day
+?energy: 1-10 average energy level
+
+Meal Pictures
+    Upload photos of all meals with timestamps
+
+Protein Intake
+    Target 40g per meal, 4-5 meals daily
+
+---
+
+Workout Date: 2025-10-20
+Active Recovery
+
+?weight: lbs
+?energy: 1-10
+?sleep: hours
+
+Run
+1x25:00 @ RPE 7

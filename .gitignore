@@ -23,14 +23,43 @@ build/
 dist/
 *.egg-info/
 pip-wheel-metadata/
+*.dmg
+*.exe
+*.app/
+TurnkeyCoachTools.app/
+release-files/
+windows-release/
 
 # IDE/workspace settings
 .vscode/
 .vs/
 .idea/
 
+# Environment and tokens
 .env
 .tokencache
-# Exclude JSON output files but keep exerciselist.json
+
+# Data files - exclude JSON except exerciselist.json
 *.json
 !exerciselist.json
+
+# Backup files
+*.bak
+*.py.1
+*.py.2
+*.py.3
+*~
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Empty test directories
+liturgiarch/
+turnkey-coach-tools/
+
+# Personal documentation directory
+karl-docs/
