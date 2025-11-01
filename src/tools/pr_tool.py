@@ -51,6 +51,10 @@ def process_workout_history(workouts, start_date=None, end_date=None):
         is_completed = workout.get("completed", False)  # Check if workout is completed
 
         for exercise in workout.get("assigned_exercises", []):
+            # Skip exercises that were marked as missed/skipped
+            if exercise.get("missed", False):
+                continue
+
             lift_name = exercise.get("exercise", {}).get("name", "Unknown").lower()
             assigned_sets = exercise.get("assigned_sets", [])
 

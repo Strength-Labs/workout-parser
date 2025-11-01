@@ -171,11 +171,24 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
 
         for exercise in workout.get('assigned_exercises', []):
             output_lines.append(f"{exercise['exercise']['name']}")
-            
-            if 'assigned_sets' in exercise:
+
+            # Check if exercise was marked as missed/skipped
+            if exercise.get('missed', False):
+                # Output prescribed sets first
+                if 'assigned_sets' in exercise:
+                    for assigned_set in exercise['assigned_sets']:
+                        if assigned_set.get('set_type') == 'custom':
+                            note_body = clean_text(assigned_set.get('body') or "")
+                            if note_body:
+                                output_lines.append(f"\t{note_body}")
+                        else:
+                            output_lines.append(f"{assigned_set['display_label']}")
+                # Then mark as skipped
+                output_lines.append("(skipped)")
+            elif 'assigned_sets' in exercise:
                 for assigned_set in exercise['assigned_sets']:
                     # Custom formatter for time-based sets (override API's raw display_label)
-                    if (assigned_set.get('time', 0) > 0 and 
+                    if (assigned_set.get('time', 0) > 0 and
                         (assigned_set.get('reps') is None or assigned_set.get('reps', 0) == 0) and
                         assigned_set.get('weight_type') in ['bodyweight', 'RPE']):
                         # Time-based: e.g., "10 x 00:10 @ RPE 10"
