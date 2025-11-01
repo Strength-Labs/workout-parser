@@ -1,4 +1,4 @@
-### Strength Coaching Markup Language v2.0
+### Strength Coaching Markup Language v2.1
 
 The Strength Coaching Markup Language provides a human-readable plain text format for strength and conditioning workouts **and nutrition assignments**. It serves as an intermediate format for a two-way data conversion process:
 
@@ -286,18 +286,105 @@ The prescribed number of sets, reps, weight, time, or distance are represented o
     * Example 1 (Distance Intervals): `5x400m @ RPE 10`
     * Example 2 (Single Distance Run): `1x3 miles`
 
-#### Accomplished Sets
+#### Accomplished Sets and Completion Logic
 
-When workout data is generated from the API via `format_tool.py`, the lifter's actual performance is displayed on an **unindented** line enclosed in parentheses `()`. The `upload_tool.py` script ignores these lines during upload. The '//' comments in the following example are explanatory only, and are not part of the markup language.
+When workout data is generated from the API via `format_tool.py`, the lifter's actual performance is displayed on **unindented** lines enclosed in parentheses `()`. The `upload_tool.py` script ignores these lines during upload.
 
-* **Example:**
-    ```
-    Squat
-    3x5 @ 405       // Assigned set prescription
-    (1x5 @ 405)     // Accomplished set 1 recorded by lifter
-    (1x4 @ 405)     // Accomplished set 2 recorded by lifter
-    (1x5 @ 385)     // Accomplished set 3 recorded by lifter
-    ```
+##### Completion Status Rules
+
+The markup language uses three patterns to indicate exercise completion status:
+
+1. **No Parenthetical Sets = Fully Completed**
+
+   If an exercise has NO parenthetical entries, assume **all prescribed sets were completed exactly as written**.
+
+   ```
+   Squat
+   3x5 @ 405
+   ```
+   This means the lifter completed all 3 sets of 5 reps at 405 lbs as prescribed.
+
+2. **Parenthetical Sets Present = Partial or Modified Completion**
+
+   If parenthetical sets `()` appear below the prescription, **ONLY those sets were actually performed**. Any prescribed sets without a corresponding parenthetical entry were NOT done.
+
+   ```
+   Squat
+   3x5 @ 405           // Prescribed 3 sets
+   (1x5 @ 405)         // Actually completed set 1
+   (1x4 @ 405)         // Actually completed set 2 (only got 4 reps)
+   ```
+   In this example, only 2 sets were attempted (the third set was not done), and the second set only achieved 4 reps instead of the prescribed 5.
+
+3. **`(skipped)` = Exercise Not Attempted**
+
+   If the notation `(skipped)` appears, the **entire exercise was not performed**.
+
+   ```
+   Bench Press
+   3x5 @ 225
+   (skipped)
+   ```
+   This explicitly marks that the exercise was intentionally or necessarily omitted from the workout.
+
+##### Accomplished Sets Examples
+
+**Example 1: All sets completed as prescribed (no parentheses needed)**
+```
+Deadlift
+1x5 @ 495
+```
+
+**Example 2: Partial completion with modifications**
+```
+Squat
+3x5 @ 405           // Prescribed
+(1x5 @ 405)         // Completed set 1 as prescribed
+(1x5 @ 405)         // Completed set 2 as prescribed
+(1x5 @ 385)         // Completed set 3 but reduced weight
+```
+
+**Example 3: Failed to complete all prescribed sets**
+```
+Press
+5x5 @ 135           // Prescribed 5 sets
+(1x5 @ 135)         // Completed
+(1x5 @ 135)         // Completed
+(1x3 @ 135)         // Only got 3 reps on set 3
+```
+The lifter only completed 3 sets total (sets 4 and 5 were not attempted).
+
+**Example 4: Exercise completely skipped**
+```
+Chin-Up
+3xAMRAP @ 0
+(skipped)
+    Shoulder felt tweaky, skipped to be safe
+```
+
+**Example 5: Client exceeded prescription**
+```
+Curls
+2x12 @ 45           // Prescribed 2 sets
+(1x12 @ 45)         // Completed set 1
+(1x12 @ 45)         // Completed set 2
+(1x10 @ 45)         // Client added a third set
+```
+
+##### Important Notes for LLM Analysis
+
+When analyzing training history to inform workout design:
+
+- **No parentheses** = Perfect compliance, exercise went as planned
+- **Parenthetical sets with modifications** (weight changes, rep failures) = Adaptation or fatigue signals
+- **Fewer parenthetical sets than prescribed** = Incomplete workout (fatigue, time, or injury)
+- **`(skipped)` notation** = Exercise was intentionally omitted (injury, equipment, or time constraints)
+
+This completion tracking allows AI systems to:
+- Identify patterns of fatigue or overreaching (frequent rep failures)
+- Detect injury concerns (specific exercises consistently skipped or modified)
+- Assess program adherence (how often workouts are completed as prescribed)
+- Adjust future programming based on actual performance vs. prescription
 
 #### Comments and Notes
 
@@ -357,8 +444,7 @@ Squat
     Keep your chest up and focus on hitting depth.
 (1x5 @ 405)
 (1x5 @ 405)
-(1x4 @ 405)
-(1x5 @ 395)
+(1x5 @ 405)
 
 Bench Press
 2x5 @ 85%
@@ -526,6 +612,16 @@ Squat
 ---
 
 ### Version History
+
+**v2.1 (2025-10-31)**
+- **NEW:** Added `(skipped)` notation to explicitly mark exercises that were not performed
+- **NEW:** Documented completion status inference rules:
+  - No parentheses = all prescribed sets completed as written
+  - Parenthetical sets present = only those sets were performed
+  - `(skipped)` = entire exercise was not attempted
+- Added comprehensive examples for partial completion, rep failures, and exercise skipping
+- Added LLM-specific guidance for analyzing completion patterns in training history
+- Improved consistency in accomplished sets examples
 
 **v2.0 (2025-10-18)**
 - Added `?metric:` syntax for informational/tracking metrics (client reports data)
