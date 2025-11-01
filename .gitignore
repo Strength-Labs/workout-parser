@@ -63,3 +63,7 @@ turnkey-coach-tools/
 
 # Personal documentation directory
 karl-docs/
+
+# Git worktrees (Crystal)
+/worktrees/
+/worktree-*/
