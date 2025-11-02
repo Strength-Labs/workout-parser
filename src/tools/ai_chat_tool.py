@@ -456,6 +456,43 @@ def run_ai_chat(token, user_id, client, exercise_map):
     except FileNotFoundError:
         markup_guide = "Markup guide not found. Use standard workout formatting."
 
+    # Build official exercise catalog list for the LLM
+    exercise_catalog = ""
+    if exercise_map:
+        # Group exercises by type
+        resistance_exercises = []
+        conditioning_exercises = []
+        nutrition_items = []
+
+        for name, data in exercise_map.items():
+            ex_type = data.get('type', 'resistance')
+            # Capitalize properly for display
+            proper_name = ' '.join(word.capitalize() for word in name.split())
+
+            if ex_type == 'nutrition':
+                nutrition_items.append(proper_name)
+            elif ex_type == 'conditioning':
+                conditioning_exercises.append(proper_name)
+            else:
+                resistance_exercises.append(proper_name)
+
+        exercise_catalog = f"""
+OFFICIAL EXERCISE CATALOG (Use these EXACT names):
+
+Resistance/Strength Exercises:
+{', '.join(sorted(resistance_exercises))}
+
+Conditioning Exercises:
+{', '.join(sorted(conditioning_exercises))}
+
+Nutrition Items (only use if directed):
+{', '.join(sorted(nutrition_items))}
+
+CRITICAL: Use exercise names EXACTLY as shown above. Do not invent new exercises or use variations of these names.
+"""
+    else:
+        exercise_catalog = "Exercise catalog not available. Use common strength training exercises."
+
     # Strict system prompt emphasizing EXACT format compliance
     system_prompt = f"""You are an AI assistant for the user, who is a strength coach.
 
@@ -467,6 +504,8 @@ CRITICAL FORMAT REQUIREMENTS:
 5. Use exact set notation: "3 x 5 @ 225 lbs" (NOT "3x5@225" or other variations)
 6. Do not add nutrition workouts or metrics unless explicitly directed by the coach
 7. When generating multiple workouts, maintain consistent formatting throughout
+
+{exercise_catalog}
 
 MARKUP LANGUAGE SPECIFICATION:
 {markup_guide}
