@@ -48,6 +48,11 @@ def process_workout_history(workouts, start_date=None, end_date=None):
         if (start_date and workout_date < start_date) or (end_date and workout_date > end_date):
             continue
 
+        # Skip future workouts - they haven't been performed yet
+        from datetime import date
+        if workout_date > date.today():
+            continue
+
         is_completed = workout.get("completed", False)  # Check if workout is completed
 
         for exercise in workout.get("assigned_exercises", []):
