@@ -721,10 +721,15 @@ def run_ai_chat(token, user_id, client, exercise_map):
             extra_params = {}
             if not model.startswith(("gpt-5", "o1-")):
                 extra_params["temperature"] = 0.7
+                # Set high token limits to support long-form content generation
+                # (e.g., 3+ months of workout programming, detailed analyses)
+                # Models will still be constrained by their native context limits
                 if provider == 'openai':
-                    extra_params['max_completion_tokens'] = 1500
+                    extra_params['max_completion_tokens'] = 32000
                 else:
-                    extra_params['max_tokens'] = 1500
+                    # For xAI Grok and other providers
+                    # Grok especially needs high limits for reasoning/planning tasks
+                    extra_params['max_tokens'] = 32000
 
             response = client_ai.chat.completions.create(
                 model=model,
