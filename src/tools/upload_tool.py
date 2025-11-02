@@ -467,17 +467,25 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
                     console.print(f"[yellow]Warning: Found indented note with no preceding exercise or metric: '{stripped_line}'[/yellow]")
                 continue
 
-            exercise_id = get_exercise_id(exercise_map, stripped_line)
+            # Special handling for "Other" which exists in both training (ID 7) and nutrition (ID 202)
+            is_other = stripped_line.strip().lower() == "other"
+            if is_other:
+                # Use the correct "Other" ID based on workout type
+                exercise_id = 202 if workout_type_value == "nutrition" else 7
+            else:
+                exercise_id = get_exercise_id(exercise_map, stripped_line)
+
             if exercise_id is not None:
                 ex_type = get_exercise_type(exercise_map, stripped_line)
 
-                # Validate exercise type matches workout type
-                if workout_type_value == "nutrition" and ex_type != "nutrition":
-                    console.print(f"[yellow]Warning: '{stripped_line}' is a {ex_type} exercise, not a nutrition item. Skipping.[/yellow]")
-                    continue
-                elif workout_type_value == "default" and ex_type == "nutrition":
-                    console.print(f"[yellow]Warning: '{stripped_line}' is a nutrition item, not a training exercise. Skipping.[/yellow]")
-                    continue
+                # Validate exercise type matches workout type (skip validation for "Other")
+                if not is_other:
+                    if workout_type_value == "nutrition" and ex_type != "nutrition":
+                        console.print(f"[yellow]Warning: '{stripped_line}' is a {ex_type} exercise, not a nutrition item. Skipping.[/yellow]")
+                        continue
+                    elif workout_type_value == "default" and ex_type == "nutrition":
+                        console.print(f"[yellow]Warning: '{stripped_line}' is a nutrition item, not a training exercise. Skipping.[/yellow]")
+                        continue
 
                 if current_exercise: workout["assigned_exercises"].append(current_exercise)
                 current_exercise = {"exercise_id": exercise_id, "priority": len(workout["assigned_exercises"]), "assigned_sets": []}
