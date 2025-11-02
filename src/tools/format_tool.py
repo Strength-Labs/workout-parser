@@ -50,7 +50,7 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
         from datetime import date
         today = date.today()
         if workout_date.date() > today:
-            output_lines.append("> Future workout (not yet completed)")
+            output_lines.append("\t> Future workout (not yet completed)")
             output_lines.append("")
 
         # Add metrics for this workout date (from external metrics parameter)
