@@ -172,6 +172,12 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
         for exercise in workout.get('assigned_exercises', []):
             output_lines.append(f"{exercise['exercise']['name']}")
 
+            # BULLETPROOF COMPLETION LOGIC (Priority Order):
+            # Priority 1: Check if exercise was explicitly marked as missed
+            # Priority 2: Check if actual_sets data exists (takes precedence over completed flag)
+            # Priority 3: Check if workout not completed and no actual_sets
+            # Priority 4: Workout completed, no actual_sets, not missed = completed as prescribed
+
             # Check if exercise has ANY actual_sets
             has_any_actual_sets = False
             if 'assigned_sets' in exercise:
@@ -180,8 +186,8 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
                         has_any_actual_sets = True
                         break
 
-            # Check if exercise was marked as missed/skipped OR has no actual_sets
-            if exercise.get('missed', False) or not has_any_actual_sets:
+            # Priority 1: Explicitly marked as missed
+            if exercise.get('missed', False):
                 # Output prescribed sets first
                 if 'assigned_sets' in exercise:
                     for assigned_set in exercise['assigned_sets']:
@@ -191,39 +197,85 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
                                 output_lines.append(f"\t{note_body}")
                         else:
                             output_lines.append(f"{assigned_set['display_label']}")
-                # Then mark as skipped
+                # Mark as skipped
                 output_lines.append("(skipped)")
-            elif 'assigned_sets' in exercise:
-                for assigned_set in exercise['assigned_sets']:
-                    # Custom formatter for time-based sets (override API's raw display_label)
-                    if (assigned_set.get('time', 0) > 0 and
-                        (assigned_set.get('reps') is None or assigned_set.get('reps', 0) == 0) and
-                        assigned_set.get('weight_type') in ['bodyweight', 'RPE']):
-                        # Time-based: e.g., "10 x 00:10 @ RPE 10"
-                        sets = assigned_set.get('sets', 1)
-                        formatted_time = format_time(assigned_set.get('time'))
-                        if formatted_time:
-                            if assigned_set.get('weight_type') == 'RPE' and assigned_set.get('weight_type_value'):
-                                rpe_val = assigned_set['weight_type_value']
-                                display = f"{sets} x {formatted_time} @ RPE {rpe_val}"
-                            else:
-                                display = f"{sets} x {formatted_time}"
-                            output_lines.append(f"{display}")
-                        else:
-                            # Fallback to API label if formatting fails
-                            output_lines.append(f"{assigned_set['display_label']}")
-                    # THE FIX: Check if the set is a custom note
-                    elif assigned_set.get('set_type') == 'custom':
-                        note_body = clean_text(assigned_set.get('body') or "")
-                        if note_body:
-                            output_lines.append(f"\t{note_body}")
-                    else:
-                        output_lines.append(f"{assigned_set['display_label']}")
 
-                    if 'actual_sets' in assigned_set and assigned_set['actual_sets']:
-                        for actual_set in assigned_set['actual_sets']:
-                            reps, weight, sets = actual_set.get('reps', ''), actual_set.get('weight', ''), actual_set.get('sets', '')
-                            output_lines.append(f"({sets}x{reps} @ {weight})")
+            # Priority 2: Has actual_sets data (regardless of completed flag)
+            elif has_any_actual_sets:
+                # Output prescribed sets with actual performance data
+                if 'assigned_sets' in exercise:
+                    for assigned_set in exercise['assigned_sets']:
+                        # Custom formatter for time-based sets (override API's raw display_label)
+                        if (assigned_set.get('time', 0) > 0 and
+                            (assigned_set.get('reps') is None or assigned_set.get('reps', 0) == 0) and
+                            assigned_set.get('weight_type') in ['bodyweight', 'RPE']):
+                            # Time-based: e.g., "10 x 00:10 @ RPE 10"
+                            sets = assigned_set.get('sets', 1)
+                            formatted_time = format_time(assigned_set.get('time'))
+                            if formatted_time:
+                                if assigned_set.get('weight_type') == 'RPE' and assigned_set.get('weight_type_value'):
+                                    rpe_val = assigned_set['weight_type_value']
+                                    display = f"{sets} x {formatted_time} @ RPE {rpe_val}"
+                                else:
+                                    display = f"{sets} x {formatted_time}"
+                                output_lines.append(f"{display}")
+                            else:
+                                # Fallback to API label if formatting fails
+                                output_lines.append(f"{assigned_set['display_label']}")
+                        # Check if the set is a custom note
+                        elif assigned_set.get('set_type') == 'custom':
+                            note_body = clean_text(assigned_set.get('body') or "")
+                            if note_body:
+                                output_lines.append(f"\t{note_body}")
+                        else:
+                            output_lines.append(f"{assigned_set['display_label']}")
+
+                        # Output actual performance data in parentheses
+                        if 'actual_sets' in assigned_set and assigned_set['actual_sets']:
+                            for actual_set in assigned_set['actual_sets']:
+                                reps, weight, sets = actual_set.get('reps', ''), actual_set.get('weight', ''), actual_set.get('sets', '')
+                                output_lines.append(f"({sets}x{reps} @ {weight})")
+
+            # Priority 3: Workout not completed and no actual_sets = skipped
+            elif not workout.get('completed', False):
+                # Output prescribed sets first
+                if 'assigned_sets' in exercise:
+                    for assigned_set in exercise['assigned_sets']:
+                        if assigned_set.get('set_type') == 'custom':
+                            note_body = clean_text(assigned_set.get('body') or "")
+                            if note_body:
+                                output_lines.append(f"\t{note_body}")
+                        else:
+                            output_lines.append(f"{assigned_set['display_label']}")
+                # Mark as skipped
+                output_lines.append("(skipped)")
+
+            # Priority 4: Workout completed, no actual_sets, not missed = completed as prescribed
+            else:
+                # Output prescribed sets only (no parentheses = completed as prescribed)
+                if 'assigned_sets' in exercise:
+                    for assigned_set in exercise['assigned_sets']:
+                        # Custom formatter for time-based sets
+                        if (assigned_set.get('time', 0) > 0 and
+                            (assigned_set.get('reps') is None or assigned_set.get('reps', 0) == 0) and
+                            assigned_set.get('weight_type') in ['bodyweight', 'RPE']):
+                            sets = assigned_set.get('sets', 1)
+                            formatted_time = format_time(assigned_set.get('time'))
+                            if formatted_time:
+                                if assigned_set.get('weight_type') == 'RPE' and assigned_set.get('weight_type_value'):
+                                    rpe_val = assigned_set['weight_type_value']
+                                    display = f"{sets} x {formatted_time} @ RPE {rpe_val}"
+                                else:
+                                    display = f"{sets} x {formatted_time}"
+                                output_lines.append(f"{display}")
+                            else:
+                                output_lines.append(f"{assigned_set['display_label']}")
+                        elif assigned_set.get('set_type') == 'custom':
+                            note_body = clean_text(assigned_set.get('body') or "")
+                            if note_body:
+                                output_lines.append(f"\t{note_body}")
+                        else:
+                            output_lines.append(f"{assigned_set['display_label']}")
 
             if 'comments' in exercise and exercise['comments']:
                  output_lines.append("")

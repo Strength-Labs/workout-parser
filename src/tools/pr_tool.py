@@ -51,7 +51,14 @@ def process_workout_history(workouts, start_date=None, end_date=None):
         is_completed = workout.get("completed", False)  # Check if workout is completed
 
         for exercise in workout.get("assigned_exercises", []):
-            # Skip exercises that were marked as missed/skipped
+            # BULLETPROOF COMPLETION LOGIC FOR 1RM CALCULATIONS
+            # Only calculate 1RM from exercises that were actually performed
+            # Priority 1: Check if exercise was explicitly marked as missed
+            # Priority 2: Check if actual_sets data exists (use this for 1RM)
+            # Priority 3: Check if workout not completed and no actual_sets (skip)
+            # Priority 4: Workout completed, no actual_sets, not missed (completed as prescribed - skip for 1RM since we need actual data)
+
+            # Priority 1: Skip exercises that were marked as missed/skipped
             if exercise.get("missed", False):
                 continue
 
@@ -62,7 +69,9 @@ def process_workout_history(workouts, start_date=None, end_date=None):
                     has_any_actual_sets = True
                     break
 
-            # Skip exercises with no actual_sets (they were skipped)
+            # Priority 2: Only process exercises with actual_sets data
+            # Priority 3 & 4: Skip exercises without actual_sets (whether skipped or completed as prescribed)
+            # We can only calculate 1RM from actual performance data, not prescribed sets
             if not has_any_actual_sets:
                 continue
 
@@ -85,7 +94,6 @@ def process_workout_history(workouts, start_date=None, end_date=None):
                                 'e1rm': estimated_1rm, 'weight': weight, 'reps': reps,
                                 'unit': workout.get("weight_type", "lbs"), 'date': workout.get("workout_date")
                             }
-                # No fallback - if no actual_sets, exercise was skipped
 
     return best_performances
 
