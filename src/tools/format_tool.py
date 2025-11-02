@@ -172,8 +172,16 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
         for exercise in workout.get('assigned_exercises', []):
             output_lines.append(f"{exercise['exercise']['name']}")
 
-            # Check if exercise was marked as missed/skipped
-            if exercise.get('missed', False):
+            # Check if exercise has ANY actual_sets
+            has_any_actual_sets = False
+            if 'assigned_sets' in exercise:
+                for assigned_set in exercise['assigned_sets']:
+                    if assigned_set.get('actual_sets') and len(assigned_set.get('actual_sets', [])) > 0:
+                        has_any_actual_sets = True
+                        break
+
+            # Check if exercise was marked as missed/skipped OR has no actual_sets
+            if exercise.get('missed', False) or not has_any_actual_sets:
                 # Output prescribed sets first
                 if 'assigned_sets' in exercise:
                     for assigned_set in exercise['assigned_sets']:

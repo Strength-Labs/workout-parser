@@ -55,6 +55,17 @@ def process_workout_history(workouts, start_date=None, end_date=None):
             if exercise.get("missed", False):
                 continue
 
+            # Check if exercise has ANY actual_sets
+            has_any_actual_sets = False
+            for assigned_set in exercise.get("assigned_sets", []):
+                if assigned_set.get("actual_sets") and len(assigned_set.get("actual_sets", [])) > 0:
+                    has_any_actual_sets = True
+                    break
+
+            # Skip exercises with no actual_sets (they were skipped)
+            if not has_any_actual_sets:
+                continue
+
             lift_name = exercise.get("exercise", {}).get("name", "Unknown").lower()
             assigned_sets = exercise.get("assigned_sets", [])
 
@@ -62,7 +73,7 @@ def process_workout_history(workouts, start_date=None, end_date=None):
                 actual_sets = assigned_set.get("actual_sets", [])
 
                 if actual_sets:
-                    # Existing logic: Use actual_sets if present
+                    # Use actual_sets for 1RM calculation
                     for actual_set in actual_sets:
                         weight = float(actual_set.get("weight", 0) or 0)
                         reps = actual_set.get("reps")
@@ -74,18 +85,7 @@ def process_workout_history(workouts, start_date=None, end_date=None):
                                 'e1rm': estimated_1rm, 'weight': weight, 'reps': reps,
                                 'unit': workout.get("weight_type", "lbs"), 'date': workout.get("workout_date")
                             }
-                elif is_completed:
-                    # New fallback: Use assigned_set if workout completed and no actual_sets
-                    weight = float(assigned_set.get("weight", 0) or 0)
-                    reps = assigned_set.get("reps")
-                    if not reps or not weight:
-                        continue
-                    estimated_1rm = wendler_1rm(weight, reps)
-                    if lift_name not in best_performances or estimated_1rm > best_performances[lift_name]['e1rm']:
-                        best_performances[lift_name] = {
-                            'e1rm': estimated_1rm, 'weight': weight, 'reps': reps,
-                            'unit': workout.get("weight_type", "lbs"), 'date': workout.get("workout_date")
-                        }
+                # No fallback - if no actual_sets, exercise was skipped
 
     return best_performances
 

@@ -292,22 +292,21 @@ When workout data is generated from the API via `format_tool.py`, the lifter's a
 
 ##### Completion Status Rules
 
-The markup language uses three patterns to indicate exercise completion status:
+The markup language uses two patterns to indicate exercise completion status:
 
-1. **No Parenthetical Sets = Fully Completed**
+1. **Parenthetical Sets Present = Exercise Was Performed**
 
-   If an exercise has NO parenthetical entries, assume **all prescribed sets were completed exactly as written**.
+   If parenthetical sets `()` appear below the prescription, **ONLY those sets were actually performed**.
 
    ```
    Squat
-   3x5 @ 405
+   3x5 @ 405           // Prescribed 3 sets
+   (1x5 @ 405)         // Actually completed set 1
+   (1x5 @ 405)         // Actually completed set 2
+   (1x5 @ 405)         // Actually completed set 3
    ```
-   This means the lifter completed all 3 sets of 5 reps at 405 lbs as prescribed.
 
-2. **Parenthetical Sets Present = Partial or Modified Completion**
-
-   If parenthetical sets `()` appear below the prescription, **ONLY those sets were actually performed**. Any prescribed sets without a corresponding parenthetical entry were NOT done.
-
+   If the actual sets differ from prescription:
    ```
    Squat
    3x5 @ 405           // Prescribed 3 sets
@@ -316,7 +315,7 @@ The markup language uses three patterns to indicate exercise completion status:
    ```
    In this example, only 2 sets were attempted (the third set was not done), and the second set only achieved 4 reps instead of the prescribed 5.
 
-3. **`(skipped)` = Exercise Not Attempted**
+2. **`(skipped)` = Exercise Not Performed**
 
    If the notation `(skipped)` appears, the **entire exercise was not performed**.
 
@@ -325,14 +324,17 @@ The markup language uses three patterns to indicate exercise completion status:
    3x5 @ 225
    (skipped)
    ```
-   This explicitly marks that the exercise was intentionally or necessarily omitted from the workout.
+   This explicitly marks that the exercise was skipped, either intentionally or due to injury/time constraints.
+
+   **Important**: An exercise with NO parenthetical notation in downloaded workout history means it was skipped and will be marked as `(skipped)` by the formatter.
 
 ##### Accomplished Sets Examples
 
-**Example 1: All sets completed as prescribed (no parentheses needed)**
+**Example 1: All sets completed as prescribed**
 ```
 Deadlift
 1x5 @ 495
+(1x5 @ 495)
 ```
 
 **Example 2: Partial completion with modifications**
@@ -375,16 +377,18 @@ Curls
 
 When analyzing training history to inform workout design:
 
-- **No parentheses** = Perfect compliance, exercise went as planned
+- **Parenthetical sets present** = Exercise was performed (use this data for training analysis)
 - **Parenthetical sets with modifications** (weight changes, rep failures) = Adaptation or fatigue signals
 - **Fewer parenthetical sets than prescribed** = Incomplete workout (fatigue, time, or injury)
-- **`(skipped)` notation** = Exercise was intentionally omitted (injury, equipment, or time constraints)
+- **`(skipped)` notation** = Exercise was not performed (injury, equipment, or time constraints)
+- **No parenthetical notation** = Exercise was skipped (same as `(skipped)`)
 
 This completion tracking allows AI systems to:
 - Identify patterns of fatigue or overreaching (frequent rep failures)
 - Detect injury concerns (specific exercises consistently skipped or modified)
 - Assess program adherence (how often workouts are completed as prescribed)
 - Adjust future programming based on actual performance vs. prescription
+- **Only use exercises with parenthetical sets for estimating 1RMs and tracking progress**
 
 #### Comments and Notes
 
@@ -613,15 +617,16 @@ Squat
 
 ### Version History
 
-**v2.1 (2025-10-31)**
+**v2.1 (2025-11-01)**
 - **NEW:** Added `(skipped)` notation to explicitly mark exercises that were not performed
-- **NEW:** Documented completion status inference rules:
-  - No parentheses = all prescribed sets completed as written
-  - Parenthetical sets present = only those sets were performed
-  - `(skipped)` = entire exercise was not attempted
+- **BREAKING CHANGE:** Simplified completion status rules:
+  - Parenthetical sets present = exercise was performed
+  - `(skipped)` or no parentheses = exercise was not performed
+  - Removed assumption that "no parentheses = completed as prescribed"
+- **NEW:** Format tool now automatically marks exercises as `(skipped)` when they have no actual_sets data
+- **NEW:** PR tool skips exercises with no actual_sets from 1RM calculations
 - Added comprehensive examples for partial completion, rep failures, and exercise skipping
 - Added LLM-specific guidance for analyzing completion patterns in training history
-- Improved consistency in accomplished sets examples
 
 **v2.0 (2025-10-18)**
 - Added `?metric:` syntax for informational/tracking metrics (client reports data)
