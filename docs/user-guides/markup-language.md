@@ -292,7 +292,7 @@ When workout data is generated from the API via `format_tool.py`, the lifter's a
 
 ##### Completion Status Rules
 
-The markup language uses two patterns to indicate exercise completion status:
+The markup language uses two patterns to indicate exercise completion status for **past workouts** (dates on or before today):
 
 1. **Parenthetical Sets Present = Exercise Was Performed**
 
@@ -327,6 +327,27 @@ The markup language uses two patterns to indicate exercise completion status:
    This explicitly marks that the exercise was skipped, either intentionally or due to injury/time constraints.
 
    **Important**: An exercise with NO parenthetical notation in downloaded workout history means it was skipped and will be marked as `(skipped)` by the formatter.
+
+3. **Future Workouts (Not Yet Due)**
+
+   Workouts with dates after today are planned programming that has not yet been performed. These workouts include a special private coach note:
+
+   ```
+   Workout Date: 2025-11-05
+   	> Future workout (not yet completed)
+
+   Squat
+   3 x 5 @ 225 lbs
+
+   Press
+   3 x 5 @ 115 lbs
+   ```
+
+   **Important for LLMs/AI workout generation:**
+   - Workouts with `> Future workout (not yet completed)` show planned programming, not historical performance
+   - Do not treat these as evidence of completed work or performance trends
+   - Use them to understand programming context, periodization, and upcoming training phases
+   - Only past workouts (without this notation) represent actual training history
 
 ##### Accomplished Sets Examples
 
