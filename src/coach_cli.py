@@ -493,9 +493,10 @@ def delete_workouts_ui(token, client):
                 console.print(f"  • {workout['date']}: {workout['error']}")
         
         # Force refresh the workout cache since we deleted workouts
-        console.print("\n[dim]Refreshing workout cache...[/dim]")
-        get_workout_history_headless(token, client, force_refresh=True)
-        
+        with console.status("[bold green]Refreshing workout cache...", spinner="dots"):
+            get_workout_history_headless(token, client, force_refresh=True)
+        console.print("[bold green]✅ Cache refreshed successfully![/bold green]")
+
         console.input("\nPress Enter to continue...")
         return  # Exit after successful operation
 
