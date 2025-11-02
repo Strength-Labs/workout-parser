@@ -449,12 +449,32 @@ def run_ai_chat(token, user_id, client, exercise_map):
 
     # Load markup guide
     try:
-        markup_guide = read_text_file("markup.md")
+        # Try to load the official markup language guide
+        markup_guide_path = os.path.join(os.path.dirname(__file__), "..", "..", "docs", "user-guides", "markup-language.md")
+        markup_guide_path = os.path.abspath(markup_guide_path)
+        markup_guide = read_text_file(markup_guide_path)
     except FileNotFoundError:
         markup_guide = "Markup guide not found. Use standard workout formatting."
 
-    # system_prompt = f"You are an AI assistant for strength coaching. Use the following markup guide for workouts: {markup_guide}. The client's workout history is: {markup_content}"
-    system_prompt = f"You are an AI assistant for the user, who is a strength coach. Use the following markup guide for workouts: {markup_guide}. The user is coaching the client. Do not add nutrition workouts or metrics unless directed by the coach. The client's workout history is: {markup_content}"
+    # Strict system prompt emphasizing EXACT format compliance
+    system_prompt = f"""You are an AI assistant for the user, who is a strength coach.
+
+CRITICAL FORMAT REQUIREMENTS:
+1. ALL workout programming MUST follow the markup language format EXACTLY as specified below
+2. DO NOT deviate from the format - incorrect formatting will cause upload failures
+3. Use ONLY exercise names from the official catalog (stick to canonical names)
+4. Follow date format precisely: Workout Date: YYYY-MM-DD
+5. Use exact set notation: "3 x 5 @ 225 lbs" (NOT "3x5@225" or other variations)
+6. Do not add nutrition workouts or metrics unless explicitly directed by the coach
+7. When generating multiple workouts, maintain consistent formatting throughout
+
+MARKUP LANGUAGE SPECIFICATION:
+{markup_guide}
+
+CLIENT WORKOUT HISTORY:
+{markup_content}
+
+Your responses will be uploaded directly to the coaching platform. Format violations will break the upload process."""
     
     # Display token count estimate for context
     estimated_tokens = estimate_token_count(system_prompt)
