@@ -46,6 +46,13 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
 
         output_lines.append("")
 
+        # Check if this is a future workout (not yet due)
+        from datetime import date
+        today = date.today()
+        if workout_date.date() > today:
+            output_lines.append("> Future workout (not yet completed)")
+            output_lines.append("")
+
         # Add metrics for this workout date (from external metrics parameter)
         # These are from pending_metrics in upload, which may have is_prescriptive flag
         workout_date_str = workout['workout_date']
@@ -236,8 +243,8 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
                                 reps, weight, sets = actual_set.get('reps', ''), actual_set.get('weight', ''), actual_set.get('sets', '')
                                 output_lines.append(f"({sets}x{reps} @ {weight})")
 
-            # Priority 3: Workout not completed and no actual_sets = skipped
-            elif not workout.get('completed', False):
+            # Priority 3: Workout not completed and no actual_sets = skipped (only for past workouts)
+            elif not workout.get('completed', False) and workout_date.date() <= today:
                 # Output prescribed sets first
                 if 'assigned_sets' in exercise:
                     for assigned_set in exercise['assigned_sets']:
