@@ -4,7 +4,7 @@
 
 set -e
 
-VERSION="1.5.0"
+VERSION="1.6.0"
 OUTPUT_DIR="dist/app-with-icon"
 APP_NAME="TurnkeyCoachTools"
 
@@ -13,9 +13,10 @@ echo "===================================================="
 echo "Version: $VERSION"
 echo ""
 
-# Ensure we're in the right directory
+# Ensure we're in the project root directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+cd "$PROJECT_ROOT"
 
 # Check if we have the one-file executable
 ONEFILE_EXEC="dist/onefile/turnkey-coach"
@@ -138,7 +139,7 @@ cat > "$CONTENTS_DIR/Info.plist" << 'EOF'
     <key>CFBundlePackageType</key>
     <string>APPL</string>
 <key>CFBundleShortVersionString</key>
-    <string>1.5.0</string>
+    <string>1.6.0</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>LSMinimumSystemVersion</key>
@@ -190,7 +191,7 @@ echo "✅ App bundle created with custom icon"
 chmod -R 755 "$APP_BUNDLE"
 chmod +x "$MACOS_DIR/TurnkeyCoachTools"
 chmod +x "$MACOS_DIR/turnkey-coach-executable"
-xattr -cr "$APP_BUNDLE"
+xattr -c "$APP_BUNDLE" 2>/dev/null || true
 
 # Test the app bundle
 echo ""

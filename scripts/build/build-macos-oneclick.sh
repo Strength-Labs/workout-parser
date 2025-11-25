@@ -4,7 +4,7 @@
 
 set -e
 
-VERSION="1.5.0"
+VERSION="1.6.0"
 OUTPUT_DIR="dist/macos-oneclick"
 APP_NAME="TurnkeyCoachTools"
 BUNDLE_ID="com.karlschudt.turnkey-coach-tools"
@@ -54,7 +54,7 @@ cat > "$CONTENTS_DIR/Info.plist" << 'EOF'
     <key>CFBundlePackageType</key>
     <string>APPL</string>
 <key>CFBundleShortVersionString</key>
-    <string>1.5.0</string>
+    <string>1.6.0</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>LSMinimumSystemVersion</key>

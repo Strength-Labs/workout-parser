@@ -4,7 +4,7 @@
 
 set -e
 
-VERSION="1.5.0"
+VERSION="1.6.0"
 OUTPUT_DIR="dist/onefile"
 EXECUTABLE_NAME="turnkey-coach"
 
@@ -36,9 +36,10 @@ else
 fi
 echo ""
 
-# Ensure we're in the right directory
+# Ensure we're in the project root directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+cd "$PROJECT_ROOT"
 
 # Check for custom icon
 if [ -f "assets/app-icon.icns" ]; then
@@ -124,7 +125,7 @@ pyinstaller \
     --hidden-import cryptography \
     --hidden-import openai \
     --hidden-import httpx \
-    coach_cli.py
+    src/coach_cli.py
 
 # Check if build succeeded
 if [ -f "dist/$EXECUTABLE_NAME" ]; then
