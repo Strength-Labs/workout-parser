@@ -98,21 +98,21 @@ pyinstaller \
     --console \
     $ICON_OPTION \
     $ADD_DATA_OPTIONS \
-    --hidden-import api_client \
-    --hidden-import settings \
-    --hidden-import directory_migration \
-    --hidden-import encoding_utils \
-    --hidden-import feed_tool \
-    --hidden-import pr_tool \
-    --hidden-import actual_prs_tool \
-    --hidden-import format_tool \
-    --hidden-import upload_tool \
-    --hidden-import ai_chat_tool \
-    --hidden-import bulk_sync \
-    --hidden-import display_utils \
-    --hidden-import workspace_manager \
-    --hidden-import workspace_setup \
-    --hidden-import metrics_tool \
+    --hidden-import src.api_client \
+    --hidden-import src.settings \
+    --hidden-import src.directory_migration \
+    --hidden-import src.encoding_utils \
+    --hidden-import src.tools.feed_tool \
+    --hidden-import src.tools.pr_tool \
+    --hidden-import src.tools.actual_prs_tool \
+    --hidden-import src.tools.format_tool \
+    --hidden-import src.tools.upload_tool \
+    --hidden-import src.tools.ai_chat_tool \
+    --hidden-import src.bulk_sync \
+    --hidden-import src.display_utils \
+    --hidden-import src.workspace_manager \
+    --hidden-import src.workspace_setup \
+    --hidden-import src.tools.metrics_tool \
     --hidden-import rich.console \
     --hidden-import rich.panel \
     --hidden-import rich.table \
