@@ -413,6 +413,14 @@ def main():
     report = generate_report(all_stats)
     print(report)
 
+    # Auto-save to triage-reports directory
+    reports_dir = os.path.expanduser("~/Turnkey-barbell-logic/triage-reports")
+    os.makedirs(reports_dir, exist_ok=True)
+    report_path = os.path.join(reports_dir, f"{date.today().isoformat()}.md")
+    with open(report_path, "w") as f:
+        f.write(report)
+    print(f"Report saved to {report_path}", file=sys.stderr)
+
 
 if __name__ == "__main__":
     main()
