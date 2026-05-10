@@ -3,7 +3,7 @@ import os
 import json
 from typing import Dict, Iterable, List, Tuple
 import requests
-from src.api_client import API_BASE_URL, console, get_exercise_id, get_exercise_type, fetch_metric_catalog
+from src.api_client import API_BASE_URL, console, get_exercise_id, get_exercise_type, fetch_metric_catalog, load_exercise_group_map
 from src.encoding_utils import read_text_file
 
 try:
@@ -400,12 +400,15 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
         if len(lines) > 1:
             potential_title = lines[1].strip()
             # Title line must not be an exercise, a set prescription, or a metric (@ or ?)
-            if potential_title and get_exercise_id(exercise_map, potential_title) is None and not re.match(r"^\d+\s*x", potential_title) and not potential_title.startswith('@') and not potential_title.startswith('?'):
+            if potential_title and get_exercise_id(exercise_map, potential_title) is None and not re.match(r"^\d+\s*x", potential_title) and not potential_title.startswith('@') and not potential_title.startswith('?') and not potential_title.lower().startswith('group:'):
                 workout["title"] = potential_title
                 start_line_index = 2
 
         current_exercise = None
+        current_exercise_is_group = False
+        current_exercise_group_members = []  # lowercase member names for skip detection
         current_metric = None  # Track current metric to collect indented notes
+        exercise_group_map = None  # lazy-loaded on first Group: line
         kg_detected = False
         for line in lines[start_line_index:]:
             stripped_line = line.strip()
@@ -441,6 +444,31 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
                     console.print(f"[cyan]Found prescriptive metric:[/cyan] {symbol}{parsed_metric['metric_type']} = {parsed_metric['value']} {parsed_metric['unit']}")
                 continue
 
+            # Check if line is a Group: header
+            if stripped_line.lower().startswith('group:'):
+                group_name = stripped_line[6:].strip()
+                if exercise_group_map is None:
+                    exercise_group_map = load_exercise_group_map()
+                if exercise_group_map is None:
+                    console.print(f"[red]Error: Cannot resolve group '{group_name}' — run 'Update Exercise Group List' first.[/red]")
+                    continue
+                group_entry = exercise_group_map.get(group_name.lower())
+                if not group_entry:
+                    console.print(f"[red]Error: Group '{group_name}' not found in exercise group list. Check spelling or run 'Update Exercise Group List'.[/red]")
+                    continue
+                if current_exercise:
+                    workout["assigned_exercises"].append(current_exercise)
+                current_exercise = {
+                    "exercise_group_id": group_entry['id'],
+                    "priority": len(workout["assigned_exercises"]),
+                    "assigned_sets": []
+                }
+                current_exercise_is_group = True
+                current_exercise_group_members = [n.lower() for n in group_entry.get('exercises', [])]
+                current_metric = None
+                console.print(f"[cyan]Found group:[/cyan] {group_name} (ID: {group_entry['id']})")
+                continue
+
             is_indented = len(line) > len(line.lstrip())
 
             if is_indented:
@@ -457,6 +485,9 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
                     else:
                         current_metric["notes"] = stripped_line
                 elif current_exercise:
+                    # Skip group member display lines (rendered in markup but not sent to API)
+                    if current_exercise_is_group and stripped_line.lower() in current_exercise_group_members:
+                        continue
                     # Add indented note to current exercise (existing behavior)
                     note_set = {
                         "set_type": "custom", "body": stripped_line, "priority": len(current_exercise["assigned_sets"]),
@@ -489,6 +520,8 @@ def parse_workouts_from_file(plain_text_path: str, user_id: int, exercise_map: d
 
                 if current_exercise: workout["assigned_exercises"].append(current_exercise)
                 current_exercise = {"exercise_id": exercise_id, "priority": len(workout["assigned_exercises"]), "assigned_sets": []}
+                current_exercise_is_group = False
+                current_exercise_group_members = []
                 current_metric = None  # Clear current metric when starting a new exercise
                 continue
 
