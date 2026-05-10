@@ -23,6 +23,9 @@ def get_token_cache_file():
 def get_exercise_list_file():
     return os.path.join(get_shared_dir(), 'exerciselist.json')
 
+def get_exercise_group_list_file():
+    return os.path.join(get_shared_dir(), 'exercisegrouplist.json')
+
 # --- Shared Helper Functions ---
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -94,6 +97,48 @@ def update_exercise_list(token):
             console.print(f"❌ [red]Error fetching exercises: {e}[/red]")
             return False
 
+
+def load_exercise_group_map():
+    """Loads exercisegrouplist.json and creates a name-to-group mapping.
+
+    Returns dict: {group_name_lower: {'id': id, 'exercises': [name, ...]}}
+    """
+    try:
+        filepath = get_exercise_group_list_file()
+        groups = safe_json_load(filepath)
+        if groups is None:
+            raise FileNotFoundError()
+        return {
+            g['name'].lower(): {
+                'id': g['id'],
+                'exercises': [ex['name'] for ex in (g.get('exercises') or [])]
+            }
+            for g in groups
+        }
+    except FileNotFoundError:
+        console.print("[bold red]Error: `exercisegrouplist.json` not found. Run Update Exercise Group List first.[/bold red]")
+        return None
+    except Exception as e:
+        console.print(f"[bold red]Error loading exercise group list: {e}[/bold red]")
+        return None
+
+def update_exercise_group_list(token):
+    """Fetches the latest exercise group list from the API and saves it to exercisegrouplist.json."""
+    url = f"{API_BASE_URL}/api/v1/exercise_groups"
+    headers = {"Authorization": f"Bearer {token}"}
+    filepath = get_exercise_group_list_file()
+
+    with console.status("[bold green]Downloading latest exercise group list...[/bold green]"):
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            groups = response.json()
+            safe_json_dump(groups, filepath)
+            console.print(f"✅ [green]Successfully saved {len(groups)} exercise groups to {filepath}[/green]")
+            return True
+        except requests.exceptions.RequestException as e:
+            console.print(f"❌ [red]Error fetching exercise groups: {e}[/red]")
+            return False
 
 def fetch_metric_catalog(token):
     """Retrieve the global list of available metric definitions."""

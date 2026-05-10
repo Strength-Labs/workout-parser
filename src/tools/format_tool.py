@@ -177,7 +177,16 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
             output_lines.append("")
 
         for exercise in workout.get('assigned_exercises', []):
-            output_lines.append(f"{exercise['exercise']['name']}")
+            is_group = bool(exercise.get('exercise_group_id'))
+            if is_group:
+                group = exercise.get('exercise_group') or {}
+                output_lines.append(f"Group: {group.get('name', 'Unknown Group')}")
+                for member in (group.get('exercises') or []):
+                    output_lines.append(f"    {member['name']}")
+                if exercise.get('exercise'):
+                    output_lines.append(f"(picked: {exercise['exercise']['name']})")
+            else:
+                output_lines.append(f"{exercise['exercise']['name']}")
 
             # BULLETPROOF COMPLETION LOGIC (Priority Order):
             # Priority 1: Check if exercise was explicitly marked as missed

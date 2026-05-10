@@ -260,6 +260,73 @@ Nutrition items typically have instructions rather than sets/reps. Use indented 
 > ```
 > Using `Workout Date:` or adding set prescriptions will cause the uploader to drop the nutrition items.
 
+#### Exercise Groups (Pick-One Families)
+
+An **exercise group** (also called an exercise family) is a coach-built bundle of exercises from which the client picks one per session. Use a `Group:` block when you want the client to choose between several movement options.
+
+**Syntax:**
+
+```
+Group: <group name>
+    <member exercise 1>
+    <member exercise 2>
+    <member exercise 3>
+<prescribed sets line>
+    <optional notes>
+```
+
+**Rules:**
+- `Group:` must be unindented (same level as a regular exercise name)
+- The group name must **exactly match** a group in the coach's exercise group catalog (same casing, same spacing). If the name is not found, the uploader will error.
+- Indented lines directly after `Group:` are member exercise names — they are displayed for reference but are **not sent to the API separately**. You do not need to list members when writing new workouts (the group already exists in TKC); listing them is optional but helpful for readability.
+- The prescribed sets line follows the same format as a regular exercise (weight-based, RPE-based, time-based, etc.)
+- Notes work the same as for regular exercises (indented lines after the sets line)
+
+**Upload example (coach writes):**
+
+```
+Workout Date: 2026-05-10
+Lower Body Day
+
+Group: Horizontal Push
+    Floor Press 1.5
+    Tempo Floor Press
+    Crush Press
+3 x 8 @ 25 lbs
+    Pick the variation that matches your equipment today.
+```
+
+**Minimal form (members omitted — also valid):**
+
+```
+Workout Date: 2026-05-10
+
+Group: Horizontal Push
+3 x 8 @ 25 lbs
+```
+
+**Downloaded form (after client picks):**
+
+When workout history is downloaded, groups render in full with the client's pick shown in parentheses:
+
+```
+Group: Horizontal Push
+    Floor Press 1.5
+    Tempo Floor Press
+    Crush Press
+(picked: Crush Press)
+3 x 8 @ 25 lbs
+(1x8 @ 25)
+(1x8 @ 25)
+(1x8 @ 25)
+```
+
+The `(picked: X)` line is ignored on re-upload, just like accomplished sets.
+
+> **LLM Hint:** To assign an exercise group, use `Group: <exact group name>` followed by the sets line. Do **not** use the regular exercise name format for groups — using the exercise name alone assigns a single specific exercise, not a group pick. Only use group names that exist in the coach's TKC exercise group catalog. If unsure, list the group name and note that the coach should verify it matches their catalog exactly.
+
+> **Important for LLMs analyzing history:** A `Group:` block with `(picked: X)` means the client already selected exercise X for that session. Treat the picked exercise as the actual movement performed. The group members listed above are the available options, not additional exercises in the workout.
+
 #### Prescribed Sets
 
 The prescribed number of sets, reps, weight, time, or distance are represented on a single, unindented line following the exercise name.
@@ -637,6 +704,12 @@ Squat
 ---
 
 ### Version History
+
+**v2.2 (2026-05-09)**
+- **NEW:** Added `Group:` block syntax for exercise group (exercise family) assignments
+- Groups render in downloaded history with all member options listed and `(picked: X)` when client has selected
+- Uploader resolves group name against local exercise group catalog (`exercisegrouplist.json`) — group must exist in TKC
+- Added LLM guidance for generating and interpreting group blocks
 
 **v2.1 (2025-11-01)**
 - **NEW:** Added `(skipped)` notation to explicitly mark exercises that were not performed
