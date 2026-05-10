@@ -213,11 +213,11 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
                 if 'assigned_sets' in exercise:
                     for assigned_set in exercise['assigned_sets']:
                         # Custom formatter for time-based sets (override API's raw display_label)
-                        if (assigned_set.get('time', 0) > 0 and
-                            (assigned_set.get('reps') is None or assigned_set.get('reps', 0) == 0) and
+                        if ((assigned_set.get('time') or 0) > 0 and
+                            (assigned_set.get('reps') is None or (assigned_set.get('reps') or 0) == 0) and
                             assigned_set.get('weight_type') in ['bodyweight', 'RPE']):
                             # Time-based: e.g., "10 x 00:10 @ RPE 10"
-                            sets = assigned_set.get('sets', 1)
+                            sets = assigned_set.get('sets') or 1
                             formatted_time = format_time(assigned_set.get('time'))
                             if formatted_time:
                                 if assigned_set.get('weight_type') == 'RPE' and assigned_set.get('weight_type_value'):
@@ -240,7 +240,7 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
                         # Output actual performance data in parentheses
                         if 'actual_sets' in assigned_set and assigned_set['actual_sets']:
                             for actual_set in assigned_set['actual_sets']:
-                                reps, weight, sets = actual_set.get('reps', ''), actual_set.get('weight', ''), actual_set.get('sets', '')
+                                reps, weight, sets = (actual_set.get('reps') or ''), (actual_set.get('weight') or ''), (actual_set.get('sets') or '')
                                 output_lines.append(f"({sets}x{reps} @ {weight})")
 
             # Priority 3: Workout not completed and no actual_sets = skipped (only for past workouts)
@@ -263,10 +263,10 @@ def format_workouts_to_markup(workouts, coach_user_id, metrics=None):
                 if 'assigned_sets' in exercise:
                     for assigned_set in exercise['assigned_sets']:
                         # Custom formatter for time-based sets
-                        if (assigned_set.get('time', 0) > 0 and
-                            (assigned_set.get('reps') is None or assigned_set.get('reps', 0) == 0) and
+                        if ((assigned_set.get('time') or 0) > 0 and
+                            (assigned_set.get('reps') is None or (assigned_set.get('reps') or 0) == 0) and
                             assigned_set.get('weight_type') in ['bodyweight', 'RPE']):
-                            sets = assigned_set.get('sets', 1)
+                            sets = assigned_set.get('sets') or 1
                             formatted_time = format_time(assigned_set.get('time'))
                             if formatted_time:
                                 if assigned_set.get('weight_type') == 'RPE' and assigned_set.get('weight_type_value'):
