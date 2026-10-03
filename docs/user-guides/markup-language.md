@@ -15,6 +15,35 @@ The Strength Coaching Markup Language provides a human-readable plain text forma
 
 Keep the reference lists from the Turnkey Coach app or internal guides nearby when drafting plans, and copy the entries verbatim—including spacing and capitalization.
 
+#### Input Format Flexibility
+
+The parser is flexible with formatting and whitespace:
+
+* **Set/Rep Line Indentation**: Indentation has no effect on parsing. You can indent prescribed sets and reps (like `    3x5 @ 405`) or leave them unindented (like `3x5 @ 405`). Both formats parse identically. This allows for flexible formatting to match personal style or existing documents.
+
+* **Break Lines (Separators)**: Lines consisting only of `---` are ignored by the parser. Use these as visual dividers between workouts or sections. They have no semantic meaning and are purely for readability.
+
+**Example with flexible indentation and break lines:**
+
+```markdown
+Workout Date: 2025-10-18
+Squat
+    3x5 @ 405
+        Deep and controlled
+
+Bench Press
+3x5 @ 225
+    Slow eccentric
+
+---
+
+Workout Date: 2025-10-19
+    Deadlift
+    1x5 @ 495
+```
+
+In this example, the indented Squat prescription, non-indented Bench Press prescription, and the `---` separator all parse identically to their non-indented, no-break-line equivalents. The parser extracts the core content regardless of formatting.
+
 #### Assignment Types
 
 The markup language supports two types of assignments:
