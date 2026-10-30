@@ -15,35 +15,6 @@ The Strength Coaching Markup Language provides a human-readable plain text forma
 
 Keep the reference lists from the Turnkey Coach app or internal guides nearby when drafting plans, and copy the entries verbatim—including spacing and capitalization.
 
-#### Input Format Flexibility
-
-The parser is flexible with formatting and whitespace:
-
-* **Set/Rep Line Indentation**: Indentation has no effect on parsing. You can indent prescribed sets and reps (like `    3x5 @ 405`) or leave them unindented (like `3x5 @ 405`). Both formats parse identically. This allows for flexible formatting to match personal style or existing documents.
-
-* **Break Lines (Separators)**: Lines consisting only of `---` are ignored by the parser. Use these as visual dividers between workouts or sections. They have no semantic meaning and are purely for readability.
-
-**Example with flexible indentation and break lines:**
-
-```markdown
-Workout Date: 2025-10-18
-Squat
-    3x5 @ 405
-        Deep and controlled
-
-Bench Press
-3x5 @ 225
-    Slow eccentric
-
----
-
-Workout Date: 2025-10-19
-    Deadlift
-    1x5 @ 495
-```
-
-In this example, the indented Squat prescription, non-indented Bench Press prescription, and the `---` separator all parse identically to their non-indented, no-break-line equivalents. The parser extracts the core content regardless of formatting.
-
 #### Assignment Types
 
 The markup language supports two types of assignments:
@@ -293,6 +264,14 @@ Nutrition items typically have instructions rather than sets/reps. Use indented 
 
 The prescribed number of sets, reps, weight, time, or distance are represented on a single, unindented line following the exercise name.
 
+> **Indentation matters.** Exercise names and set lines must start at the left edge. The parser treats any indented line as a note. An indented `3x5 @ 405` is saved as a text note, not a set. An indented exercise name becomes a note on the exercise above it, or is skipped with a warning if there is no exercise above it.
+>
+> ```
+> Squat
+> 3x5 @ 405          <- a set
+>     3x5 @ 405      <- a note that reads "3x5 @ 405"
+> ```
+
 **Resistance Training Formats:**
 
 * **Weight-Based:** `[sets] x [reps] @ [weight]`
@@ -465,7 +444,7 @@ This completion tracking allows AI systems to:
 
 #### Separators
 
-Each individual workout block (representing a single day) should be separated by a horizontal rule `---`. The parser ignores this line.
+Each individual workout block (representing a single day) should be separated by a horizontal rule `---`. The parser skips any line that is only `---` (spaces around it are fine), wherever it appears, so you can also use it to break up a long day. It is never needed: a new `Workout Date:` or `Nutrition Date:` line starts a new block on its own.
 
 ---
 
