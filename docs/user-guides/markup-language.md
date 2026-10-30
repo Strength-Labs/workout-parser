@@ -264,6 +264,14 @@ Nutrition items typically have instructions rather than sets/reps. Use indented 
 
 The prescribed number of sets, reps, weight, time, or distance are represented on a single, unindented line following the exercise name.
 
+> **Indentation matters.** Exercise names and set lines must start at the left edge. The parser treats any indented line as a note. An indented `3x5 @ 405` is saved as a text note, not a set. An indented exercise name becomes a note on the exercise above it, or is skipped with a warning if there is no exercise above it.
+>
+> ```
+> Squat
+> 3x5 @ 405          <- a set
+>     3x5 @ 405      <- a note that reads "3x5 @ 405"
+> ```
+
 **Resistance Training Formats:**
 
 * **Weight-Based:** `[sets] x [reps] @ [weight]`
@@ -436,7 +444,7 @@ This completion tracking allows AI systems to:
 
 #### Separators
 
-Each individual workout block (representing a single day) should be separated by a horizontal rule `---`. The parser ignores this line.
+Each individual workout block (representing a single day) should be separated by a horizontal rule `---`. The parser skips any line that is only `---` (spaces around it are fine), wherever it appears, so you can also use it to break up a long day. It is never needed: a new `Workout Date:` or `Nutrition Date:` line starts a new block on its own.
 
 ---
 
